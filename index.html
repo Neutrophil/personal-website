@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Junjie Chen — Research Scientist · Genomics + Machine Learning</title>
+  <meta name="description" content="Junjie Chen — Research Scientist II at Lucence Diagnostics. PhD molecular biologist and immunologist bridging clinical genomics, bioinformatics and machine learning, building toward AI for Life Science." />
+  <meta name="author" content="Junjie Chen" />
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Junjie Chen — Genomics + Machine Learning" />
+  <meta property="og:description" content="Bridging molecular biology and computation — building toward AI for Life Science." />
+  <meta property="og:url" content="https://neutrophil.github.io/" />
+
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="stylesheet" href="css/styles.css" />
+
+  <!-- Set theme before paint to avoid flash of wrong theme -->
+  <script>
+    (function () {
+      try {
+        var stored = localStorage.getItem('theme');
+        var theme = stored || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+        document.documentElement.setAttribute('data-theme', theme);
+      } catch (e) {}
+    })();
+  </script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <!-- ============ NAV ============ -->
+  <header class="nav" id="top">
+    <div class="container nav__inner">
+      <a class="nav__brand" href="#top" aria-label="Junjie Chen — home">
+        <span class="nav__monogram">JC</span>
+        <span class="nav__name">Junjie Chen</span>
+      </a>
+
+      <nav class="nav__links" id="nav-links" aria-label="Primary">
+        <a href="#about">About</a>
+        <a href="#expertise">Expertise</a>
+        <a href="#experience">Experience</a>
+        <a href="#projects">Projects</a>
+        <a href="#publications">Publications</a>
+        <a href="blog.html">Blog</a>
+        <a href="#contact">Contact</a>
+      </nav>
+
+      <div class="nav__actions">
+        <a class="btn btn--small btn--primary nav__cv" href="assets/cv/CHEN_Junjie_CV.pdf" target="_blank" rel="noopener">Download CV</a>
+        <button class="theme-toggle" id="theme-toggle" type="button" aria-label="Toggle dark mode" title="Toggle dark mode">
+          <svg class="icon-sun" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"></path></svg>
+          <svg class="icon-moon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+        </button>
+        <button class="nav__burger" id="nav-burger" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="nav-links">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main id="main">
+
+    <!-- ============ HERO ============ -->
+    <section class="hero">
+      <div class="container">
+        <p class="hero__eyebrow reveal">Research Scientist · Singapore</p>
+        <h1 class="hero__title reveal">Junjie Chen</h1>
+        <p class="hero__role reveal">Genomics&nbsp;+&nbsp;Machine&nbsp;Learning</p>
+        <p class="hero__lede reveal">
+          A molecular biologist and immunologist by training, now developing whole-genome
+          sequencing workflows and machine-learning models for cancer detection at
+          <strong>Lucence Diagnostics</strong>. I work at the interface of wet-lab biology and
+          computation — building toward <strong>AI for Life Science</strong>.
+        </p>
+        <div class="hero__cta reveal">
+          <a class="btn btn--primary" href="#contact">Get in touch</a>
+          <a class="btn btn--ghost" href="assets/cv/CHEN_Junjie_CV.pdf" target="_blank" rel="noopener">Download CV</a>
+        </div>
+        <div class="hero__links reveal" aria-label="Profiles">
+          <a href="https://www.linkedin.com/in/junjie-chen-nus/" target="_blank" rel="noopener">LinkedIn</a>
+          <span aria-hidden="true">·</span>
+          <a href="https://github.com/Neutrophil" target="_blank" rel="noopener">GitHub</a>
+          <span aria-hidden="true">·</span>
+          <a href="mailto:chen_junjie@outlook.com">chen_junjie@outlook.com</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ ABOUT ============ -->
+    <section class="section" id="about">
+      <div class="container">
+        <h2 class="section__title reveal"><span class="section__num">01</span> About</h2>
+        <div class="about__grid">
+          <div class="about__body reveal">
+            <p>
+              I am a <strong>Research Scientist II at Lucence Diagnostics</strong>, where I develop
+              whole-genome sequencing (WGS) workflows across <strong>cfDNA, gDNA and FFPE-DNA</strong>
+              and build the bioinformatics behind them. My work spans pipeline development,
+              training <strong>machine-learning models for cancer differentiation and
+              classification</strong>, and <strong>multi-omics integration</strong> to turn
+              sequencing data into clinically meaningful signal.
+            </p>
+            <p>
+              That computational work rests on a decade in the lab. I earned my
+              <strong>PhD in Microbiology &amp; Immunology at NUS</strong>, studying the proteomics
+              and protein networks of the nucleolus, and spent years optimizing molecular assays
+              (PCR, NGS, FISH, HLA typing) and engineering cell-based cancer immunotherapies —
+              peptide-adjuvant vaccines and artificial-APC TCR-T cells.
+            </p>
+            <p>
+              I am drawn to the place where biology and algorithms meet. My goal is to work in
+              <strong>AI for Life Science</strong> — applying modern machine learning to genomics
+              and multi-omics, grounded in a real understanding of the underlying biology and the
+              assays that generate the data.
+            </p>
+          </div>
+          <aside class="about__facts reveal" aria-label="At a glance">
+            <h3>At a glance</h3>
+            <ul>
+              <li><span>Now</span> Research Scientist II, Lucence Diagnostics</li>
+              <li><span>Focus</span> WGS bioinformatics · ML · multi-omics</li>
+              <li><span>Training</span> PhD, Microbiology &amp; Immunology (NUS)</li>
+              <li><span>Foundation</span> B.Eng, Chemical &amp; Biomolecular Eng. (NUS)</li>
+              <li><span>Based</span> Singapore</li>
+              <li><span>Languages</span> English · Mandarin</li>
+            </ul>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ EXPERTISE ============ -->
+    <section class="section section--alt" id="expertise">
+      <div class="container">
+        <h2 class="section__title reveal"><span class="section__num">02</span> Expertise</h2>
+        <p class="section__lede reveal">
+          A rare combination of computational and wet-lab depth — equally at home writing a
+          variant-calling pipeline and running the assay that produced the reads.
+        </p>
+        <div class="cards">
+          <article class="card reveal">
+            <h3 class="card__title">Computational &amp; ML</h3>
+            <ul class="tags">
+              <li>Python</li>
+              <li>Bioinformatics pipelines</li>
+              <li>ML model training</li>
+              <li>Cancer classification</li>
+              <li>Multi-omics integration</li>
+              <li>R</li>
+              <li>MATLAB</li>
+              <li>Data visualization</li>
+            </ul>
+          </article>
+          <article class="card reveal">
+            <h3 class="card__title">Genomics &amp; NGS</h3>
+            <ul class="tags">
+              <li>cfDNA WGS</li>
+              <li>gDNA WGS</li>
+              <li>FFPE-DNA WGS</li>
+              <li>NGS library prep</li>
+              <li>Variant &amp; assay analysis</li>
+              <li>PCR / qPCR</li>
+              <li>HLA typing</li>
+              <li>FISH</li>
+            </ul>
+          </article>
+          <article class="card reveal">
+            <h3 class="card__title">Molecular &amp; Cell Biology</h3>
+            <ul class="tags">
+              <li>Proteomics &amp; PPI</li>
+              <li>Mass spectrometry</li>
+              <li>CRISPR / siRNA / shRNA</li>
+              <li>Cancer vaccines</li>
+              <li>TCR-T &amp; cell therapy</li>
+              <li>Stable cell lines</li>
+              <li>Flow cytometry</li>
+              <li>Confocal microscopy</li>
+            </ul>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ EXPERIENCE ============ -->
+    <section class="section" id="experience">
+      <div class="container">
+        <h2 class="section__title reveal"><span class="section__num">03</span> Experience</h2>
+        <ol class="timeline">
+          <li class="timeline__item reveal">
+            <div class="timeline__meta">
+              <span class="timeline__date">Current</span>
+            </div>
+            <div class="timeline__body">
+              <h3>Research Scientist II</h3>
+              <p class="timeline__org">Lucence Diagnostics · Singapore</p>
+              <ul>
+                <li>Develop WGS workflows across cfDNA, gDNA and FFPE-DNA, and the bioinformatics pipelines that process them.</li>
+                <li>Train machine-learning models for cancer differentiation and classification.</li>
+                <li>Lead multi-omics integration to strengthen clinical signal from sequencing data.</li>
+              </ul>
+            </div>
+          </li>
+          <li class="timeline__item reveal">
+            <div class="timeline__meta">
+              <span class="timeline__date">2022 – 2024</span>
+            </div>
+            <div class="timeline__body">
+              <h3>Research Fellow</h3>
+              <p class="timeline__org">Immunology Translational Research Programme, NUS</p>
+              <ul>
+                <li>Developed and optimized molecular assays (PCR, NGS, FISH, HLA typing).</li>
+                <li>Engineered protein- and peptide-adjuvant therapeutics for cancer vaccines, and artificial-APC TCR-T cell therapies using human PBMCs.</li>
+                <li>Led cross-institution projects; supervised five PhD and four undergraduate students.</li>
+              </ul>
+            </div>
+          </li>
+          <li class="timeline__item reveal">
+            <div class="timeline__meta">
+              <span class="timeline__date">2014 – 2022</span>
+            </div>
+            <div class="timeline__body">
+              <h3>Research Assistant</h3>
+              <p class="timeline__org">Immunology Translational Research Programme, NUS</p>
+              <ul>
+                <li>Investigated proteomics and protein–protein interactions of nucleolar complexes.</li>
+                <li>Developed and published novel protocols for extracting and purifying nucleolar proteins.</li>
+              </ul>
+            </div>
+          </li>
+          <li class="timeline__item reveal">
+            <div class="timeline__meta">
+              <span class="timeline__date">2013</span>
+            </div>
+            <div class="timeline__body">
+              <h3>Drug Formulation Scientist (Intern)</h3>
+              <p class="timeline__org">AbbVie · Singapore</p>
+              <ul>
+                <li>Supported a Hepatitis C drug pipeline with US and Germany collaborators.</li>
+                <li>Developed oral-dispersible drug films using Hot Melt Extrusion.</li>
+              </ul>
+            </div>
+          </li>
+        </ol>
+        <p class="section__foot reveal">
+          PhD, Microbiology &amp; Immunology (NUS, 2017–2022) · B.Eng, Chemical &amp; Biomolecular
+          Engineering, Honors (NUS, 2010–2014).
+        </p>
+      </div>
+    </section>
+
+    <!-- ============ PROJECTS ============ -->
+    <section class="section section--alt" id="projects">
+      <div class="container">
+        <h2 class="section__title reveal"><span class="section__num">04</span> Projects &amp; Focus Areas</h2>
+        <p class="section__lede reveal">
+          Selected areas of work. Code and notebooks live on
+          <a href="https://github.com/Neutrophil" target="_blank" rel="noopener">GitHub</a>.
+        </p>
+        <div class="cards cards--projects">
+          <article class="card card--project reveal">
+            <h3 class="card__title">WGS Bioinformatics Pipeline</h3>
+            <p>End-to-end whole-genome sequencing workflows spanning cfDNA, gDNA and FFPE-DNA — from raw reads through QC, alignment and variant analysis.</p>
+            <ul class="tags tags--mini">
+              <li>WGS</li><li>Python</li><li>Pipeline</li><li>NGS</li>
+            </ul>
+            <a class="card__link" href="https://github.com/Neutrophil" target="_blank" rel="noopener">View on GitHub →</a>
+          </article>
+          <article class="card card--project reveal">
+            <h3 class="card__title">ML for Cancer Classification</h3>
+            <p>Machine-learning models that differentiate and classify cancer signal from sequencing-derived features, designed for a clinical-diagnostics setting.</p>
+            <ul class="tags tags--mini">
+              <li>Machine learning</li><li>Classification</li><li>Genomic features</li>
+            </ul>
+            <a class="card__link" href="https://github.com/Neutrophil" target="_blank" rel="noopener">View on GitHub →</a>
+          </article>
+          <article class="card card--project reveal">
+            <h3 class="card__title">Multi-Omics Integration</h3>
+            <p>Integrating genomic and complementary omics layers to improve detection sensitivity and biological interpretability of diagnostic models.</p>
+            <ul class="tags tags--mini">
+              <li>Multi-omics</li><li>Feature integration</li><li>Statistics</li>
+            </ul>
+            <a class="card__link" href="https://github.com/Neutrophil" target="_blank" rel="noopener">View on GitHub →</a>
+          </article>
+          <article class="card card--project reveal">
+            <h3 class="card__title">Nucleolar Proteomics (PhD)</h3>
+            <p>Mapping protein networks proximal to nucleolar autoantigens (UBF, H1x) — the proteomics foundation behind several peer-reviewed publications.</p>
+            <ul class="tags tags--mini">
+              <li>Proteomics</li><li>Mass spec</li><li>PPI</li>
+            </ul>
+            <a class="card__link" href="#publications">See publications →</a>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ PUBLICATIONS ============ -->
+    <section class="section" id="publications">
+      <div class="container">
+        <h2 class="section__title reveal"><span class="section__num">05</span> Publications</h2>
+        <p class="section__lede reveal">Peer-reviewed articles and manuscripts. Author name in bold.</p>
+        <ol class="pubs">
+          <li class="pub reveal">
+            <p><strong>Chen, J.</strong>, Teo, B. H. D., Cai, Y., Wee, S. Y. K., &amp; Lu, J. (2025). Multiple promiscuous localization signals determine the nucleolar H1x and nucleoplasmic H1.5 localization. <em>Manuscript submitted.</em></p>
+          </li>
+          <li class="pub reveal">
+            <p><strong>Chen, J.</strong>, Teo, B. H. D., &amp; Lu, J. (2025). Neutrophil nuclear lobulation through myeloid nuclear differentiation antigen (MNDA). <em>Manuscript submitted.</em></p>
+          </li>
+          <li class="pub reveal">
+            <p>Zhang J, Tam WWS, Lu J, <strong>Chen J</strong>, Kusuyama J, et al. (2025). Cognitive Risk Stratification Score in Middle-aged and Older Adults with Type 2 Diabetes: a Cross-Sectional Study. <em>J Clin Endocrinol Metab</em>, dgaf063. <a href="https://doi.org/10.1210/clinem/dgaf063" target="_blank" rel="noopener">DOI</a></p>
+          </li>
+          <li class="pub reveal">
+            <p>Wu, S., <strong>Chen, J.</strong>, Teo, B. H. D., Wee, S. Y. K., Wong, M. H. M., et al. (2023). The axis of complement C1 and nucleolus in antinuclear autoimmunity. <em>Front Immunol</em>, 14, 1196544. <a href="https://doi.org/10.3389/fimmu.2023.1196544" target="_blank" rel="noopener">DOI</a></p>
+          </li>
+          <li class="pub reveal">
+            <p>Wu, S., Teo, B. H. D., Wee, S. Y. K., <strong>Chen, J.</strong>, &amp; Lu, J. (2021). The GAR/RGG motif defines a family of nuclear alarmins. <em>Cell Death Dis</em>, 12(5), 477. <a href="https://doi.org/10.1038/s41419-021-03766-w" target="_blank" rel="noopener">DOI</a></p>
+          </li>
+          <li class="pub reveal">
+            <p><strong>Chen, J.</strong>, Teo, B. H. D., Cai, Y., Wee, S. Y. K., &amp; Lu, J. (2018). The linker histone H1.2 is a novel component of the nucleolar organizer regions. <em>J Biol Chem</em>, 293(7), 2358–2369. <a href="https://doi.org/10.1074/jbc.M117.810184" target="_blank" rel="noopener">DOI</a></p>
+          </li>
+          <li class="pub reveal">
+            <p><strong>Chen, J.</strong>, Teo, B., &amp; Lu, J. (2018). A Method for Extracting the Nuclear Scaffold from the Chromatin Network. <em>Bio-Protocol</em>, 8(8). <a href="https://doi.org/10.21769/BioProtoc.2821" target="_blank" rel="noopener">DOI</a></p>
+          </li>
+          <li class="pub reveal">
+            <p>Cai, Y., Wee, S. Y. K., <strong>Chen, J.</strong>, Teo, B. H. D., Ng, Y. L. C., Leong, K. P., &amp; Lu, J. (2017). Broad Susceptibility of Nucleolar Proteins and Autoantigens to Complement C1 Protease Degradation. <em>J Immunol</em>, 199(12), 3981–3990. <a href="https://doi.org/10.4049/jimmunol.1700728" target="_blank" rel="noopener">DOI</a></p>
+          </li>
+        </ol>
+      </div>
+    </section>
+
+    <!-- ============ CONTACT ============ -->
+    <section class="section section--alt section--contact" id="contact">
+      <div class="container">
+        <h2 class="section__title reveal"><span class="section__num">06</span> Contact</h2>
+        <p class="section__lede reveal">
+          Open to roles and collaborations in <strong>AI for Life Science</strong>, genomics and
+          computational biology. The fastest way to reach me is email.
+        </p>
+        <div class="contact__links reveal">
+          <a class="contact__link" href="mailto:chen_junjie@outlook.com">
+            <span class="contact__label">Email</span>
+            <span class="contact__value">chen_junjie@outlook.com</span>
+          </a>
+          <a class="contact__link" href="https://www.linkedin.com/in/junjie-chen-nus/" target="_blank" rel="noopener">
+            <span class="contact__label">LinkedIn</span>
+            <span class="contact__value">in/junjie-chen-nus</span>
+          </a>
+          <a class="contact__link" href="https://github.com/Neutrophil" target="_blank" rel="noopener">
+            <span class="contact__label">GitHub</span>
+            <span class="contact__value">@Neutrophil</span>
+          </a>
+        </div>
+        <div class="contact__cta reveal">
+          <a class="btn btn--primary" href="assets/cv/CHEN_Junjie_CV.pdf" target="_blank" rel="noopener">Download CV</a>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="footer">
+    <div class="container footer__inner">
+      <p>© <span id="year"></span> Junjie Chen · Singapore</p>
+      <p class="footer__note">Static site · no trackers · <a href="#top">Back to top ↑</a></p>
+    </div>
+  </footer>
+
+  <script src="js/main.js"></script>
+</body>
+</html>

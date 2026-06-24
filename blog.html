@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Blog — Junjie Chen</title>
+  <meta name="description" content="Scientific writing and thinking by Junjie Chen — notes on genomics, machine learning, multi-omics and AI for Life Science." />
+  <meta name="author" content="Junjie Chen" />
+
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Blog — Junjie Chen" />
+  <meta property="og:description" content="Scientific writing and thinking on genomics, ML and AI for Life Science." />
+  <meta property="og:url" content="https://neutrophil.github.io/blog.html" />
+
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
+  <link rel="stylesheet" href="css/styles.css" />
+
+  <script>
+    (function () {
+      try {
+        var stored = localStorage.getItem('theme');
+        var theme = stored || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+        document.documentElement.setAttribute('data-theme', theme);
+      } catch (e) {}
+    })();
+  </script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <!-- ============ NAV ============ -->
+  <header class="nav" id="top">
+    <div class="container nav__inner">
+      <a class="nav__brand" href="index.html" aria-label="Junjie Chen — home">
+        <span class="nav__monogram">JC</span>
+        <span class="nav__name">Junjie Chen</span>
+      </a>
+
+      <nav class="nav__links" id="nav-links" aria-label="Primary">
+        <a href="index.html#about">About</a>
+        <a href="index.html#expertise">Expertise</a>
+        <a href="index.html#experience">Experience</a>
+        <a href="index.html#projects">Projects</a>
+        <a href="index.html#publications">Publications</a>
+        <a href="blog.html" class="is-active" aria-current="page">Blog</a>
+        <a href="index.html#contact">Contact</a>
+      </nav>
+
+      <div class="nav__actions">
+        <a class="btn btn--small btn--primary nav__cv" href="assets/cv/CHEN_Junjie_CV.pdf" target="_blank" rel="noopener">Download CV</a>
+        <button class="theme-toggle" id="theme-toggle" type="button" aria-label="Toggle dark mode" title="Toggle dark mode">
+          <svg class="icon-sun" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"></path></svg>
+          <svg class="icon-moon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+        </button>
+        <button class="nav__burger" id="nav-burger" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="nav-links">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main id="main">
+
+    <!-- ============ BLOG HEADER ============ -->
+    <section class="blog-hero">
+      <div class="container">
+        <p class="hero__eyebrow reveal">Writing &amp; thinking</p>
+        <h1 class="blog-hero__title reveal">Blog</h1>
+        <p class="blog-hero__lede reveal">
+          Notes at the intersection of biology and computation — genomics, machine learning,
+          multi-omics, and where I think <strong>AI for Life Science</strong> is heading. Working
+          through ideas in the open.
+        </p>
+      </div>
+    </section>
+
+    <!-- ============ POST LIST ============ -->
+    <section class="section">
+      <div class="container">
+        <ul class="postlist">
+
+          <li class="postlist__item reveal">
+            <a class="postcard" href="posts/2026-06-24-bridging-biology-and-ai.html">
+              <div class="postcard__meta">
+                <time datetime="2026-06-24">24 Jun 2026</time>
+                <span class="postcard__read">· 5 min read</span>
+              </div>
+              <h2 class="postcard__title">Bridging the bench and the model: why I'm moving toward AI for Life Science</h2>
+              <p class="postcard__summary">
+                A decade in the lab taught me how messy real biological data is. Here's why that
+                makes me optimistic — and cautious — about machine learning in genomics, and what
+                I want to build next.
+              </p>
+              <ul class="tags tags--mini">
+                <li>AI for Life Science</li><li>Genomics</li><li>Career</li>
+              </ul>
+              <span class="postcard__more">Read post →</span>
+            </a>
+          </li>
+
+          <!-- Add new posts by copying the <li>…</li> block above and creating a matching
+               file in posts/. The newest post should go at the top. -->
+
+        </ul>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="footer">
+    <div class="container footer__inner">
+      <p>© <span id="year"></span> Junjie Chen · Singapore</p>
+      <p class="footer__note">Static site · no trackers · <a href="#top">Back to top ↑</a></p>
+    </div>
+  </footer>
+
+  <script src="js/main.js"></script>
+</body>
+</html>

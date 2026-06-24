@@ -1,0 +1,19 @@
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Python (local preview server)
+__pycache__/
+*.py[cod]
+
+# Temp / logs
+*.log
+
+# Source CV documents (raw .pdf/.docx originals — compiled copy lives in assets/cv/)
+CV/

@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<!--
+  POST TEMPLATE — to publish a new post:
+    1. Copy this file to  posts/YYYY-MM-DD-slug.html
+    2. Fill in TITLE, DATE, READ TIME, TAGS, and the body inside <div class="prose">.
+    3. Add a matching <li>…</li> card at the TOP of the list in ../blog.html.
+  Everything else (nav, theme, styling) just works.
+-->
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>POST TITLE — Junjie Chen</title>
+  <meta name="description" content="ONE-SENTENCE SUMMARY OF THE POST." />
+  <meta name="author" content="Junjie Chen" />
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="POST TITLE" />
+
+  <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg" />
+  <link rel="stylesheet" href="../css/styles.css" />
+  <script>
+    (function () {
+      try {
+        var stored = localStorage.getItem('theme');
+        var theme = stored || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+        document.documentElement.setAttribute('data-theme', theme);
+      } catch (e) {}
+    })();
+  </script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <header class="nav" id="top">
+    <div class="container nav__inner">
+      <a class="nav__brand" href="../index.html" aria-label="Junjie Chen — home">
+        <span class="nav__monogram">JC</span>
+        <span class="nav__name">Junjie Chen</span>
+      </a>
+      <nav class="nav__links" id="nav-links" aria-label="Primary">
+        <a href="../index.html#about">About</a>
+        <a href="../index.html#expertise">Expertise</a>
+        <a href="../index.html#experience">Experience</a>
+        <a href="../index.html#projects">Projects</a>
+        <a href="../index.html#publications">Publications</a>
+        <a href="../blog.html" class="is-active">Blog</a>
+        <a href="../index.html#contact">Contact</a>
+      </nav>
+      <div class="nav__actions">
+        <a class="btn btn--small btn--primary nav__cv" href="../assets/cv/CHEN_Junjie_CV.pdf" target="_blank" rel="noopener">Download CV</a>
+        <button class="theme-toggle" id="theme-toggle" type="button" aria-label="Toggle dark mode" title="Toggle dark mode">
+          <svg class="icon-sun" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"></path></svg>
+          <svg class="icon-moon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+        </button>
+        <button class="nav__burger" id="nav-burger" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="nav-links">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main id="main">
+    <article class="post">
+      <div class="container container--narrow">
+
+        <p class="post__back reveal"><a href="../blog.html">← All posts</a></p>
+
+        <header class="post__head reveal">
+          <div class="postcard__meta">
+            <time datetime="YYYY-MM-DD">DD Month YYYY</time>
+            <span class="postcard__read">· N min read</span>
+          </div>
+          <h1 class="post__title">POST TITLE</h1>
+          <ul class="tags tags--mini">
+            <li>Tag one</li><li>Tag two</li>
+          </ul>
+        </header>
+
+        <div class="prose reveal">
+          <p>Opening paragraph…</p>
+
+          <h2>A section heading</h2>
+          <p>Body text. You can use <strong>bold</strong>, <em>italics</em>, and
+            <a href="#">links</a>. For inline code use <code>like_this()</code>.</p>
+
+          <blockquote>Use a blockquote for a pulled-out idea.</blockquote>
+
+          <pre><code>// fenced code block
+def model(x):
+    return x</code></pre>
+
+          <ul>
+            <li>Bullet one</li>
+            <li>Bullet two</li>
+          </ul>
+        </div>
+
+        <footer class="post__foot reveal">
+          <p>
+            Thoughts or disagreements?
+            <a href="mailto:chen_junjie@outlook.com">chen_junjie@outlook.com</a> or on
+            <a href="https://www.linkedin.com/in/junjie-chen-nus/" target="_blank" rel="noopener">LinkedIn</a>.
+          </p>
+          <p class="post__back"><a href="../blog.html">← Back to all posts</a></p>
+        </footer>
+
+      </div>
+    </article>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer__inner">
+      <p>© <span id="year"></span> Junjie Chen · Singapore</p>
+      <p class="footer__note">Static site · no trackers · <a href="#top">Back to top ↑</a></p>
+    </div>
+  </footer>
+
+  <script src="../js/main.js"></script>
+</body>
+</html>

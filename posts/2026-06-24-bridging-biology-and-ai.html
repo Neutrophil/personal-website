@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bridging the bench and the model — Junjie Chen</title>
+  <meta name="description" content="Why a decade at the bench makes me both optimistic and cautious about machine learning in genomics — and what I want to build next in AI for Life Science." />
+  <meta name="author" content="Junjie Chen" />
+
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="Bridging the bench and the model" />
+  <meta property="og:description" content="Why I'm moving toward AI for Life Science." />
+
+  <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg" />
+  <link rel="stylesheet" href="../css/styles.css" />
+
+  <script>
+    (function () {
+      try {
+        var stored = localStorage.getItem('theme');
+        var theme = stored || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+        document.documentElement.setAttribute('data-theme', theme);
+      } catch (e) {}
+    })();
+  </script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <!-- ============ NAV ============ -->
+  <header class="nav" id="top">
+    <div class="container nav__inner">
+      <a class="nav__brand" href="../index.html" aria-label="Junjie Chen — home">
+        <span class="nav__monogram">JC</span>
+        <span class="nav__name">Junjie Chen</span>
+      </a>
+
+      <nav class="nav__links" id="nav-links" aria-label="Primary">
+        <a href="../index.html#about">About</a>
+        <a href="../index.html#expertise">Expertise</a>
+        <a href="../index.html#experience">Experience</a>
+        <a href="../index.html#projects">Projects</a>
+        <a href="../index.html#publications">Publications</a>
+        <a href="../blog.html" class="is-active">Blog</a>
+        <a href="../index.html#contact">Contact</a>
+      </nav>
+
+      <div class="nav__actions">
+        <a class="btn btn--small btn--primary nav__cv" href="../assets/cv/CHEN_Junjie_CV.pdf" target="_blank" rel="noopener">Download CV</a>
+        <button class="theme-toggle" id="theme-toggle" type="button" aria-label="Toggle dark mode" title="Toggle dark mode">
+          <svg class="icon-sun" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"></path></svg>
+          <svg class="icon-moon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+        </button>
+        <button class="nav__burger" id="nav-burger" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="nav-links">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main id="main">
+    <article class="post">
+      <div class="container container--narrow">
+
+        <p class="post__back reveal"><a href="../blog.html">← All posts</a></p>
+
+        <header class="post__head reveal">
+          <div class="postcard__meta">
+            <time datetime="2026-06-24">24 June 2026</time>
+            <span class="postcard__read">· 5 min read</span>
+          </div>
+          <h1 class="post__title">Bridging the bench and the model: why I'm moving toward AI for Life Science</h1>
+          <ul class="tags tags--mini">
+            <li>AI for Life Science</li><li>Genomics</li><li>Career</li>
+          </ul>
+        </header>
+
+        <div class="prose reveal">
+          <p>
+            I spent the better part of a decade at the bench — pipetting, optimizing assays,
+            chasing protein complexes through the nucleolus. These days I spend most of mine
+            writing code: building whole-genome sequencing workflows and training models to tell
+            cancer signal apart from noise. People sometimes ask whether that was a hard switch.
+            The honest answer is that it felt less like a switch and more like following the same
+            question into a new tool.
+          </p>
+
+          <h2>The data is never as clean as the slide deck</h2>
+          <p>
+            The single most useful thing the lab taught me is how a number actually comes to
+            exist. Before a variant call is a row in a table, it was a fragment of cell-free DNA in
+            a tube, a library prep that may or may not have worked, a flow cell with its own
+            quirks. FFPE tissue deaminates. cfDNA is short and scarce. Every step adds a fingerprint
+            to the data.
+          </p>
+          <p>
+            When you have stood at the bench, you read a model's errors differently. A
+            false positive isn't just a misclassification — it might be a batch effect, a
+            contamination artifact, a coverage dropout in a hard-to-map region. Knowing where the
+            data comes from tells you which features to trust and which ones the model is quietly
+            exploiting for the wrong reasons.
+          </p>
+
+          <h2>Why I'm optimistic</h2>
+          <p>
+            Genomics is, in a sense, an ideal substrate for machine learning: high-dimensional,
+            structured, and increasingly abundant. Multi-omics integration — stitching together
+            genomic, epigenomic and fragmentomic signal — is exactly the kind of problem where a
+            well-posed model can see patterns a single assay cannot. We are moving from hand-crafted
+            thresholds toward representations that the data itself suggests.
+          </p>
+
+          <h2>Why I'm cautious</h2>
+          <p>
+            And yet biology punishes overconfidence. A model that reports 99% accuracy on a clean
+            cohort can fall apart on the next sequencing batch, the next hospital, the next sample
+            type. In a clinical-diagnostics setting the cost of being wrong is not a worse metric —
+            it is a patient. So I care as much about calibration, robustness and interpretability
+            as I do about raw performance. The goal is not a model that wins a benchmark; it is one
+            a clinician can trust on a Tuesday.
+          </p>
+
+          <h2>What I want to build next</h2>
+          <p>
+            I want to keep working where wet-lab reality and computation meet — models that are
+            grounded in how the assay behaves, validated like a diagnostic and not just a
+            leaderboard entry, and honest about their uncertainty. That is what <em>AI for Life
+            Science</em> means to me: not applying a generic model to a biological dataset, but
+            building systems that respect the biology and the messy, beautiful way its data is made.
+          </p>
+          <p>
+            This blog is where I'll think out loud about that — methods I'm reading, ideas I'm
+            testing, and the occasional opinion. More soon.
+          </p>
+        </div>
+
+        <footer class="post__foot reveal">
+          <p>
+            Thoughts or disagreements? I'd genuinely like to hear them —
+            <a href="mailto:chen_junjie@outlook.com">chen_junjie@outlook.com</a> or on
+            <a href="https://www.linkedin.com/in/junjie-chen-nus/" target="_blank" rel="noopener">LinkedIn</a>.
+          </p>
+          <p class="post__back"><a href="../blog.html">← Back to all posts</a></p>
+        </footer>
+
+      </div>
+    </article>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer__inner">
+      <p>© <span id="year"></span> Junjie Chen · Singapore</p>
+      <p class="footer__note">Static site · no trackers · <a href="#top">Back to top ↑</a></p>
+    </div>
+  </footer>
+
+  <script src="../js/main.js"></script>
+</body>
+</html>
