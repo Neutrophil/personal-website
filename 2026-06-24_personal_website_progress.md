@@ -1,6 +1,6 @@
 # Personal Website — Progress / Restart Guide
 
-**Last updated:** 2026-06-24
+**Last updated:** 2026-06-27
 **Owner:** Junjie Chen (chen_junjie@outlook.com · LinkedIn `in/junjie-chen-nus` · GitHub `@Neutrophil`)
 **Location:** `/home/junjie/claude/personal_website/`
 **Plan file:** `/home/junjie/.claude/plans/build-a-personal-website-cheerful-pony.md`
@@ -24,8 +24,9 @@ billing (a confirmed design decision).
   CDNs, no trackers.** (Node is not available in this environment; git is.)
 - **Visual style:** "modern scientific minimal" — clean whitespace, single teal accent
   (`#0d9488` light / `#2dd4bf` dark), **light default with a persisted dark-mode toggle**.
-- **Deploy target:** GitHub Pages **user site** at `https://neutrophil.github.io/` (repo must be
-  named exactly `neutrophil.github.io`). Not yet pushed (outward-facing; do on request).
+- **Deploy target (current):** private GitHub repo `git@github.com:Neutrophil/personal-website.git`.
+  When ready to go public, rename repo to `neutrophil.github.io`, make it public, and enable
+  GitHub Pages (source = main / root) → live at `https://neutrophil.github.io/`.
 - **Extras included:** downloadable CV, Projects section, Publications list, **Blog**.
   Declined: contact form.
 
@@ -118,18 +119,18 @@ hamburger, year stamp, reveal, and scrollspy.
 
 ✅ Complete and verified locally: main page, all sections, dark mode, responsive/mobile nav,
 Download CV, Projects, Publications, **Blog index + first post + post template**, README, favicon.
-❌ Not done: not yet committed to git or pushed to GitHub Pages (deliberately deferred).
+✅ Git initialized; initial commit `7878c6a` on `main`; pushed to private GitHub repo (2026-06-27).
+✅ `.gitignore` excludes `CV/` (source docs), OS files, editor files, Python cache, logs.
+❌ Not yet public / GitHub Pages not enabled (deliberately deferred until ready to apply for jobs).
 
-## 8. Deploy steps (when ready — outward-facing, do on request)
+## 8. Deploy steps to go public (when ready)
 
 ```bash
-cd /home/junjie/claude/personal_website
-git init && git add -A && git commit -m "Personal website + blog"
-git branch -M main
-# create empty public repo named exactly  neutrophil.github.io  on GitHub, then:
-git remote add origin https://github.com/Neutrophil/neutrophil.github.io.git
-git push -u origin main
-# Settings → Pages: source = main / root. Live at https://neutrophil.github.io/
+# On GitHub: rename repo to  neutrophil.github.io  and make it public, then:
+git remote set-url origin git@github.com:Neutrophil/neutrophil.github.io.git
+git push
+# GitHub repo Settings → Pages → Source: main / root → Save
+# Live at https://neutrophil.github.io/ within ~1 min
 ```
 
 ## 9. Deferred / next ideas
