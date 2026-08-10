@@ -54,6 +54,10 @@ CV/
 
 # Local private configuration — real account numbers, names, baselines.
 # Never committed; a *.example.* sibling is committed instead.
+# Nothing under private/ is ever committed. The template documenting its shape
+# lives OUTSIDE it (<name>.example.toml at the repo root), so it stays readable
+# and reviewable without a gitignore negation — git cannot re-include a file
+# whose parent directory is excluded.
 private/
 *.local.toml
 *.local.json

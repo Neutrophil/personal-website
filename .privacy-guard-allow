@@ -1,0 +1,14 @@
+# Deliberate exceptions to the workspace privacy rules, for this repository only.
+# See /home/junjie/claude/CLAUDE.md § "Privacy & data safety".
+#
+# This is a PUBLIC personal website. Its whole purpose is to publish the owner's
+# name, biography, contact address and CV under their own domain, so the guard's
+# name and contact rules do not apply here. Everything else still does: no
+# account numbers, no card numbers, no financial figures, no third-party names.
+rule:denylist-name
+rule:contact
+
+# Everything under assets/ is published on purpose, including the CV PDF.
+# Anything added here is world-readable — check it carries no phone number or
+# home address before committing it.
+assets/**
