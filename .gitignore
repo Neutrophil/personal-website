@@ -17,3 +17,73 @@ __pycache__/
 
 # Source CV documents (raw .pdf/.docx originals — compiled copy lives in assets/cv/)
 CV/
+
+# ===========================================================================
+# Privacy guard — deny-by-default for data files.
+# Rationale + full rules: /home/junjie/claude/CLAUDE.md § "Privacy & data safety".
+# Only code + docs go to GitHub. If you genuinely need to track a file matching
+# one of these, add an explicit `!path/to/file` negation below AND make sure it
+# contains no personal data.
+# ===========================================================================
+# Databases / local state
+*.db
+*.db-journal
+*.db-wal
+*.sqlite
+*.sqlite3
+
+# Tabular + document data (statements, holdings, exports, reports)
+*.csv
+*.tsv
+*.xls
+*.xlsx
+*.pdf
+*.docx
+
+# Screenshots and scanned documents
+*.jpg
+*.jpeg
+*.png
+*.webp
+*.heic
+
+# Archives dropped in the tree before unpacking
+*.zip
+*.rar
+*.7z
+
+# Local private configuration — real account numbers, names, baselines.
+# Never committed; a *.example.* sibling is committed instead.
+private/
+*.local.toml
+*.local.json
+
+# Secrets
+.env
+.env.*
+!.env.example
+secrets.toml
+.streamlit/secrets.toml
+*.pem
+*.key
+
+# Vision-OCR scratch tiles (crops of brokerage screenshots)
+.tiles/
+
+# Python / tooling artefacts
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ipynb_checkpoints/
+
+# WSL/Windows download sidecars
+*:Zone.Identifier
+.DS_Store
+Thumbs.db
+
+# --- personal_website specific ----------------------------------------------
+# This site is deliberately public. Its published assets are the ONE approved
+# exception to the deny-by-default rules above — re-include them explicitly.
+!assets/**
+# ...but never the raw CV source documents.
+CV/
