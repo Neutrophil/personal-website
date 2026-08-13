@@ -607,8 +607,11 @@ def main() -> None:
         import http.server
 
         handler = functools.partial(http.server.SimpleHTTPRequestHandler, directory=str(ROOT))
+        # Loopback only. This serves the repo root, which also holds .git, the
+        # raw CV sources and the gitignored working notes — none of which should
+        # be reachable from the LAN just to preview a page.
         print("serving http://localhost:8910 — ctrl-c to stop")
-        http.server.ThreadingHTTPServer(("", 8910), handler).serve_forever()
+        http.server.ThreadingHTTPServer(("127.0.0.1", 8910), handler).serve_forever()
 
 
 if __name__ == "__main__":
