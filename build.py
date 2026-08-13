@@ -36,6 +36,9 @@ POSTS_SRC = SRC / "posts"
 POSTS_OUT = ROOT / "posts"
 
 WORDS_PER_MINUTE = 200
+# Social-card image. Referenced by absolute URL in a <meta content=...>, which
+# the link checker cannot follow — so `--check` verifies it separately.
+OG_IMAGE = "assets/og.png"
 FRONTMATTER_FENCE = "+++"
 TOKEN_RE = re.compile(r"\{\{\s*([A-Za-z0-9_:./-]+)\s*\}\}")
 MAX_RESOLVE_PASSES = 6
@@ -303,6 +306,7 @@ def base_context(site: dict, rel: str) -> dict:
         "linkedin": site["links"]["linkedin"],
         "github": site["links"]["github"],
         "cv": site["links"]["cv"],
+        "og_image": f"{site['url']}/{OG_IMAGE}",
         "year": str(date.today().year),
     }
 
@@ -563,7 +567,13 @@ def run_checks(site: dict, written: list[Path], posts: list[Post]) -> None:
                     f"below {minimum}:1 ({what})"
                 )
 
-    # 5. posts carry everything the index and the feed need
+    # 5. the social card exists — every page points at it by absolute URL, so a
+    #    missing file shows up only as a bare link preview, never as a 404 here
+    if not (ROOT / OG_IMAGE).is_file():
+        problems.append(f"{OG_IMAGE} is referenced by every page but does not exist "
+                        f"— run tools/make_og.py")
+
+    # 6. posts carry everything the index and the feed need
     for post in posts:
         if len(post.summary) < 40:
             problems.append(f"{_rel(post.doc.path)}: summary is too short to be useful")

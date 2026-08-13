@@ -46,7 +46,8 @@ src/blog.html             writing index; the post list is generated into it
 src/posts/*.html          one fragment per post (+ _TEMPLATE.html, skipped by the build)
 css/styles.css            design system — dark default, light counterpart
 js/main.js                theme toggle, nav, reveal, tag filter, copy buttons, progress bar
-assets/                   favicon + CV (PDF)
+tools/make_og.py          regenerates assets/og.png — needs Pillow, run by hand, NOT in build.py
+assets/                   favicon + CV (PDF) + og.png (1200x630 social card, committed)
 → index.html projects.html blog.html 404.html feed.xml posts/*.html    generated, committed
 ```
 
@@ -60,9 +61,11 @@ rebuild — the next build overwrites root-level changes without warning.
   chips, nav links) is assembled in Python, in `build.py`. Keep it that way; the value of this
   generator is that it fits in one readable file.
 - **`--check` is the test suite.** It fails on unresolved tokens, dead local links, incomplete
-  frontmatter, a malformed feed, and **any text/background pair below WCAG AA in either
-  theme** — contrast is computed from the CSS tokens, not eyeballed. Add a gate here rather
-  than relying on a manual look.
+  frontmatter, a malformed feed, a missing social card, and **any text/background pair below
+  WCAG AA in either theme** — contrast is computed from the CSS tokens, not eyeballed. Add a
+  gate here rather than relying on a manual look.
+- **`build.py` stays dependency-free.** Anything needing a third-party package (currently just
+  the social-card renderer) lives in `tools/` and is run by hand, with its output committed.
 - **JS is enhancement only.** The inline head script swaps `no-js` for `js` on `<html>`, and
   `.reveal` is hidden only under `.js`. If `main.js` fails to load, the page must still be
   complete — do not add content that only appears after script runs.
