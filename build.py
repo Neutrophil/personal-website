@@ -403,8 +403,15 @@ def build(check: bool = False) -> list[Path]:
 
 def build_feed(site: dict, posts: list[Post]) -> str:
     """RSS 2.0. Hand-rolled rather than ElementTree so the output stays readable
-    in a diff; `--check` parses it back to prove it is well-formed."""
-    now = datetime.now(timezone.utc).strftime("%a, %d %b %Y %H:%M:%S +0000")
+    in a diff; `--check` parses it back to prove it is well-formed.
+
+    lastBuildDate is derived from the newest post rather than the clock, so a
+    rebuild that changed nothing produces no diff. A wall-clock value would put
+    a spurious feed change in every future commit."""
+    newest = max((p.date for p in posts), default=date.today())
+    now = datetime(newest.year, newest.month, newest.day, 9, 0, tzinfo=timezone.utc).strftime(
+        "%a, %d %b %Y %H:%M:%S +0000"
+    )
     items = []
     for post in posts:
         link = f"{site['url']}/{post.href}"

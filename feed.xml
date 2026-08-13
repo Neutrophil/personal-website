@@ -6,7 +6,7 @@
     <atom:link href="https://neutrophil.github.io/feed.xml" rel="self" type="application/rss+xml" />
     <description>Notes on genomics, machine learning, and systems built on evenings.</description>
     <language>en</language>
-    <lastBuildDate>Wed, 12 Aug 2026 20:08:19 +0000</lastBuildDate>
+    <lastBuildDate>Thu, 13 Aug 2026 09:00:00 +0000</lastBuildDate>
     <item>
       <title>Notes from sixty Streamlit pages</title>
       <link>https://neutrophil.github.io/posts/2026-08-13-sixty-streamlit-pages.html</link>
