@@ -1,0 +1,84 @@
+<svg viewBox="0 0 900 236" role="img" aria-labelledby="d1-title">
+  <title id="d1-title">Price history produces an expected-return vector and a covariance matrix; both fold into a single upper-triangular Q matrix, which a simulated annealer minimises to select K stocks.</title>
+  <defs>
+    <marker id="d1-arw" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 Z" fill="var(--border-lit)" />
+    </marker>
+  </defs>
+
+  <!-- A · price history -->
+  <rect class="d-fill-elev d-stroke" x="14" y="82" width="118" height="66" rx="8" stroke-width="1" />
+  <text class="d-label" x="73" y="108" text-anchor="middle">price history</text>
+  <text class="d-label--sm" x="73" y="126" text-anchor="middle">N tickers · 126d</text>
+
+  <!-- B1 · expected return -->
+  <rect class="d-fill-elev d-stroke" x="180" y="30" width="150" height="60" rx="8" stroke-width="1" />
+  <text class="d-label--accent" x="196" y="54">μ</text>
+  <text class="d-label" x="214" y="54">expected return</text>
+  <text class="d-label--sm" x="196" y="72">8 clipped signals, blended</text>
+
+  <!-- B2 · covariance -->
+  <rect class="d-fill-elev d-stroke" x="180" y="140" width="150" height="60" rx="8" stroke-width="1" />
+  <text class="d-label--accent" x="196" y="164">Σ</text>
+  <text class="d-label" x="214" y="164">covariance</text>
+  <text class="d-label--sm" x="196" y="182">shrunk toward diagonal</text>
+
+  <!-- C · Q matrix -->
+  <rect class="d-fill-elev d-stroke" x="378" y="68" width="164" height="94" rx="8" stroke-width="1" />
+  <g transform="translate(394 84)">
+    <!-- 4x4 glyph: only the upper triangle carries weight -->
+    <g class="d-accent-fill">
+      <rect x="0"  y="0"  width="12" height="12" rx="2" opacity=".85" />
+      <rect x="14" y="0"  width="12" height="12" rx="2" opacity=".6" />
+      <rect x="28" y="0"  width="12" height="12" rx="2" opacity=".45" />
+      <rect x="42" y="0"  width="12" height="12" rx="2" opacity=".3" />
+      <rect x="14" y="14" width="12" height="12" rx="2" opacity=".85" />
+      <rect x="28" y="14" width="12" height="12" rx="2" opacity=".6" />
+      <rect x="42" y="14" width="12" height="12" rx="2" opacity=".45" />
+      <rect x="28" y="28" width="12" height="12" rx="2" opacity=".85" />
+      <rect x="42" y="28" width="12" height="12" rx="2" opacity=".6" />
+      <rect x="42" y="42" width="12" height="12" rx="2" opacity=".85" />
+    </g>
+    <g class="d-muted" fill="none" stroke-width="1">
+      <rect x="0"  y="14" width="12" height="12" rx="2" />
+      <rect x="0"  y="28" width="12" height="12" rx="2" />
+      <rect x="14" y="28" width="12" height="12" rx="2" />
+      <rect x="0"  y="42" width="12" height="12" rx="2" />
+      <rect x="14" y="42" width="12" height="12" rx="2" />
+      <rect x="28" y="42" width="12" height="12" rx="2" />
+    </g>
+  </g>
+  <text class="d-label" x="466" y="102">Q</text>
+  <text class="d-label--sm" x="466" y="120">upper-</text>
+  <text class="d-label--sm" x="466" y="134">triangular</text>
+  <text class="d-label--sm" x="460" y="180" text-anchor="middle">+ cardinality penalty P</text>
+
+  <!-- D · annealer -->
+  <rect class="d-fill-elev d-stroke" x="590" y="68" width="160" height="94" rx="8" stroke-width="1" />
+  <text class="d-label" x="670" y="98" text-anchor="middle">simulated</text>
+  <text class="d-label" x="670" y="114" text-anchor="middle">annealing</text>
+  <text class="d-label--sm" x="670" y="134" text-anchor="middle">60 reads ×</text>
+  <text class="d-label--sm" x="670" y="148" text-anchor="middle">1200 sweeps</text>
+
+  <!-- E · selection -->
+  <rect class="d-fill-elev d-accent" x="798" y="68" width="90" height="94" rx="8" stroke-width="1.4" />
+  <text class="d-label--accent" x="843" y="100" text-anchor="middle">x ∈ {0,1}</text>
+  <text class="d-label--sm" x="843" y="122" text-anchor="middle">Σ xᵢ = K</text>
+  <g class="d-accent-fill">
+    <rect x="816" y="134" width="8" height="8" rx="2" />
+    <rect x="828" y="134" width="8" height="8" rx="2" opacity=".25" />
+    <rect x="840" y="134" width="8" height="8" rx="2" />
+    <rect x="852" y="134" width="8" height="8" rx="2" opacity=".25" />
+    <rect x="864" y="134" width="8" height="8" rx="2" />
+  </g>
+
+  <!-- flow -->
+  <g class="d-stroke" fill="none" stroke-width="1.2" marker-end="url(#d1-arw)">
+    <path d="M132 104 C 156 104, 156 60, 178 60" />
+    <path d="M132 126 C 156 126, 156 170, 178 170" />
+    <path d="M330 60  C 354 60, 354 100, 376 100" />
+    <path d="M330 170 C 354 170, 354 132, 376 132" />
+    <path d="M542 115 L 588 115" />
+    <path d="M750 115 L 796 115" />
+  </g>
+</svg>

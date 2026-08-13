@@ -1,0 +1,242 @@
++++
+title   = "Multi-currency is a data-modelling problem, not a formatting problem"
+date    = 2026-08-13
+summary = "Showing a number in a different currency looks like a display concern. It is not. Get it wrong and your history grows a step change through its middle, an FX move vanishes from a chart, and a function you wrote six months ago is still quietly answering in last year's currency."
+tags    = ["Python", "Data modelling", "Learning notes"]
+description = "Storage currency versus display currency, why default arguments bind at import, per-date FX restatement, and why a missing price is not a zero price."
++++
+          <p>
+            I have a dashboard that values a portfolio held across several markets. It has a
+            dropdown that switches the display currency, and for about a week that dropdown was the
+            simplest feature in the project: multiply everything by a rate on the way to the screen.
+          </p>
+          <p>
+            Then I looked at the net-worth chart and found a step change through the middle of it,
+            on a day when nothing had happened.
+          </p>
+          <p>
+            Currency is not a formatting layer. It is part of the type of the number, and every
+            place a number is written down, read back, compared to another number, or summed is a
+            place where the currency has to be right. This is what I learned making that true.
+          </p>
+
+          <h2>Two currencies, and only one of them may change</h2>
+          <p>
+            The mistake underneath the step change was having one notion of "the currency" when the
+            system needs two:
+          </p>
+          <ul>
+            <li>
+              A <strong>storage currency</strong>, fixed at the start of the project and never
+              changed. Every snapshot ever written — daily net worth, per-holding valuations — is
+              denominated in it. It is a property of the database, not of the person looking at it.
+            </li>
+            <li>
+              A <strong>display currency</strong>, chosen at runtime, persisted per user, and
+              changeable at any moment. It affects what is rendered and absolutely nothing that is
+              stored.
+            </li>
+          </ul>
+          <p>
+            When those are the same variable, the snapshot writer follows the dropdown. Switch from
+            one currency to another on a Tuesday and Tuesday's row is written in the new one, sitting
+            in a table where every previous row is in the old one. The chart draws a cliff. Worse,
+            the weekly change report diffs the two rows and reports every position as having moved
+            twenty percent, which is the sort of thing that ruins a morning.
+          </p>
+
+          <figure class="diagram">
+            <div class="diagram__scroll">
+{{ include:diagrams/currency-tracks.svg }}
+            </div>
+            <figcaption>
+              The storage track is written once and never restated. The display track is derived on
+              read — each point converted at the rate that applied on its own date, not at today's
+              rate applied to the finished series.
+            </figcaption>
+          </figure>
+
+          <p>
+            The way I enforced the separation is blunt and has held up: the valuation objects carry
+            <strong>mirror fields</strong> in the storage currency alongside the display ones —
+            <code>value</code> and <code>value_sgd</code>, <code>cost</code> and
+            <code>cost_sgd</code>, and so on. Anything that persists must use the mirror fields.
+            Anything that renders uses the display fields. The rule is checkable by reading a
+            single line, which matters more than elegance for a rule you need to apply in a dozen
+            places you have not written yet.
+          </p>
+
+          <h2>The trap: a default argument binds at import</h2>
+          <p>
+            This one cost me an afternoon and is worth the price of the whole post.
+          </p>
+
+          <div class="codeblock">
+            <div class="codeblock__bar"><span class="codeblock__name">the bug</span></div>
+            <pre><code>def format_money(amount, currency=config.base_currency()):
+    ...</code></pre>
+          </div>
+
+          <p>
+            That looks like "default to whatever the current currency is". It is not. Python
+            evaluates default arguments <strong>once, when the function is defined</strong> — which
+            here means when the module is first imported, which means at process start. The default
+            is frozen to whatever the currency was at boot. Switch currencies and this function
+            keeps answering in the old one, for the life of the process, with no error and no
+            warning.
+          </p>
+          <p>
+            The symptom is maddening because it is partial. Most of the page updates. One panel does
+            not. Restart the app and the stale panel is now correct and a different one is wrong,
+            depending on import order and what you switched to.
+          </p>
+
+          <div class="callout">
+            <span class="callout__label">The rule</span>
+            <p>
+              Never put a value that can change at runtime in a default argument. The signature
+              becomes <code>currency: str | None = None</code>, and the body does
+              <code>currency = currency or config.base_currency()</code>. It is two extra lines and
+              it removes an entire class of bug that produces no stack trace.
+            </p>
+          </div>
+
+          <p>
+            The same trap has a second form worth knowing: a module that does
+            <code>from config import BASE_CURRENCY</code> takes a copy of the value at import time.
+            Import the <em>module</em> and read the attribute at call time instead.
+          </p>
+
+          <h2>Reading history: convert per date, not per series</h2>
+          <p>
+            The other half of the problem is what to do when someone switches currency and looks at
+            three years of history. The obvious implementation converts the finished series by
+            today's rate. It is wrong in an interesting way.
+          </p>
+          <p>
+            Multiplying an entire series by one constant produces a chart with exactly the same
+            shape as the original, just with different axis labels. Every currency draws an
+            identical picture. Which means the chart is silently telling you that FX did not move —
+            when in fact the FX move is often the most interesting thing that happened to a
+            cross-currency portfolio that year.
+          </p>
+          <p>
+            The correct version restates each stored point at the rate that applied on
+            <em>that point's own date</em>. In pandas that is an as-of join against a rate series,
+            which handles the fact that FX quotes do not exist on days the market was shut:
+          </p>
+
+          <div class="codeblock">
+            <div class="codeblock__bar"><span class="codeblock__name">converting a stored series</span></div>
+            <pre><code>rates = fx.rate_series(STORAGE_CCY, display_ccy, start, end)  # sparse, business days
+
+def convert_series(values: pd.Series, rates: pd.Series) -> pd.Series:
+    # For each snapshot date, take the most recent rate at or before it.
+    # asof() is the whole point: a weekend snapshot uses Friday's rate,
+    # not the next available one, and not a single rate for the whole span.
+    aligned = rates.asof(values.index)
+    return values * aligned</code></pre>
+          </div>
+
+          <p>
+            Now each currency's chart has its own shape, and the difference between them is the FX
+            contribution — which is information, not noise.
+          </p>
+
+          <h2>When the rate itself is missing</h2>
+          <p>
+            Free FX data is unreliable in a specific way: the usual source returns a stale last
+            close at weekends and after hours, silently. Not an error — a number, just the wrong
+            one. So the FX lookup is a ladder, and each rung is there because the one above it
+            failed in production:
+          </p>
+          <ol>
+            <li>Ask for the currency pair directly.</li>
+            <li>If that is empty, ask for the inverse pair and reciprocate it.</li>
+            <li>If that is empty too, fall back to a second, independent provider.</li>
+            <li>If everything fails, return 1.0 <strong>with a staleness flag set</strong>, and let
+              the page say so.</li>
+          </ol>
+          <p>
+            The last rung is the one worth arguing about. Returning 1.0 is obviously wrong. But the
+            alternative — raising — takes down a page that is 90% useful for a reason the reader
+            cannot act on. Returning a wrong number <em>silently</em> is the only genuinely
+            unacceptable option. Degrade, but say so.
+          </p>
+
+          <h2>Threading the currency through without touching thirty call sites</h2>
+          <p>
+            One more piece. Reports are generated, archived as HTML, and read back weeks later. A
+            report must render in the currency it was <em>built</em> in — an archived file that
+            silently restates itself when you change a dropdown is not an archive.
+          </p>
+          <p>
+            The report builder had around thirty calls to a small <code>_money()</code> formatter,
+            none of which took a currency. Threading a parameter through all of them would have
+            been a large, mechanical, error-prone diff where a single missed call site produces a
+            report with two currencies in it.
+          </p>
+          <p>
+            A <code>ContextVar</code> solved it in about six lines. The report sets the currency
+            for the duration of its own render; <code>_money()</code> reads it; every call site is
+            untouched. It is the right tool for exactly this shape of problem — an ambient value
+            scoped to one operation — and it is properly isolated across threads and async tasks,
+            which a module-level global is not.
+          </p>
+
+          <h2>And the one that had nothing to do with currency</h2>
+          <p>
+            While auditing the valuation code I found a worse bug, and it belongs here because it is
+            the same category of mistake: <strong>a type that cannot represent "unknown".</strong>
+          </p>
+          <p>
+            When a price provider fails — a delisting, a rate limit, a cold cache — it returned a
+            quote with a price of zero and an "unavailable" flag. The valuation code read the
+            price, ignored the flag, and paired a market value of zero with the holding's real,
+            correct cost basis. Which is a complete loss:
+          </p>
+
+          <div class="codeblock">
+            <div class="codeblock__bar"><span class="codeblock__name">what the table showed</span></div>
+            <pre><code>SOMETHING   value 0      cost 20,000    P/L −20,000    −100.0%   ← no quote available
+
+TOTAL       P/L −18,000  return −60%
+            (truth, over the holdings that actually had prices: +2,000, +20%)</code></pre>
+          </div>
+
+          <p>
+            The fabricated position then <em>topped the chart of biggest contributors to P/L</em>,
+            which is the cruellest possible place for it to appear: the one panel where a large
+            negative number looks like a finding rather than a fault. And it fires exactly when you
+            are least likely to interrogate it — during a rate-limit episode, when several things
+            look odd at once.
+          </p>
+          <p>
+            The fix is to make the type honest. An unpriced holding has <code>None</code> for value,
+            profit and return — not zero — and the page reports how many rows it could not price
+            rather than folding them into the total.
+          </p>
+
+          <div class="callout">
+            <span class="callout__label">The part I want to remember</span>
+            <p>
+              I fixed it, verified the table, and moved on. It came back a week later, because a
+              second code path recomputed cost basis natively from its own inputs and needed
+              <em>the same guard applied separately</em>. One bug, two places, no shared code
+              between them. Fixing the first re-opened nothing; it just failed to close the second.
+              When a bug comes from a <em>convention</em> rather than a function, grep for the
+              convention.
+            </p>
+          </div>
+
+          <p>
+            The generalisation is the one I care about most, because it is not a finance problem at
+            all. <strong>Missing is not zero.</strong> It is the same mistake as imputing 0 for an
+            absent feature and letting a model read it as a real measurement of "none", or treating
+            an uncovered region as evidence of no variant rather than absence of evidence. Zero is a
+            value. Unknown is a different thing, and if your type cannot say so, some downstream
+            average will confidently tell you it was zero all along.
+          </p>
+          <p>
+            <a class="arrowlink" href="../projects.html#portfolio">The build this came from <span aria-hidden="true">→</span></a>
+          </p>

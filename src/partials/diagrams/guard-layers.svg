@@ -1,0 +1,56 @@
+<svg viewBox="0 0 900 300" role="img" aria-labelledby="d5-title">
+  <title id="d5-title">Four independent gates stand between an edited file and a remote: a pre-commit scan of staged blobs, a pre-push scan of every tracked file, an agent hook that intercepts shell commands, and a weekly audit that re-checks every repository and verifies the hooks are still installed.</title>
+  <defs>
+    <marker id="d5-arw" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 Z" fill="var(--border-lit)" />
+    </marker>
+  </defs>
+
+  <!-- the pipeline -->
+  <rect class="d-fill-elev d-stroke" x="16" y="96" width="112" height="58" rx="8" stroke-width="1" />
+  <text class="d-label" x="72" y="122" text-anchor="middle">working</text>
+  <text class="d-label" x="72" y="138" text-anchor="middle">tree</text>
+
+  <rect class="d-fill-elev d-accent" x="196" y="96" width="140" height="58" rx="8" stroke-width="1.3" />
+  <text class="d-label" x="266" y="120" text-anchor="middle">pre-commit</text>
+  <text class="d-label--sm" x="266" y="138" text-anchor="middle">staged blobs</text>
+
+  <rect class="d-fill-elev d-accent" x="404" y="96" width="140" height="58" rx="8" stroke-width="1.3" />
+  <text class="d-label" x="474" y="120" text-anchor="middle">pre-push</text>
+  <text class="d-label--sm" x="474" y="138" text-anchor="middle">every tracked file</text>
+
+  <rect class="d-fill-elev d-stroke" x="612" y="96" width="120" height="58" rx="8" stroke-width="1" />
+  <text class="d-label" x="672" y="130" text-anchor="middle">remote</text>
+
+  <g class="d-stroke" fill="none" stroke-width="1.2" marker-end="url(#d5-arw)">
+    <path d="M128 125 L194 125" />
+    <path d="M336 125 L402 125" />
+    <path d="M544 125 L610 125" />
+  </g>
+
+  <!-- gate 3: the agent hook, sitting above the developer -->
+  <rect class="d-fill-elev d-accent2" x="140" y="16" width="256" height="50" rx="8" stroke-width="1.3" />
+  <text class="d-label" x="268" y="38" text-anchor="middle">agent PreToolUse hook</text>
+  <text class="d-label--sm" x="268" y="55" text-anchor="middle">blocks a shell reader aimed at a private path</text>
+  <path class="d-accent2" fill="none" stroke-width="1.2" stroke-dasharray="4 4" d="M268 66 L268 94" />
+
+  <!-- gate 4: the weekly audit, looping back -->
+  <rect class="d-fill-elev d-stroke" x="404" y="216" width="330" height="50" rx="8" stroke-width="1" />
+  <text class="d-label" x="424" y="238">weekly audit</text>
+  <text class="d-label--sm" x="424" y="255">re-scans every repo — and checks the hooks are still there</text>
+  <path class="d-muted" fill="none" stroke-width="1.2" stroke-dasharray="4 4"
+        d="M404 241 C 300 241, 250 200, 250 158" marker-end="url(#d5-arw)" />
+
+  <!-- what the scanner carries, and what it does not -->
+  <rect class="d-fill-bg d-stroke" x="762" y="60" width="126" height="130" rx="8" stroke-width="1" />
+  <text class="d-label--sm" x="778" y="82">the scanner</text>
+  <line class="d-muted" x1="778" y1="92" x2="872" y2="92" stroke-width="1" />
+  <text class="d-label--sm" x="778" y="110">generic patterns</text>
+  <text class="d-label--sm" x="778" y="128">checksums</text>
+  <text class="d-label--sm" x="778" y="146">path rules</text>
+  <line class="d-muted" x1="778" y1="158" x2="872" y2="158" stroke-width="1" />
+  <text class="d-label--sm" x="778" y="176" fill="var(--accent)">no real values</text>
+
+  <text class="d-label--sm" x="16" y="200">Any one gate can be bypassed by someone determined.</text>
+  <text class="d-label--sm" x="16" y="218">The point is that an accident has to get past all four.</text>
+</svg>

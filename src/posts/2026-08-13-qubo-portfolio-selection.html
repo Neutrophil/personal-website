@@ -1,0 +1,265 @@
++++
+title   = "Choosing ten stocks out of thirty with a QUBO"
+date    = 2026-08-13
+summary = "Portfolio selection is a combinatorial problem hiding inside a linear-algebra costume. Posing it as a QUBO and solving it by simulated annealing takes about 200 lines of numpy — and one scaling decision that quietly decides whether any of it works."
+tags    = ["Optimization", "Python", "Quant"]
+description = "How to pose K-of-N portfolio selection as a QUBO, why the cardinality penalty must be scaled relative to the objective, and how a 170-line simulated annealer solves it."
++++
+          <p>
+            Suppose you have thirty candidate stocks and you want to hold ten of them. Not the ten
+            with the highest expected return — that portfolio would be concentrated in whatever
+            sector happened to run last quarter. You want ten that together give a good return for
+            the risk they take on, which means the choice of any one name depends on all the others.
+          </p>
+          <p>
+            That dependency is the whole difficulty. There are
+            <code>C(30,10) ≈ 30,045,015</code> ways to pick ten from thirty. Evaluate a portfolio in
+            a microsecond and you are still looking at half a minute for a problem that small,
+            and the count explodes from there: fifty candidates gives you ten billion. Greedy
+            selection is fast but wrong in a specific way — it will happily pick two names that are
+            individually excellent and 0.9 correlated with each other.
+          </p>
+          <p>
+            One clean way to attack this is to stop treating it as a search over subsets and start
+            treating it as minimising a quadratic function over binary variables. That object has a
+            name — a <strong>QUBO</strong>, quadratic unconstrained binary optimisation — and a
+            deep bench of solvers, including the physical annealers that gave the family its
+            reputation. I do not have a quantum annealer. I do have numpy, and simulated annealing
+            on a QUBO is a genuinely good classical solver.
+          </p>
+
+          <figure class="diagram">
+            <div class="diagram__scroll">
+{{ include:diagrams/qubo-pipeline.svg }}
+            </div>
+            <figcaption>
+              Price history yields an expected-return vector and a covariance matrix; both fold
+              into one upper-triangular matrix Q, whose minimiser over binary vectors is the
+              portfolio. The cardinality constraint is not enforced separately — it is baked into Q.
+            </figcaption>
+          </figure>
+
+          <h2>Writing the objective</h2>
+          <p>
+            Let <code>xᵢ ∈ {0,1}</code> say whether stock <em>i</em> is held. Selected names are
+            equal-weighted, so the weight of each is <code>1/K</code> and any constant factor there
+            can be absorbed into the risk coefficient. The thing to minimise is:
+          </p>
+
+          <div class="codeblock">
+            <div class="codeblock__bar"><span class="codeblock__name">the objective</span></div>
+            <pre><code>f(x) = − Σᵢ μᵢ xᵢ          expected return, negated because we minimise
+       + γ Σᵢⱼ σᵢⱼ xᵢ xⱼ    risk: every selected pair's covariance
+       + P (Σᵢ xᵢ − K)²     penalty: zero when exactly K are chosen</code></pre>
+          </div>
+
+          <p>
+            The first two terms are ordinary mean–variance. The third is the interesting one. A
+            QUBO is <em>unconstrained</em> by definition, so "hold exactly ten" cannot be a
+            constraint — it has to become part of the thing being minimised. Squaring the deviation
+            does that: the term is zero when the count is right and grows quadratically in either
+            direction, so an eleven-stock portfolio pays for its extra name and a nine-stock one
+            pays for its missing slot.
+          </p>
+
+          <h2>Folding it into a matrix</h2>
+          <p>
+            To get a QUBO you need everything as <code>xᵀQx</code>. The trick that makes this work
+            is that binary variables are idempotent: <code>xᵢ² = xᵢ</code>, because 0² = 0 and
+            1² = 1. That single identity collapses every squared term into a linear one, and the
+            linear terms then live on the diagonal of Q.
+          </p>
+          <p>
+            Expanding the penalty with it:
+          </p>
+
+          <div class="codeblock">
+            <div class="codeblock__bar"><span class="codeblock__name">expanding P(Σxᵢ − K)²</span></div>
+            <pre><code>(Σᵢ xᵢ)²  =  Σᵢ xᵢ²  +  2 Σᵢ&lt;ⱼ xᵢxⱼ
+          =  Σᵢ xᵢ   +  2 Σᵢ&lt;ⱼ xᵢxⱼ        ← because xᵢ² = xᵢ
+
+P(Σxᵢ − K)²  =  P Σᵢ xᵢ (1 − 2K)  +  2P Σᵢ&lt;ⱼ xᵢxⱼ  +  P K²
+                └── diagonal ──┘     └── off-diagonal ──┘   └ constant ┘</code></pre>
+          </div>
+
+          <p>
+            The risk term splits the same way — its diagonal is the variances, its off-diagonal the
+            covariances, doubled because an upper-triangular matrix counts each pair once. Collect
+            the pieces and Q writes itself:
+          </p>
+
+          <div class="codeblock">
+            <div class="codeblock__bar"><span class="codeblock__name">core/qubo.py</span></div>
+            <pre><code>def build_q(mu, cov, k, gamma, penalty):
+    n = len(mu)
+
+    # Scale the penalty to the objective it has to compete with.
+    obj_diag = -mu + gamma * np.diag(cov)
+    scale = float(np.mean(np.abs(obj_diag))) or 1.0
+    p = penalty * scale
+
+    q = np.zeros((n, n))
+    np.fill_diagonal(q, obj_diag + p * (1 - 2 * k))
+
+    iu = np.triu_indices(n, k=1)
+    q[iu] = 2 * gamma * cov[iu] + 2 * p
+
+    # P·K² does not depend on x, so it cannot move the argmin. Keep it on the
+    # side anyway, or reported energies will not match hand calculations.
+    return q, p * k * k</code></pre>
+          </div>
+
+          <h2>The line that actually decides whether this works</h2>
+          <p>
+            Look again at those three lines computing <code>p</code>. They are the part I would
+            have got wrong if I had written this from the textbook.
+          </p>
+          <p>
+            The penalty coefficient P has to be large enough that violating the cardinality
+            constraint costs more than the return you gain by violating it, and small enough that
+            it does not drown out the return-versus-risk trade-off you actually care about. Between
+            those two failures there is a usable band — and where that band sits depends entirely
+            on the units of μ and Σ.
+          </p>
+          <p>
+            Daily expected returns are numbers like 0.0004. Daily covariances are numbers like
+            0.0001. A penalty of P = 5 against coefficients of that size is not a nudge, it is a
+            steamroller: the solver returns some arbitrary ten-stock portfolio, because getting the
+            count right is worth ten thousand times more than getting the stocks right. Rescale
+            your returns to annualised percentages and the same P = 5 becomes invisible, and the
+            solver returns all thirty names.
+          </p>
+
+          <div class="callout">
+            <span class="callout__label">The fix</span>
+            <p>
+              Make P a <strong>multiplier on the objective's own magnitude</strong>, not an
+              absolute number. Take the mean absolute value of the objective's diagonal — the
+              scale at which this particular problem's return and risk terms actually operate —
+              and set the penalty relative to it. Now P = 5 means "five times the typical
+              coefficient", which is meaningful for any units.
+            </p>
+          </div>
+
+          <p>
+            This is the kind of thing that is obvious once stated and invisible beforehand. It is
+            also almost undebuggable from the outside: a badly scaled penalty does not raise an
+            error, it returns a plausible-looking portfolio that ignores half the objective. So the
+            curriculum this lives in has a lab whose entire purpose is to let a reader set P by
+            hand and watch both failure modes happen. I would rather someone break it deliberately
+            than trust it silently.
+          </p>
+          <p>
+            To make that inspectable at all, the solver can decompose any candidate's energy into
+            its three parts — return, risk, penalty — and the labs assert that the three sum to the
+            total. If they ever stop summing, the expansion above has a sign error in it.
+          </p>
+
+          <figure class="diagram">
+            <div class="diagram__scroll">
+{{ include:diagrams/anneal-energy.svg }}
+            </div>
+            <figcaption>
+              Left: the return term pulls energy down while risk and penalty push it up; a correct
+              decomposition must sum to the total. Right: as inverse temperature β rises
+              geometrically, the walk stops accepting uphill moves and freezes into a solution.
+            </figcaption>
+          </figure>
+
+          <h2>The annealer</h2>
+          <p>
+            Simulated annealing is a Metropolis random walk over bit strings with a temperature
+            that falls over time. Early on it accepts moves that make things worse, which is how it
+            escapes local minima; later it accepts almost nothing and settles. Written in terms of
+            inverse temperature β = 1/T, a proposed flip with energy change ΔE is accepted with
+            probability <code>min(1, e^(−β·ΔE))</code>, so raising β means "accept less".
+          </p>
+          <p>
+            The naive implementation recomputes <code>xᵀQx</code> for each candidate flip, which is
+            O(N²) per proposal and therefore O(N³) per sweep. You do not need to. Split Q into its
+            diagonal <code>d</code> and a symmetric off-diagonal matrix <code>C</code>, and
+            maintain a <em>field</em> vector <code>field = C·x</code> alongside the state. Then
+            flipping bit <em>i</em> changes the energy by a quantity you can read off in O(1), and
+            repairing the field afterwards costs O(N):
+          </p>
+
+          <div class="codeblock">
+            <div class="codeblock__bar"><span class="codeblock__name">core/annealer.py — the inner loop</span></div>
+            <pre><code>field = c @ x                       # maintained incrementally from here on
+
+for beta in np.geomspace(beta_start, beta_end, num_sweeps):
+    for i in rng.permutation(n):
+        v = x[i]
+        s = 1 - 2 * v                          # +1 turning on, −1 turning off
+        d_energy = s * (diag[i] + field[i])    # O(1), no matrix product
+
+        if d_energy &lt;= 0 or rng.random() &lt; np.exp(-beta * d_energy):
+            x[i] = 1 - v
+            field += c[:, i] * s               # O(N) repair, not O(N²)</code></pre>
+          </div>
+
+          <p>
+            The schedule is geometric rather than linear — <code>np.geomspace(0.1, 12.0, 1200)</code>
+            — because what matters is the ratio of β between consecutive sweeps, not the difference.
+            Sixty independent restarts run from different random k-hot starting states, and the best
+            of the sixty is returned. Starting from a state that already has roughly the right
+            number of bits set gives the cardinality penalty a head start; starting from a uniform
+            coin flip wastes the first few hundred sweeps just getting the count into range.
+          </p>
+
+          <h2>Making it reproducible, and proving it right</h2>
+          <p>
+            Two things I would not skip again.
+          </p>
+          <p>
+            <strong>Seed the restarts from a master generator, not a shared one.</strong> A single
+            RNG shared across sixty reads makes results depend on scheduling order. One master
+            <code>default_rng(seed)</code> that spawns a child generator per read gives you
+            bit-identical output across runs, which is what makes a regression test possible at
+            all. It also means the tracing that draws those energy curves has to be
+            <em>RNG-neutral</em> — recording β, energy and acceptance rate each sweep must not draw
+            a single number from the generator, or turning tracing on would silently change the
+            answer. There is a test that runs the same seed with and without tracing and asserts
+            the results are identical, because that is precisely the kind of thing that decays.
+          </p>
+          <p>
+            <strong>Race it against the truth while the truth is still computable.</strong> For
+            N ≤ 16 you can enumerate all 2^N states — 65,536 of them — vectorise the energies, and
+            find the exact global minimum. The tests do that and assert that annealing reaches it.
+            Above sixteen the enumeration is hopeless, which is the point of the exercise, but by
+            then you have evidence that the solver is not merely returning something
+            plausible-looking.
+          </p>
+
+          <div class="callout">
+            <span class="callout__label">Honest caveats</span>
+            <p>
+              The expected-return vector is by far the noisiest input to any of this, and no amount
+              of solver quality fixes a bad μ. The default candidate universe is today's large
+              caps, which is survivorship bias baked in — so backtests over it are biased upward
+              and are useful for <em>relative</em> ranking only. This is research and paper
+              trading, not advice, and it does not trade real money.
+            </p>
+          </div>
+
+          <h2>What I would build next</h2>
+          <p>
+            The current formulation equal-weights whatever it selects, which is a real limitation.
+            The standard extension is to give each asset several binary variables representing bits
+            of its weight and add a budget constraint as another squared penalty — a binary
+            expansion. Sector limits fall out the same way: one more squared term per sector. That
+            is the pleasant property of this formulation. Every constraint you can write as
+            "this sum should equal that" becomes another penalty and folds into the same matrix,
+            and the solver never has to know it happened.
+          </p>
+          <p>
+            The part I find genuinely interesting is not the finance. It is that a discrete
+            selection problem with interacting choices — <em>pick a subset where the value of each
+            element depends on the others</em> — shows up everywhere. Feature selection under
+            redundancy is the same shape. So is choosing a panel of markers where you want
+            coverage without measuring the same biology four times. The matrix changes; the
+            machinery does not.
+          </p>
+          <p>
+            <a class="arrowlink" href="../projects.html#quantum">The build this came from <span aria-hidden="true">→</span></a>
+          </p>

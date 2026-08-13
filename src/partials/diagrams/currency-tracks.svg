@@ -1,0 +1,67 @@
+<svg viewBox="0 0 900 300" role="img" aria-labelledby="d4-title">
+  <title id="d4-title">Snapshots are written once in an immutable storage currency. Display restates each snapshot at the rate that applied on its own date; rescaling the whole series by one rate would hide the currency move entirely.</title>
+  <defs>
+    <marker id="d4-arw" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 Z" fill="var(--accent)" />
+    </marker>
+  </defs>
+
+  <!-- ---------- storage track ---------- -->
+  <text class="d-label" x="20" y="34">storage · one currency, chosen once, never changed</text>
+  <line class="d-stroke" x1="20" y1="70" x2="700" y2="70" stroke-width="1" />
+  <g class="d-accent-fill">
+    <circle cx="90"  cy="70" r="5" />
+    <circle cx="212" cy="70" r="5" />
+    <circle cx="334" cy="70" r="5" />
+    <circle cx="456" cy="70" r="5" />
+    <circle cx="578" cy="70" r="5" />
+  </g>
+  <g class="d-label--sm" text-anchor="middle">
+    <text x="90"  y="56">t₁</text>
+    <text x="212" y="56">t₂</text>
+    <text x="334" y="56">t₃</text>
+    <text x="456" y="56">t₄</text>
+    <text x="578" y="56">t₅</text>
+  </g>
+  <rect class="d-fill-elev d-stroke" x="724" y="48" width="156" height="44" rx="8" stroke-width="1" />
+  <text class="d-label--sm" x="802" y="66" text-anchor="middle">write path uses the</text>
+  <text class="d-label--sm" x="802" y="80" text-anchor="middle">_sgd mirror fields only</text>
+
+  <!-- ---------- conversion ---------- -->
+  <g class="d-accent" fill="none" stroke-width="1.2" marker-end="url(#d4-arw)">
+    <path d="M90  80 L90  152" />
+    <path d="M212 80 L212 152" />
+    <path d="M334 80 L334 152" />
+    <path d="M456 80 L456 152" />
+    <path d="M578 80 L578 152" />
+  </g>
+  <g class="d-label--sm" text-anchor="middle" fill="var(--accent)">
+    <text x="90"  y="120">fx(t₁)</text>
+    <text x="212" y="120">fx(t₂)</text>
+    <text x="334" y="120">fx(t₃)</text>
+    <text x="456" y="120">fx(t₄)</text>
+    <text x="578" y="120">fx(t₅)</text>
+  </g>
+  <text class="d-label--sm" x="620" y="120">each point at its own date's rate</text>
+
+  <!-- ---------- display track ---------- -->
+  <line class="d-stroke" x1="20" y1="164" x2="700" y2="164" stroke-width="1" />
+  <g class="d-accent2-fill">
+    <circle cx="90"  cy="164" r="5" />
+    <circle cx="212" cy="164" r="5" />
+    <circle cx="334" cy="164" r="5" />
+    <circle cx="456" cy="164" r="5" />
+    <circle cx="578" cy="164" r="5" />
+  </g>
+  <text class="d-label" x="20" y="196">display · whatever the reader picked today</text>
+
+  <!-- ---------- the rejected shortcut ---------- -->
+  <line class="d-muted" x1="20" y1="222" x2="880" y2="222" stroke-width="1" />
+  <text class="d-label--sm" x="20" y="248" fill="var(--text-faint)">the alternative: convert the finished series by one rate</text>
+  <g stroke="var(--text-faint)" stroke-width="1.6" stroke-linecap="round">
+    <line x1="470" y1="238" x2="484" y2="252" />
+    <line x1="484" y1="238" x2="470" y2="252" />
+  </g>
+  <text class="d-label--sm" x="500" y="248" fill="var(--text-faint)">every currency draws the same shape, scaled — the FX move disappears</text>
+  <text class="d-label--sm" x="20" y="276" fill="var(--text-faint)">and the storage currency must not follow the toggle, or the history gets a step change through its middle</text>
+</svg>

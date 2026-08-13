@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Junjie Chen — writing</title>
+    <link>https://neutrophil.github.io/blog.html</link>
+    <atom:link href="https://neutrophil.github.io/feed.xml" rel="self" type="application/rss+xml" />
+    <description>Notes on genomics, machine learning, and systems built on evenings.</description>
+    <language>en</language>
+    <lastBuildDate>Wed, 12 Aug 2026 20:08:19 +0000</lastBuildDate>
+    <item>
+      <title>Notes from sixty Streamlit pages</title>
+      <link>https://neutrophil.github.io/posts/2026-08-13-sixty-streamlit-pages.html</link>
+      <guid isPermaLink="true">https://neutrophil.github.io/posts/2026-08-13-sixty-streamlit-pages.html</guid>
+      <pubDate>Thu, 13 Aug 2026 09:00:00 +0000</pubDate>
+      <description>Five dashboards, sixty-odd pages, and a collection of failures that each took longer to find than they should have. A page that returns HTTP 200 while displaying a traceback, a sort order that puts 9.9% above 12.0%, and a single cached lookup that made every keystroke take ten seconds.</description>
+      <category>Streamlit</category>
+      <category>Learning notes</category>
+      <category>Python</category>
+    </item>
+    <item>
+      <title>Choosing ten stocks out of thirty with a QUBO</title>
+      <link>https://neutrophil.github.io/posts/2026-08-13-qubo-portfolio-selection.html</link>
+      <guid isPermaLink="true">https://neutrophil.github.io/posts/2026-08-13-qubo-portfolio-selection.html</guid>
+      <pubDate>Thu, 13 Aug 2026 09:00:00 +0000</pubDate>
+      <description>Portfolio selection is a combinatorial problem hiding inside a linear-algebra costume. Posing it as a QUBO and solving it by simulated annealing takes about 200 lines of numpy — and one scaling decision that quietly decides whether any of it works.</description>
+      <category>Optimization</category>
+      <category>Python</category>
+      <category>Quant</category>
+    </item>
+    <item>
+      <title>Every backtest number I had was wrong</title>
+      <link>https://neutrophil.github.io/posts/2026-08-13-every-backtest-number-was-wrong.html</link>
+      <guid isPermaLink="true">https://neutrophil.github.io/posts/2026-08-13-every-backtest-number-was-wrong.html</guid>
+      <pubDate>Thu, 13 Aug 2026 09:00:00 +0000</pubDate>
+      <description>I went looking for one suspicious result in a strategy tournament and found that the whole leaderboard was invalid — warm-up eaten out of the window, a helper quietly re-levering every portfolio, metrics that ranked a strategy which never lost money as the worst in the field, and three days of trading that happened at the weekend.</description>
+      <category>Postmortem</category>
+      <category>Testing</category>
+      <category>Quant</category>
+    </item>
+    <item>
+      <title>Multi-currency is a data-modelling problem, not a formatting problem</title>
+      <link>https://neutrophil.github.io/posts/2026-08-13-currency-is-a-data-model.html</link>
+      <guid isPermaLink="true">https://neutrophil.github.io/posts/2026-08-13-currency-is-a-data-model.html</guid>
+      <pubDate>Thu, 13 Aug 2026 09:00:00 +0000</pubDate>
+      <description>Showing a number in a different currency looks like a display concern. It is not. Get it wrong and your history grows a step change through its middle, an FX move vanishes from a chart, and a function you wrote six months ago is still quietly answering in last year&#x27;s currency.</description>
+      <category>Python</category>
+      <category>Data modelling</category>
+      <category>Learning notes</category>
+    </item>
+    <item>
+      <title>A privacy scanner for my own repositories</title>
+      <link>https://neutrophil.github.io/posts/2026-08-13-a-scanner-for-my-own-repos.html</link>
+      <guid isPermaLink="true">https://neutrophil.github.io/posts/2026-08-13-a-scanner-for-my-own-repos.html</guid>
+      <pubDate>Thu, 13 Aug 2026 09:00:00 +0000</pubDate>
+      <description>I audited the repositories on my own machine and did not like what I found. The result is a stdlib-only scanner wired into every commit — and a set of design constraints that turn out to be more interesting than the regexes, starting with the fact that a scanner must not contain the things it looks for.</description>
+      <category>Security</category>
+      <category>Tooling</category>
+      <category>Python</category>
+    </item>
+    <item>
+      <title>Bridging the bench and the model: why I&#x27;m moving toward AI for Life Science</title>
+      <link>https://neutrophil.github.io/posts/2026-06-24-bridging-biology-and-ai.html</link>
+      <guid isPermaLink="true">https://neutrophil.github.io/posts/2026-06-24-bridging-biology-and-ai.html</guid>
+      <pubDate>Wed, 24 Jun 2026 09:00:00 +0000</pubDate>
+      <description>A decade in the lab taught me how messy real biological data is. Here&#x27;s why that makes me optimistic — and cautious — about machine learning in genomics, and what I want to build next.</description>
+      <category>AI for Life Science</category>
+      <category>Genomics</category>
+      <category>Career</category>
+    </item>
+  </channel>
+</rss>

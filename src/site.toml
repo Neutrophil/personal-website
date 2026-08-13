@@ -1,0 +1,36 @@
+# Site-wide metadata. Read by build.py; every value here is published.
+# Privacy: this repo is deliberately public, but only the owner's own details
+# belong in it. See CLAUDE.md before adding anything.
+
+title    = "Junjie Chen"
+tagline  = "Genomics + Machine Learning"
+url      = "https://neutrophil.github.io"
+author   = "Junjie Chen"
+email    = "chen_junjie@outlook.com"
+location = "Singapore"
+lang     = "en"
+
+description = "Junjie Chen — Research Scientist II at Lucence Diagnostics. PhD molecular biologist and immunologist bridging clinical genomics, bioinformatics and machine learning, building toward AI for Life Science."
+
+[links]
+linkedin = "https://www.linkedin.com/in/junjie-chen-nus/"
+github   = "https://github.com/Neutrophil"
+cv       = "assets/cv/CHEN_Junjie_CV.pdf"
+
+# Primary navigation. `href` is resolved against {{rel}} at build time unless
+# it starts with http. Keep this short — a nav with seven items reads as a menu.
+[[nav]]
+label = "builds"
+href  = "projects.html"
+
+[[nav]]
+label = "writing"
+href  = "blog.html"
+
+[[nav]]
+label = "about"
+href  = "index.html#about"
+
+[[nav]]
+label = "contact"
+href  = "index.html#contact"

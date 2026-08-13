@@ -1,0 +1,61 @@
+<svg viewBox="0 0 900 250" role="img" aria-labelledby="d2-title">
+  <title id="d2-title">Left: total energy split into a return term that pulls it down and risk and penalty terms that push it up. Right: as inverse temperature rises on a geometric schedule, accepted energy falls and the walk freezes.</title>
+
+  <!-- ================= left: energy decomposition ================= -->
+  <text class="d-label" x="20" y="26">energy terms at a candidate x</text>
+  <line class="d-muted" x1="20" y1="38" x2="400" y2="38" stroke-width="1" />
+
+  <!-- zero axis -->
+  <line class="d-stroke" x1="215" y1="56" x2="215" y2="214" stroke-width="1" stroke-dasharray="3 4" />
+  <text class="d-label--sm" x="215" y="230" text-anchor="middle">0</text>
+
+  <!-- return: negative, pulls energy down -->
+  <text class="d-label--sm" x="20" y="80">−μᵀx</text>
+  <rect class="d-accent2-fill" x="119" y="66" width="96" height="20" rx="3" opacity=".85" />
+  <text class="d-label--sm" x="112" y="80" text-anchor="end">return</text>
+
+  <!-- risk -->
+  <text class="d-label--sm" x="20" y="124">γ xᵀΣx</text>
+  <rect class="d-accent-fill" x="215" y="110" width="62" height="20" rx="3" opacity=".85" />
+  <text class="d-label--sm" x="285" y="124">risk</text>
+
+  <!-- penalty -->
+  <text class="d-label--sm" x="20" y="168">P(Σx−K)²</text>
+  <rect x="215" y="154" width="14" height="20" rx="3" fill="var(--border-lit)" />
+  <text class="d-label--sm" x="237" y="168">penalty · 0 when the count is right</text>
+
+  <!-- total -->
+  <line class="d-muted" x1="20" y1="190" x2="400" y2="190" stroke-width="1" />
+  <text class="d-label" x="20" y="210">total</text>
+  <rect class="d-accent2-fill" x="177" y="196" width="38" height="18" rx="3" opacity=".55" />
+  <text class="d-label--sm" x="292" y="210">the three must sum to it</text>
+
+  <!-- ================= right: the schedule ================= -->
+  <text class="d-label" x="470" y="26">1200 sweeps of Metropolis</text>
+  <line class="d-muted" x1="470" y1="38" x2="880" y2="38" stroke-width="1" />
+
+  <!-- frame -->
+  <line class="d-stroke" x1="500" y1="60" x2="500" y2="200" stroke-width="1" />
+  <line class="d-stroke" x1="500" y1="200" x2="870" y2="200" stroke-width="1" />
+  <text class="d-label--sm" x="500" y="220">β = 0.1</text>
+  <text class="d-label--sm" x="870" y="220" text-anchor="end">β = 12</text>
+  <text class="d-label--sm" x="685" y="236" text-anchor="middle">inverse temperature, geometric</text>
+
+  <!-- beta schedule (rising, dashed) -->
+  <path class="d-accent2" fill="none" stroke-width="1.4" stroke-dasharray="4 4"
+        d="M500 194 C 600 190, 680 174, 730 146 C 780 118, 820 86, 870 68" />
+  <text class="d-label--sm" x="812" y="60" fill="var(--accent-2)">β</text>
+
+  <!-- energy trace (falling, noisy early, frozen late) -->
+  <path class="d-accent" fill="none" stroke-width="1.6" stroke-linejoin="round"
+        d="M500 74 L516 96 L528 78 L544 108 L558 92 L572 122 L588 104 L604 134
+           L620 120 L636 146 L652 138 L668 158 L684 150 L700 166 L716 162
+           L732 174 L748 171 L764 179 L780 178 L796 183 L812 182 L828 185
+           L844 185 L860 186 L870 186" />
+  <circle class="d-accent-fill" cx="870" cy="186" r="3.5" />
+  <text class="d-label--sm" x="560" y="66" fill="var(--accent)">energy</text>
+
+  <!-- annotations -->
+  <text class="d-label--sm" x="540" y="192">uphill moves accepted</text>
+  <text class="d-label--sm" x="866" y="150" text-anchor="end">frozen</text>
+</svg>

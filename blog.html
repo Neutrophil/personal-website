@@ -1,118 +1,219 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="no-js">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Blog — Junjie Chen</title>
-  <meta name="description" content="Scientific writing and thinking by Junjie Chen — notes on genomics, machine learning, multi-omics and AI for Life Science." />
+  <meta name="color-scheme" content="dark light" />
+  <title>Writing — Junjie Chen</title>
+  <meta name="description" content="Notes on genomics, machine learning, optimization and the systems Junjie Chen builds on evenings — postmortems, learning notes and design write-ups." />
   <meta name="author" content="Junjie Chen" />
 
   <meta property="og:type" content="website" />
-  <meta property="og:title" content="Blog — Junjie Chen" />
-  <meta property="og:description" content="Scientific writing and thinking on genomics, ML and AI for Life Science." />
+  <meta property="og:title" content="Writing" />
+  <meta property="og:description" content="Notes on genomics, machine learning, optimization and the systems Junjie Chen builds on evenings — postmortems, learning notes and design write-ups." />
   <meta property="og:url" content="https://neutrophil.github.io/blog.html" />
+  <meta property="og:site_name" content="Junjie Chen" />
+  <meta name="twitter:card" content="summary_large_image" />
 
   <link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
   <link rel="stylesheet" href="css/styles.css" />
+  <link rel="alternate" type="application/rss+xml" title="Junjie Chen — writing" href="feed.xml" />
+  <link rel="canonical" href="https://neutrophil.github.io/blog.html" />
 
+  <!-- Resolve the theme and announce JS before first paint.
+       The no-js -> js swap matters: .reveal starts at opacity 0 only when
+       scripting is available, so a JS failure degrades to visible content
+       rather than a blank page. -->
   <script>
     (function () {
+      var d = document.documentElement;
+      d.classList.remove('no-js');
+      d.classList.add('js');
       try {
         var stored = localStorage.getItem('theme');
-        var theme = stored || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-        document.documentElement.setAttribute('data-theme', theme);
-      } catch (e) {}
+        var theme = stored || (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+        d.setAttribute('data-theme', theme);
+      } catch (e) {
+        d.setAttribute('data-theme', 'dark');
+      }
     })();
   </script>
 </head>
-<body>
+<body class="page-blog">
   <a class="skip-link" href="#main">Skip to content</a>
+  <div class="progress" id="progress" aria-hidden="true"></div>
 
-  <!-- ============ NAV ============ -->
   <header class="nav" id="top">
-    <div class="container nav__inner">
+    <div class="shell nav__inner">
       <a class="nav__brand" href="index.html" aria-label="Junjie Chen — home">
-        <span class="nav__monogram">JC</span>
+        <span class="nav__monogram" aria-hidden="true">
+          <svg viewBox="0 0 32 32" width="30" height="30" fill="none" aria-hidden="true">
+            <rect x="1" y="1" width="30" height="30" rx="8" stroke="currentColor" stroke-width="1.25" opacity=".55"/>
+            <path d="M12 9v10.2a3.3 3.3 0 0 1-3.3 3.3H7.4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            <path d="M24.6 10.4a5.9 5.9 0 0 0-8.6 1 6.6 6.6 0 0 0 0 8.6 5.9 5.9 0 0 0 8.6 1" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </span>
         <span class="nav__name">Junjie Chen</span>
       </a>
 
       <nav class="nav__links" id="nav-links" aria-label="Primary">
-        <a href="index.html#about">About</a>
-        <a href="index.html#expertise">Expertise</a>
-        <a href="index.html#experience">Experience</a>
-        <a href="index.html#projects">Projects</a>
-        <a href="index.html#publications">Publications</a>
-        <a href="blog.html" class="is-active" aria-current="page">Blog</a>
-        <a href="index.html#contact">Contact</a>
+        <a href="projects.html"><span class="nav__bracket" aria-hidden="true">[</span>builds<span class="nav__bracket" aria-hidden="true">]</span></a>
+        <a href="blog.html" class="is-active" aria-current="page"><span class="nav__bracket" aria-hidden="true">[</span>writing<span class="nav__bracket" aria-hidden="true">]</span></a>
+        <a href="index.html#about"><span class="nav__bracket" aria-hidden="true">[</span>about<span class="nav__bracket" aria-hidden="true">]</span></a>
+        <a href="index.html#contact"><span class="nav__bracket" aria-hidden="true">[</span>contact<span class="nav__bracket" aria-hidden="true">]</span></a>
       </nav>
 
       <div class="nav__actions">
-        <a class="btn btn--small btn--primary nav__cv" href="assets/cv/CHEN_Junjie_CV.pdf" target="_blank" rel="noopener">Download CV</a>
-        <button class="theme-toggle" id="theme-toggle" type="button" aria-label="Toggle dark mode" title="Toggle dark mode">
-          <svg class="icon-sun" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"></path></svg>
-          <svg class="icon-moon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+        <a class="btn btn--sm btn--primary nav__cv" href="assets/cv/CHEN_Junjie_CV.pdf" target="_blank" rel="noopener">CV</a>
+        <button class="iconbtn" id="theme-toggle" type="button" aria-label="Switch to light theme" title="Switch theme">
+          <svg class="icon-sun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"></path></svg>
+          <svg class="icon-moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
         </button>
-        <button class="nav__burger" id="nav-burger" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="nav-links">
+        <button class="iconbtn nav__burger" id="nav-burger" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="nav-links">
           <span></span><span></span><span></span>
         </button>
       </div>
     </div>
   </header>
 
-  <main id="main">
 
-    <!-- ============ BLOG HEADER ============ -->
-    <section class="blog-hero">
-      <div class="container">
-        <p class="hero__eyebrow reveal">Writing &amp; thinking</p>
-        <h1 class="blog-hero__title reveal">Blog</h1>
-        <p class="blog-hero__lede reveal">
-          Notes at the intersection of biology and computation — genomics, machine learning,
-          multi-omics, and where I think <strong>AI for Life Science</strong> is heading. Working
-          through ideas in the open.
+  <main id="main">
+    <section class="pagehead">
+      <div class="grid-bg" aria-hidden="true"></div>
+      <div class="shell shell--narrow">
+        <p class="eyebrow"><span aria-hidden="true">▸</span> 6 posts</p>
+        <h1 class="pagehead__title">Writing</h1>
+        <p class="pagehead__lede">
+          Working notes from two directions at once: clinical genomics and machine learning by
+          day, and a shelf of systems built on evenings. Mostly postmortems — the bugs are where
+          the design actually shows up.
         </p>
       </div>
     </section>
 
-    <!-- ============ POST LIST ============ -->
-    <section class="section">
-      <div class="container">
-        <ul class="postlist">
-
-          <li class="postlist__item reveal">
+    <section class="section section--tight">
+      <div class="shell shell--narrow">
+        <div class="chips" id="tag-filter" role="group" aria-label="Filter posts by tag">
+          <button type="button" class="chip is-on" data-tag="*" aria-pressed="true">all <span class="chip__n">6</span></button>
+          <button type="button" class="chip" data-tag="Python" aria-pressed="false">Python <span class="chip__n">4</span></button>
+          <button type="button" class="chip" data-tag="Learning notes" aria-pressed="false">Learning notes <span class="chip__n">2</span></button>
+          <button type="button" class="chip" data-tag="Quant" aria-pressed="false">Quant <span class="chip__n">2</span></button>
+          <button type="button" class="chip" data-tag="AI for Life Science" aria-pressed="false">AI for Life Science <span class="chip__n">1</span></button>
+          <button type="button" class="chip" data-tag="Career" aria-pressed="false">Career <span class="chip__n">1</span></button>
+          <button type="button" class="chip" data-tag="Data modelling" aria-pressed="false">Data modelling <span class="chip__n">1</span></button>
+          <button type="button" class="chip" data-tag="Genomics" aria-pressed="false">Genomics <span class="chip__n">1</span></button>
+          <button type="button" class="chip" data-tag="Optimization" aria-pressed="false">Optimization <span class="chip__n">1</span></button>
+          <button type="button" class="chip" data-tag="Postmortem" aria-pressed="false">Postmortem <span class="chip__n">1</span></button>
+          <button type="button" class="chip" data-tag="Security" aria-pressed="false">Security <span class="chip__n">1</span></button>
+          <button type="button" class="chip" data-tag="Streamlit" aria-pressed="false">Streamlit <span class="chip__n">1</span></button>
+          <button type="button" class="chip" data-tag="Testing" aria-pressed="false">Testing <span class="chip__n">1</span></button>
+          <button type="button" class="chip" data-tag="Tooling" aria-pressed="false">Tooling <span class="chip__n">1</span></button>
+        </div>
+        <ul class="postlist" id="postlist">
+          <li class="postlist__item reveal" data-tags="Streamlit|Learning notes|Python">
+            <a class="postcard" href="posts/2026-08-13-sixty-streamlit-pages.html">
+              <div class="postcard__meta">
+                <time datetime="2026-08-13">13 Aug 2026</time>
+                <span class="dot" aria-hidden="true">·</span>
+                <span>8 min read</span>
+              </div>
+              <h2 class="postcard__title">Notes from sixty Streamlit pages</h2>
+              <p class="postcard__summary">Five dashboards, sixty-odd pages, and a collection of failures that each took longer to find than they should have. A page that returns HTTP 200 while displaying a traceback, a sort order that puts 9.9% above 12.0%, and a single cached lookup that made every keystroke take ten seconds.</p>
+              <ul class="tags tags--mini"><li>Streamlit</li><li>Learning notes</li><li>Python</li></ul>
+              <span class="postcard__more">Read <span aria-hidden="true">→</span></span>
+            </a>
+          </li>
+          <li class="postlist__item reveal" data-tags="Optimization|Python|Quant">
+            <a class="postcard" href="posts/2026-08-13-qubo-portfolio-selection.html">
+              <div class="postcard__meta">
+                <time datetime="2026-08-13">13 Aug 2026</time>
+                <span class="dot" aria-hidden="true">·</span>
+                <span>9 min read</span>
+              </div>
+              <h2 class="postcard__title">Choosing ten stocks out of thirty with a QUBO</h2>
+              <p class="postcard__summary">Portfolio selection is a combinatorial problem hiding inside a linear-algebra costume. Posing it as a QUBO and solving it by simulated annealing takes about 200 lines of numpy — and one scaling decision that quietly decides whether any of it works.</p>
+              <ul class="tags tags--mini"><li>Optimization</li><li>Python</li><li>Quant</li></ul>
+              <span class="postcard__more">Read <span aria-hidden="true">→</span></span>
+            </a>
+          </li>
+          <li class="postlist__item reveal" data-tags="Postmortem|Testing|Quant">
+            <a class="postcard" href="posts/2026-08-13-every-backtest-number-was-wrong.html">
+              <div class="postcard__meta">
+                <time datetime="2026-08-13">13 Aug 2026</time>
+                <span class="dot" aria-hidden="true">·</span>
+                <span>8 min read</span>
+              </div>
+              <h2 class="postcard__title">Every backtest number I had was wrong</h2>
+              <p class="postcard__summary">I went looking for one suspicious result in a strategy tournament and found that the whole leaderboard was invalid — warm-up eaten out of the window, a helper quietly re-levering every portfolio, metrics that ranked a strategy which never lost money as the worst in the field, and three days of trading that happened at the weekend.</p>
+              <ul class="tags tags--mini"><li>Postmortem</li><li>Testing</li><li>Quant</li></ul>
+              <span class="postcard__more">Read <span aria-hidden="true">→</span></span>
+            </a>
+          </li>
+          <li class="postlist__item reveal" data-tags="Python|Data modelling|Learning notes">
+            <a class="postcard" href="posts/2026-08-13-currency-is-a-data-model.html">
+              <div class="postcard__meta">
+                <time datetime="2026-08-13">13 Aug 2026</time>
+                <span class="dot" aria-hidden="true">·</span>
+                <span>8 min read</span>
+              </div>
+              <h2 class="postcard__title">Multi-currency is a data-modelling problem, not a formatting problem</h2>
+              <p class="postcard__summary">Showing a number in a different currency looks like a display concern. It is not. Get it wrong and your history grows a step change through its middle, an FX move vanishes from a chart, and a function you wrote six months ago is still quietly answering in last year&#x27;s currency.</p>
+              <ul class="tags tags--mini"><li>Python</li><li>Data modelling</li><li>Learning notes</li></ul>
+              <span class="postcard__more">Read <span aria-hidden="true">→</span></span>
+            </a>
+          </li>
+          <li class="postlist__item reveal" data-tags="Security|Tooling|Python">
+            <a class="postcard" href="posts/2026-08-13-a-scanner-for-my-own-repos.html">
+              <div class="postcard__meta">
+                <time datetime="2026-08-13">13 Aug 2026</time>
+                <span class="dot" aria-hidden="true">·</span>
+                <span>9 min read</span>
+              </div>
+              <h2 class="postcard__title">A privacy scanner for my own repositories</h2>
+              <p class="postcard__summary">I audited the repositories on my own machine and did not like what I found. The result is a stdlib-only scanner wired into every commit — and a set of design constraints that turn out to be more interesting than the regexes, starting with the fact that a scanner must not contain the things it looks for.</p>
+              <ul class="tags tags--mini"><li>Security</li><li>Tooling</li><li>Python</li></ul>
+              <span class="postcard__more">Read <span aria-hidden="true">→</span></span>
+            </a>
+          </li>
+          <li class="postlist__item reveal" data-tags="AI for Life Science|Genomics|Career">
             <a class="postcard" href="posts/2026-06-24-bridging-biology-and-ai.html">
               <div class="postcard__meta">
                 <time datetime="2026-06-24">24 Jun 2026</time>
-                <span class="postcard__read">· 5 min read</span>
+                <span class="dot" aria-hidden="true">·</span>
+                <span>2 min read</span>
               </div>
-              <h2 class="postcard__title">Bridging the bench and the model: why I'm moving toward AI for Life Science</h2>
-              <p class="postcard__summary">
-                A decade in the lab taught me how messy real biological data is. Here's why that
-                makes me optimistic — and cautious — about machine learning in genomics, and what
-                I want to build next.
-              </p>
-              <ul class="tags tags--mini">
-                <li>AI for Life Science</li><li>Genomics</li><li>Career</li>
-              </ul>
-              <span class="postcard__more">Read post →</span>
+              <h2 class="postcard__title">Bridging the bench and the model: why I&#x27;m moving toward AI for Life Science</h2>
+              <p class="postcard__summary">A decade in the lab taught me how messy real biological data is. Here&#x27;s why that makes me optimistic — and cautious — about machine learning in genomics, and what I want to build next.</p>
+              <ul class="tags tags--mini"><li>AI for Life Science</li><li>Genomics</li><li>Career</li></ul>
+              <span class="postcard__more">Read <span aria-hidden="true">→</span></span>
             </a>
           </li>
-
-          <!-- Add new posts by copying the <li>…</li> block above and creating a matching
-               file in posts/. The newest post should go at the top. -->
-
         </ul>
+        <p class="postlist__empty" id="postlist-empty" hidden>Nothing tagged that way yet.</p>
       </div>
     </section>
 
   </main>
 
   <footer class="footer">
-    <div class="container footer__inner">
-      <p>© <span id="year"></span> Junjie Chen · Singapore</p>
-      <p class="footer__note">Static site · no trackers · <a href="#top">Back to top ↑</a></p>
+    <div class="shell footer__inner">
+      <div class="footer__col">
+        <p class="footer__sig">Junjie Chen</p>
+        <p class="footer__meta">Singapore · genomics, machine learning, and things built on evenings</p>
+      </div>
+      <nav class="footer__col footer__links" aria-label="Elsewhere">
+        <a href="mailto:chen_junjie@outlook.com">Email</a>
+        <a href="https://www.linkedin.com/in/junjie-chen-nus/" target="_blank" rel="noopener">LinkedIn</a>
+        <a href="https://github.com/Neutrophil" target="_blank" rel="noopener">GitHub</a>
+        <a href="feed.xml">RSS</a>
+      </nav>
+      <div class="footer__col footer__end">
+        <p class="footer__meta">© <span id="year">2026</span> · static site, no trackers, no analytics</p>
+        <p><a class="footer__top" href="#top">Back to top <span aria-hidden="true">↑</span></a></p>
+      </div>
     </div>
   </footer>
+
 
   <script src="js/main.js"></script>
 </body>

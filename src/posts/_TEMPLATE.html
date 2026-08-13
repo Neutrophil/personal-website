@@ -1,0 +1,63 @@
++++
+# Copy this file to src/posts/YYYY-MM-DD-some-slug.html and fill it in.
+# The leading underscore is what keeps this file out of the build.
+# Then run:  python build.py --check
+# The blog index, the tag filter, the RSS feed, prev/next links and the reading
+# time are all derived from what is below — there is nothing else to update.
+
+title   = "A title that says what happened"
+date    = 2026-01-01
+summary = "Two or three sentences for the index card and the feed. Concrete beats clever; this is what decides whether anyone opens the post."
+tags    = ["Learning notes"]
+
+# Optional. Defaults to `summary` for the meta description, and to a word count
+# at 200 wpm for the reading time.
+# description = "A shorter line for search results and link previews."
+# minutes = 7
++++
+          <p>
+            The body is an HTML fragment. No &lt;html&gt;, no &lt;head&gt;, no nav, no footer —
+            the build wraps all of that around it. Start straight in with the first paragraph.
+          </p>
+
+          <h2>A section</h2>
+          <p>
+            Available inline: <strong>strong</strong>, <em>em</em>, <code>code</code>, and
+            <a href="https://example.com">links</a>. Lists and blockquotes work as you expect.
+          </p>
+
+          <div class="codeblock">
+            <div class="codeblock__bar"><span class="codeblock__name">path/to/file.py</span></div>
+            <pre><code>def example():
+    """Escape &lt; and &gt; and &amp; inside code blocks."""
+    return 42</code></pre>
+          </div>
+
+          <div class="callout">
+            <span class="callout__label">Callout</span>
+            <p>For the one idea in the post that is worth stopping for.</p>
+          </div>
+
+          <figure class="diagram">
+            <div class="diagram__scroll">
+{{ include:diagrams/layered-architecture.svg }}
+            </div>
+            <figcaption>
+              Diagrams live in src/partials/diagrams/ and are included by name. Use the shared
+              d-* classes so they stay theme-aware and visually consistent.
+            </figcaption>
+          </figure>
+
+          <div class="tablewrap">
+            <table class="datatable">
+              <thead><tr><th>thing</th><th>before</th><th>after</th></tr></thead>
+              <tbody><tr><td>a measurement</td><td>3.47 s</td><td>0.03 s</td></tr></tbody>
+            </table>
+          </div>
+
+          <p>
+            Close with a link back to the build it came from, if there is one.
+          </p>
+          <p>
+            <a class="arrowlink" href="../projects.html">The build this came from <span aria-hidden="true">→</span></a>
+          </p>

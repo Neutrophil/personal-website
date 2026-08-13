@@ -1,104 +1,162 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="no-js">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Junjie Chen — Research Scientist · Genomics + Machine Learning</title>
+  <meta name="color-scheme" content="dark light" />
+  <title>Junjie Chen — Genomics + Machine Learning</title>
   <meta name="description" content="Junjie Chen — Research Scientist II at Lucence Diagnostics. PhD molecular biologist and immunologist bridging clinical genomics, bioinformatics and machine learning, building toward AI for Life Science." />
   <meta name="author" content="Junjie Chen" />
 
-  <!-- Open Graph -->
   <meta property="og:type" content="website" />
   <meta property="og:title" content="Junjie Chen — Genomics + Machine Learning" />
-  <meta property="og:description" content="Bridging molecular biology and computation — building toward AI for Life Science." />
+  <meta property="og:description" content="Research Scientist II at Lucence Diagnostics. Bridging molecular biology and computation, building toward AI for Life Science." />
   <meta property="og:url" content="https://neutrophil.github.io/" />
+  <meta property="og:site_name" content="Junjie Chen" />
+  <meta name="twitter:card" content="summary_large_image" />
 
   <link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="stylesheet" href="css/styles.css" />
+  <link rel="alternate" type="application/rss+xml" title="Junjie Chen — writing" href="feed.xml" />
+  <link rel="canonical" href="https://neutrophil.github.io/" />
 
-  <!-- Set theme before paint to avoid flash of wrong theme -->
+  <!-- Resolve the theme and announce JS before first paint.
+       The no-js -> js swap matters: .reveal starts at opacity 0 only when
+       scripting is available, so a JS failure degrades to visible content
+       rather than a blank page. -->
   <script>
     (function () {
+      var d = document.documentElement;
+      d.classList.remove('no-js');
+      d.classList.add('js');
       try {
         var stored = localStorage.getItem('theme');
-        var theme = stored || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-        document.documentElement.setAttribute('data-theme', theme);
-      } catch (e) {}
+        var theme = stored || (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+        d.setAttribute('data-theme', theme);
+      } catch (e) {
+        d.setAttribute('data-theme', 'dark');
+      }
     })();
   </script>
 </head>
-<body>
+<body class="page-index">
   <a class="skip-link" href="#main">Skip to content</a>
+  <div class="progress" id="progress" aria-hidden="true"></div>
 
-  <!-- ============ NAV ============ -->
   <header class="nav" id="top">
-    <div class="container nav__inner">
-      <a class="nav__brand" href="#top" aria-label="Junjie Chen — home">
-        <span class="nav__monogram">JC</span>
+    <div class="shell nav__inner">
+      <a class="nav__brand" href="index.html" aria-label="Junjie Chen — home">
+        <span class="nav__monogram" aria-hidden="true">
+          <svg viewBox="0 0 32 32" width="30" height="30" fill="none" aria-hidden="true">
+            <rect x="1" y="1" width="30" height="30" rx="8" stroke="currentColor" stroke-width="1.25" opacity=".55"/>
+            <path d="M12 9v10.2a3.3 3.3 0 0 1-3.3 3.3H7.4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            <path d="M24.6 10.4a5.9 5.9 0 0 0-8.6 1 6.6 6.6 0 0 0 0 8.6 5.9 5.9 0 0 0 8.6 1" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </span>
         <span class="nav__name">Junjie Chen</span>
       </a>
 
       <nav class="nav__links" id="nav-links" aria-label="Primary">
-        <a href="#about">About</a>
-        <a href="#expertise">Expertise</a>
-        <a href="#experience">Experience</a>
-        <a href="#projects">Projects</a>
-        <a href="#publications">Publications</a>
-        <a href="blog.html">Blog</a>
-        <a href="#contact">Contact</a>
+        <a href="projects.html"><span class="nav__bracket" aria-hidden="true">[</span>builds<span class="nav__bracket" aria-hidden="true">]</span></a>
+        <a href="blog.html"><span class="nav__bracket" aria-hidden="true">[</span>writing<span class="nav__bracket" aria-hidden="true">]</span></a>
+        <a href="index.html#about" class="is-active" aria-current="page"><span class="nav__bracket" aria-hidden="true">[</span>about<span class="nav__bracket" aria-hidden="true">]</span></a>
+        <a href="index.html#contact" class="is-active" aria-current="page"><span class="nav__bracket" aria-hidden="true">[</span>contact<span class="nav__bracket" aria-hidden="true">]</span></a>
       </nav>
 
       <div class="nav__actions">
-        <a class="btn btn--small btn--primary nav__cv" href="assets/cv/CHEN_Junjie_CV.pdf" target="_blank" rel="noopener">Download CV</a>
-        <button class="theme-toggle" id="theme-toggle" type="button" aria-label="Toggle dark mode" title="Toggle dark mode">
-          <svg class="icon-sun" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"></path></svg>
-          <svg class="icon-moon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+        <a class="btn btn--sm btn--primary nav__cv" href="assets/cv/CHEN_Junjie_CV.pdf" target="_blank" rel="noopener">CV</a>
+        <button class="iconbtn" id="theme-toggle" type="button" aria-label="Switch to light theme" title="Switch theme">
+          <svg class="icon-sun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"></path></svg>
+          <svg class="icon-moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
         </button>
-        <button class="nav__burger" id="nav-burger" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="nav-links">
+        <button class="iconbtn nav__burger" id="nav-burger" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="nav-links">
           <span></span><span></span><span></span>
         </button>
       </div>
     </div>
   </header>
 
-  <main id="main">
 
-    <!-- ============ HERO ============ -->
+  <main id="main">
     <section class="hero">
-      <div class="container">
-        <p class="hero__eyebrow reveal">Research Scientist · Singapore</p>
-        <h1 class="hero__title reveal">Junjie Chen</h1>
-        <p class="hero__role reveal">Genomics&nbsp;+&nbsp;Machine&nbsp;Learning</p>
+      <div class="grid-bg" aria-hidden="true"></div>
+      <div class="aurora" aria-hidden="true"></div>
+      <div class="shell hero__inner">
+        <p class="eyebrow reveal"><span aria-hidden="true">▸</span> Research Scientist · Singapore</p>
+        <h1 class="hero__title reveal">Junjie&nbsp;Chen</h1>
+        <p class="hero__role reveal">Genomics <span class="hero__plus" aria-hidden="true">+</span> Machine&nbsp;Learning</p>
         <p class="hero__lede reveal">
-          A molecular biologist and immunologist by training, now developing whole-genome
+          A molecular biologist and immunologist by training, now building whole-genome
           sequencing workflows and machine-learning models for cancer detection at
-          <strong>Lucence Diagnostics</strong>. I work at the interface of wet-lab biology and
-          computation — building toward <strong>AI for Life Science</strong>.
+          <strong>Lucence Diagnostics</strong>. I work where wet-lab reality meets computation —
+          and I build systems on evenings to keep the engineering sharp.
         </p>
         <div class="hero__cta reveal">
-          <a class="btn btn--primary" href="#contact">Get in touch</a>
+          <a class="btn btn--primary" href="projects.html">See what I've built</a>
           <a class="btn btn--ghost" href="assets/cv/CHEN_Junjie_CV.pdf" target="_blank" rel="noopener">Download CV</a>
         </div>
-        <div class="hero__links reveal" aria-label="Profiles">
-          <a href="https://www.linkedin.com/in/junjie-chen-nus/" target="_blank" rel="noopener">LinkedIn</a>
-          <span aria-hidden="true">·</span>
-          <a href="https://github.com/Neutrophil" target="_blank" rel="noopener">GitHub</a>
-          <span aria-hidden="true">·</span>
+        <p class="hero__links reveal">
           <a href="mailto:chen_junjie@outlook.com">chen_junjie@outlook.com</a>
-        </div>
+          <span class="dot" aria-hidden="true">·</span>
+          <a href="https://www.linkedin.com/in/junjie-chen-nus/" target="_blank" rel="noopener">LinkedIn</a>
+          <span class="dot" aria-hidden="true">·</span>
+          <a href="https://github.com/Neutrophil" target="_blank" rel="noopener">GitHub</a>
+        </p>
+      </div>
+      <div class="hero__signal" aria-hidden="true">
+<svg class="signal" viewBox="0 0 1200 140" preserveAspectRatio="none" role="presentation" focusable="false">
+  <defs>
+    <linearGradient id="sig-fade" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%"   stop-color="currentColor" stop-opacity="0" />
+      <stop offset="18%"  stop-color="currentColor" stop-opacity=".9" />
+      <stop offset="82%"  stop-color="currentColor" stop-opacity=".9" />
+      <stop offset="100%" stop-color="currentColor" stop-opacity="0" />
+    </linearGradient>
+  </defs>
+
+  <!-- baseline -->
+  <line class="signal__base" x1="0" y1="70" x2="1200" y2="70"
+        stroke="currentColor" stroke-width="1" stroke-dasharray="2 6"
+        opacity=".22" vector-effect="non-scaling-stroke" />
+
+  <!-- secondary trace -->
+  <polyline class="signal__trace signal__trace--2" fill="none"
+    stroke="var(--accent-2)" stroke-width="1.25" stroke-linejoin="round" stroke-linecap="round"
+    opacity=".55" vector-effect="non-scaling-stroke"
+    points="0,74 50,71 100,77 150,68 200,80 250,64 300,86 350,72 400,90 450,66
+            500,82 550,60 600,88 650,70 700,92 750,68 800,84 850,62 900,86 950,72
+            1000,78 1050,66 1100,80 1150,70 1200,74" />
+
+  <!-- primary trace -->
+  <polyline class="signal__trace" fill="none"
+    stroke="url(#sig-fade)" stroke-width="1.75" stroke-linejoin="round" stroke-linecap="round"
+    vector-effect="non-scaling-stroke"
+    points="0,70 40,66 80,74 120,58 160,78 200,50 240,84 280,44 320,68 360,32
+            400,72 440,26 480,60 520,38 560,66 600,18 640,74 680,42 720,80 760,34
+            800,88 840,52 880,62 920,40 960,76 1000,28 1040,58 1080,46 1120,66 1160,54 1200,70" />
+
+  <!-- landmarks -->
+  <g class="signal__dots" fill="var(--accent)">
+    <circle cx="600" cy="18" r="3" />
+    <circle cx="440" cy="26" r="2.2" opacity=".7" />
+    <circle cx="1000" cy="28" r="2.2" opacity=".7" />
+  </g>
+</svg>
+
       </div>
     </section>
 
     <!-- ============ ABOUT ============ -->
     <section class="section" id="about">
-      <div class="container">
-        <h2 class="section__title reveal"><span class="section__num">01</span> About</h2>
-        <div class="about__grid">
+      <div class="shell">
+        <header class="section__head reveal">
+          <h2 class="section__title"><span class="section__num">// 01</span> About</h2>
+        </header>
+        <div class="about">
           <div class="about__body reveal">
             <p>
               I am a <strong>Research Scientist II at Lucence Diagnostics</strong>, where I develop
-              whole-genome sequencing (WGS) workflows across <strong>cfDNA, gDNA and FFPE-DNA</strong>
+              whole-genome sequencing workflows across <strong>cfDNA, gDNA and FFPE-DNA</strong>
               and build the bioinformatics behind them. My work spans pipeline development,
               training <strong>machine-learning models for cancer differentiation and
               classification</strong>, and <strong>multi-omics integration</strong> to turn
@@ -118,16 +176,16 @@
               assays that generate the data.
             </p>
           </div>
-          <aside class="about__facts reveal" aria-label="At a glance">
-            <h3>At a glance</h3>
-            <ul>
-              <li><span>Now</span> Research Scientist II, Lucence Diagnostics</li>
-              <li><span>Focus</span> WGS bioinformatics · ML · multi-omics</li>
-              <li><span>Training</span> PhD, Microbiology &amp; Immunology (NUS)</li>
-              <li><span>Foundation</span> B.Eng, Chemical &amp; Biomolecular Eng. (NUS)</li>
-              <li><span>Based</span> Singapore</li>
-              <li><span>Languages</span> English · Mandarin</li>
-            </ul>
+          <aside class="facts card card--tick reveal" aria-label="At a glance">
+            <h3 class="facts__title">At a glance</h3>
+            <dl class="facts__list">
+              <div class="facts__row"><dt>Now</dt><dd>Research Scientist II, Lucence Diagnostics</dd></div>
+              <div class="facts__row"><dt>Focus</dt><dd>WGS bioinformatics · ML · multi-omics</dd></div>
+              <div class="facts__row"><dt>Training</dt><dd>PhD, Microbiology &amp; Immunology (NUS)</dd></div>
+              <div class="facts__row"><dt>Foundation</dt><dd>B.Eng, Chemical &amp; Biomolecular Eng. (NUS)</dd></div>
+              <div class="facts__row"><dt>Based</dt><dd>Singapore</dd></div>
+              <div class="facts__row"><dt>Languages</dt><dd>English · Mandarin</dd></div>
+            </dl>
           </aside>
         </div>
       </div>
@@ -135,50 +193,36 @@
 
     <!-- ============ EXPERTISE ============ -->
     <section class="section section--alt" id="expertise">
-      <div class="container">
-        <h2 class="section__title reveal"><span class="section__num">02</span> Expertise</h2>
-        <p class="section__lede reveal">
-          A rare combination of computational and wet-lab depth — equally at home writing a
-          variant-calling pipeline and running the assay that produced the reads.
-        </p>
-        <div class="cards">
-          <article class="card reveal">
+      <div class="shell">
+        <header class="section__head reveal">
+          <h2 class="section__title"><span class="section__num">// 02</span> Expertise</h2>
+          <p class="section__lede">
+            An uncommon pairing: equally at home writing a variant-calling pipeline and running
+            the assay that produced the reads.
+          </p>
+        </header>
+        <div class="cards cards--3">
+          <article class="card card--tick reveal">
             <h3 class="card__title">Computational &amp; ML</h3>
             <ul class="tags">
-              <li>Python</li>
-              <li>Bioinformatics pipelines</li>
-              <li>ML model training</li>
-              <li>Cancer classification</li>
-              <li>Multi-omics integration</li>
-              <li>R</li>
-              <li>MATLAB</li>
-              <li>Data visualization</li>
+              <li>Python</li><li>Bioinformatics pipelines</li><li>ML model training</li>
+              <li>Cancer classification</li><li>Multi-omics integration</li><li>R</li>
+              <li>MATLAB</li><li>Data visualization</li>
             </ul>
           </article>
-          <article class="card reveal">
+          <article class="card card--tick reveal">
             <h3 class="card__title">Genomics &amp; NGS</h3>
             <ul class="tags">
-              <li>cfDNA WGS</li>
-              <li>gDNA WGS</li>
-              <li>FFPE-DNA WGS</li>
-              <li>NGS library prep</li>
-              <li>Variant &amp; assay analysis</li>
-              <li>PCR / qPCR</li>
-              <li>HLA typing</li>
-              <li>FISH</li>
+              <li>cfDNA WGS</li><li>gDNA WGS</li><li>FFPE-DNA WGS</li><li>NGS library prep</li>
+              <li>Variant &amp; assay analysis</li><li>PCR / qPCR</li><li>HLA typing</li><li>FISH</li>
             </ul>
           </article>
-          <article class="card reveal">
+          <article class="card card--tick reveal">
             <h3 class="card__title">Molecular &amp; Cell Biology</h3>
             <ul class="tags">
-              <li>Proteomics &amp; PPI</li>
-              <li>Mass spectrometry</li>
-              <li>CRISPR / siRNA / shRNA</li>
-              <li>Cancer vaccines</li>
-              <li>TCR-T &amp; cell therapy</li>
-              <li>Stable cell lines</li>
-              <li>Flow cytometry</li>
-              <li>Confocal microscopy</li>
+              <li>Proteomics &amp; PPI</li><li>Mass spectrometry</li><li>CRISPR / siRNA / shRNA</li>
+              <li>Cancer vaccines</li><li>TCR-T &amp; cell therapy</li><li>Stable cell lines</li>
+              <li>Flow cytometry</li><li>Confocal microscopy</li>
             </ul>
           </article>
         </div>
@@ -187,13 +231,13 @@
 
     <!-- ============ EXPERIENCE ============ -->
     <section class="section" id="experience">
-      <div class="container">
-        <h2 class="section__title reveal"><span class="section__num">03</span> Experience</h2>
+      <div class="shell">
+        <header class="section__head reveal">
+          <h2 class="section__title"><span class="section__num">// 03</span> Experience</h2>
+        </header>
         <ol class="timeline">
           <li class="timeline__item reveal">
-            <div class="timeline__meta">
-              <span class="timeline__date">Current</span>
-            </div>
+            <div class="timeline__meta"><span class="timeline__date">Current</span></div>
             <div class="timeline__body">
               <h3>Research Scientist II</h3>
               <p class="timeline__org">Lucence Diagnostics · Singapore</p>
@@ -205,9 +249,7 @@
             </div>
           </li>
           <li class="timeline__item reveal">
-            <div class="timeline__meta">
-              <span class="timeline__date">2022 – 2024</span>
-            </div>
+            <div class="timeline__meta"><span class="timeline__date">2022 – 2024</span></div>
             <div class="timeline__body">
               <h3>Research Fellow</h3>
               <p class="timeline__org">Immunology Translational Research Programme, NUS</p>
@@ -219,9 +261,7 @@
             </div>
           </li>
           <li class="timeline__item reveal">
-            <div class="timeline__meta">
-              <span class="timeline__date">2014 – 2022</span>
-            </div>
+            <div class="timeline__meta"><span class="timeline__date">2014 – 2022</span></div>
             <div class="timeline__body">
               <h3>Research Assistant</h3>
               <p class="timeline__org">Immunology Translational Research Programme, NUS</p>
@@ -232,9 +272,7 @@
             </div>
           </li>
           <li class="timeline__item reveal">
-            <div class="timeline__meta">
-              <span class="timeline__date">2013</span>
-            </div>
+            <div class="timeline__meta"><span class="timeline__date">2013</span></div>
             <div class="timeline__body">
               <h3>Drug Formulation Scientist (Intern)</h3>
               <p class="timeline__org">AbbVie · Singapore</p>
@@ -252,56 +290,79 @@
       </div>
     </section>
 
-    <!-- ============ PROJECTS ============ -->
+    <!-- ============ BUILDS ============ -->
     <section class="section section--alt" id="projects">
-      <div class="container">
-        <h2 class="section__title reveal"><span class="section__num">04</span> Projects &amp; Focus Areas</h2>
-        <p class="section__lede reveal">
-          Selected areas of work. Code and notebooks live on
-          <a href="https://github.com/Neutrophil" target="_blank" rel="noopener">GitHub</a>.
-        </p>
-        <div class="cards cards--projects">
-          <article class="card card--project reveal">
-            <h3 class="card__title">WGS Bioinformatics Pipeline</h3>
-            <p>End-to-end whole-genome sequencing workflows spanning cfDNA, gDNA and FFPE-DNA — from raw reads through QC, alignment and variant analysis.</p>
-            <ul class="tags tags--mini">
-              <li>WGS</li><li>Python</li><li>Pipeline</li><li>NGS</li>
-            </ul>
-            <a class="card__link" href="https://github.com/Neutrophil" target="_blank" rel="noopener">View on GitHub →</a>
-          </article>
-          <article class="card card--project reveal">
-            <h3 class="card__title">ML for Cancer Classification</h3>
-            <p>Machine-learning models that differentiate and classify cancer signal from sequencing-derived features, designed for a clinical-diagnostics setting.</p>
-            <ul class="tags tags--mini">
-              <li>Machine learning</li><li>Classification</li><li>Genomic features</li>
-            </ul>
-            <a class="card__link" href="https://github.com/Neutrophil" target="_blank" rel="noopener">View on GitHub →</a>
-          </article>
-          <article class="card card--project reveal">
-            <h3 class="card__title">Multi-Omics Integration</h3>
-            <p>Integrating genomic and complementary omics layers to improve detection sensitivity and biological interpretability of diagnostic models.</p>
-            <ul class="tags tags--mini">
-              <li>Multi-omics</li><li>Feature integration</li><li>Statistics</li>
-            </ul>
-            <a class="card__link" href="https://github.com/Neutrophil" target="_blank" rel="noopener">View on GitHub →</a>
-          </article>
-          <article class="card card--project reveal">
-            <h3 class="card__title">Nucleolar Proteomics (PhD)</h3>
-            <p>Mapping protein networks proximal to nucleolar autoantigens (UBF, H1x) — the proteomics foundation behind several peer-reviewed publications.</p>
-            <ul class="tags tags--mini">
-              <li>Proteomics</li><li>Mass spec</li><li>PPI</li>
-            </ul>
-            <a class="card__link" href="#publications">See publications →</a>
-          </article>
+      <div class="shell">
+        <header class="section__head reveal">
+          <h2 class="section__title"><span class="section__num">// 04</span> Selected builds</h2>
+          <p class="section__lede">
+            Research work at Lucence and NUS, plus a shelf of systems built on evenings — around
+            70,000 lines of Python behind roughly 1,400 offline tests. The engineering habits are
+            the point.
+          </p>
+        </header>
+        <div class="pindex reveal">
+          <a class="pindex__row" href="projects.html#quantum">
+            <span class="pindex__date">optimization</span>
+            <span class="pindex__title">Portfolio selection as a QUBO, solved by simulated annealing</span>
+            <span class="pindex__tag">numpy</span>
+          </a>
+          <a class="pindex__row" href="projects.html#research">
+            <span class="pindex__date">genomics</span>
+            <span class="pindex__title">WGS pipelines and ML for cancer classification</span>
+            <span class="pindex__tag">clinical</span>
+          </a>
+          <a class="pindex__row" href="projects.html#guard">
+            <span class="pindex__date">tooling</span>
+            <span class="pindex__title">A privacy scanner wired into every commit on this machine</span>
+            <span class="pindex__tag">stdlib</span>
+          </a>
         </div>
+        <p class="section__foot reveal">
+          <a class="arrowlink" href="projects.html">All builds, with the engineering detail <span aria-hidden="true">→</span></a>
+        </p>
+      </div>
+    </section>
+
+    <!-- ============ WRITING ============ -->
+    <section class="section" id="writing">
+      <div class="shell">
+        <header class="section__head reveal">
+          <h2 class="section__title"><span class="section__num">// 05</span> Recent writing</h2>
+          <p class="section__lede">
+            Mostly postmortems. A bug is the most honest description of a design you will ever get.
+          </p>
+        </header>
+        <div class="pindex reveal">
+          <a class="pindex__row" href="posts/2026-08-13-sixty-streamlit-pages.html">
+            <span class="pindex__date"><time datetime="2026-08-13">13 Aug 2026</time></span>
+            <span class="pindex__title">Notes from sixty Streamlit pages</span>
+            <span class="pindex__tag">Streamlit</span>
+          </a>
+          <a class="pindex__row" href="posts/2026-08-13-qubo-portfolio-selection.html">
+            <span class="pindex__date"><time datetime="2026-08-13">13 Aug 2026</time></span>
+            <span class="pindex__title">Choosing ten stocks out of thirty with a QUBO</span>
+            <span class="pindex__tag">Optimization</span>
+          </a>
+          <a class="pindex__row" href="posts/2026-08-13-every-backtest-number-was-wrong.html">
+            <span class="pindex__date"><time datetime="2026-08-13">13 Aug 2026</time></span>
+            <span class="pindex__title">Every backtest number I had was wrong</span>
+            <span class="pindex__tag">Postmortem</span>
+          </a>
+        </div>
+        <p class="section__foot reveal">
+          <a class="arrowlink" href="blog.html">All 6 posts <span aria-hidden="true">→</span></a>
+        </p>
       </div>
     </section>
 
     <!-- ============ PUBLICATIONS ============ -->
-    <section class="section" id="publications">
-      <div class="container">
-        <h2 class="section__title reveal"><span class="section__num">05</span> Publications</h2>
-        <p class="section__lede reveal">Peer-reviewed articles and manuscripts. Author name in bold.</p>
+    <section class="section section--alt" id="publications">
+      <div class="shell">
+        <header class="section__head reveal">
+          <h2 class="section__title"><span class="section__num">// 06</span> Publications</h2>
+          <p class="section__lede">Peer-reviewed articles and manuscripts. My name in bold.</p>
+        </header>
         <ol class="pubs">
           <li class="pub reveal">
             <p><strong>Chen, J.</strong>, Teo, B. H. D., Cai, Y., Wee, S. Y. K., &amp; Lu, J. (2025). Multiple promiscuous localization signals determine the nucleolar H1x and nucleoplasmic H1.5 localization. <em>Manuscript submitted.</em></p>
@@ -332,28 +393,30 @@
     </section>
 
     <!-- ============ CONTACT ============ -->
-    <section class="section section--alt section--contact" id="contact">
-      <div class="container">
-        <h2 class="section__title reveal"><span class="section__num">06</span> Contact</h2>
-        <p class="section__lede reveal">
-          Open to roles and collaborations in <strong>AI for Life Science</strong>, genomics and
-          computational biology. The fastest way to reach me is email.
-        </p>
-        <div class="contact__links reveal">
-          <a class="contact__link" href="mailto:chen_junjie@outlook.com">
+    <section class="section" id="contact">
+      <div class="shell">
+        <header class="section__head reveal">
+          <h2 class="section__title"><span class="section__num">// 07</span> Contact</h2>
+          <p class="section__lede">
+            Open to roles and collaborations in <strong>AI for Life Science</strong>, genomics and
+            computational biology. Email is fastest.
+          </p>
+        </header>
+        <div class="contact reveal">
+          <a class="contact__link card--tick" href="mailto:chen_junjie@outlook.com">
             <span class="contact__label">Email</span>
             <span class="contact__value">chen_junjie@outlook.com</span>
           </a>
-          <a class="contact__link" href="https://www.linkedin.com/in/junjie-chen-nus/" target="_blank" rel="noopener">
+          <a class="contact__link card--tick" href="https://www.linkedin.com/in/junjie-chen-nus/" target="_blank" rel="noopener">
             <span class="contact__label">LinkedIn</span>
             <span class="contact__value">in/junjie-chen-nus</span>
           </a>
-          <a class="contact__link" href="https://github.com/Neutrophil" target="_blank" rel="noopener">
+          <a class="contact__link card--tick" href="https://github.com/Neutrophil" target="_blank" rel="noopener">
             <span class="contact__label">GitHub</span>
             <span class="contact__value">@Neutrophil</span>
           </a>
         </div>
-        <div class="contact__cta reveal">
+        <div class="btnrow reveal">
           <a class="btn btn--primary" href="assets/cv/CHEN_Junjie_CV.pdf" target="_blank" rel="noopener">Download CV</a>
         </div>
       </div>
@@ -362,11 +425,24 @@
   </main>
 
   <footer class="footer">
-    <div class="container footer__inner">
-      <p>© <span id="year"></span> Junjie Chen · Singapore</p>
-      <p class="footer__note">Static site · no trackers · <a href="#top">Back to top ↑</a></p>
+    <div class="shell footer__inner">
+      <div class="footer__col">
+        <p class="footer__sig">Junjie Chen</p>
+        <p class="footer__meta">Singapore · genomics, machine learning, and things built on evenings</p>
+      </div>
+      <nav class="footer__col footer__links" aria-label="Elsewhere">
+        <a href="mailto:chen_junjie@outlook.com">Email</a>
+        <a href="https://www.linkedin.com/in/junjie-chen-nus/" target="_blank" rel="noopener">LinkedIn</a>
+        <a href="https://github.com/Neutrophil" target="_blank" rel="noopener">GitHub</a>
+        <a href="feed.xml">RSS</a>
+      </nav>
+      <div class="footer__col footer__end">
+        <p class="footer__meta">© <span id="year">2026</span> · static site, no trackers, no analytics</p>
+        <p><a class="footer__top" href="#top">Back to top <span aria-hidden="true">↑</span></a></p>
+      </div>
     </div>
   </footer>
+
 
   <script src="js/main.js"></script>
 </body>

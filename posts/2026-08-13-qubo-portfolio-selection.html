@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="en" class="no-js">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="color-scheme" content="dark light" />
+  <title>Choosing ten stocks out of thirty with a QUBO — Junjie Chen</title>
+  <meta name="description" content="How to pose K-of-N portfolio selection as a QUBO, why the cardinality penalty must be scaled relative to the objective, and how a 170-line simulated annealer solves it." />
+  <meta name="author" content="Junjie Chen" />
+
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="Choosing ten stocks out of thirty with a QUBO" />
+  <meta property="og:description" content="How to pose K-of-N portfolio selection as a QUBO, why the cardinality penalty must be scaled relative to the objective, and how a 170-line simulated annealer solves it." />
+  <meta property="og:url" content="https://neutrophil.github.io/posts/2026-08-13-qubo-portfolio-selection.html" />
+  <meta property="og:site_name" content="Junjie Chen" />
+  <meta name="twitter:card" content="summary_large_image" />
+
+  <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg" />
+  <link rel="stylesheet" href="../css/styles.css" />
+  <link rel="alternate" type="application/rss+xml" title="Junjie Chen — writing" href="../feed.xml" />
+  <link rel="canonical" href="https://neutrophil.github.io/posts/2026-08-13-qubo-portfolio-selection.html" />
+
+  <!-- Resolve the theme and announce JS before first paint.
+       The no-js -> js swap matters: .reveal starts at opacity 0 only when
+       scripting is available, so a JS failure degrades to visible content
+       rather than a blank page. -->
+  <script>
+    (function () {
+      var d = document.documentElement;
+      d.classList.remove('no-js');
+      d.classList.add('js');
+      try {
+        var stored = localStorage.getItem('theme');
+        var theme = stored || (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+        d.setAttribute('data-theme', theme);
+      } catch (e) {
+        d.setAttribute('data-theme', 'dark');
+      }
+    })();
+  </script>
+</head>
+<body class="page-post">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <div class="progress" id="progress" aria-hidden="true"></div>
+
+  <header class="nav" id="top">
+    <div class="shell nav__inner">
+      <a class="nav__brand" href="../index.html" aria-label="Junjie Chen — home">
+        <span class="nav__monogram" aria-hidden="true">
+          <svg viewBox="0 0 32 32" width="30" height="30" fill="none" aria-hidden="true">
+            <rect x="1" y="1" width="30" height="30" rx="8" stroke="currentColor" stroke-width="1.25" opacity=".55"/>
+            <path d="M12 9v10.2a3.3 3.3 0 0 1-3.3 3.3H7.4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            <path d="M24.6 10.4a5.9 5.9 0 0 0-8.6 1 6.6 6.6 0 0 0 0 8.6 5.9 5.9 0 0 0 8.6 1" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </span>
+        <span class="nav__name">Junjie Chen</span>
+      </a>
+
+      <nav class="nav__links" id="nav-links" aria-label="Primary">
+        <a href="../projects.html"><span class="nav__bracket" aria-hidden="true">[</span>builds<span class="nav__bracket" aria-hidden="true">]</span></a>
+        <a href="../blog.html" class="is-active" aria-current="page"><span class="nav__bracket" aria-hidden="true">[</span>writing<span class="nav__bracket" aria-hidden="true">]</span></a>
+        <a href="../index.html#about"><span class="nav__bracket" aria-hidden="true">[</span>about<span class="nav__bracket" aria-hidden="true">]</span></a>
+        <a href="../index.html#contact"><span class="nav__bracket" aria-hidden="true">[</span>contact<span class="nav__bracket" aria-hidden="true">]</span></a>
+      </nav>
+
+      <div class="nav__actions">
+        <a class="btn btn--sm btn--primary nav__cv" href="../assets/cv/CHEN_Junjie_CV.pdf" target="_blank" rel="noopener">CV</a>
+        <button class="iconbtn" id="theme-toggle" type="button" aria-label="Switch to light theme" title="Switch theme">
+          <svg class="icon-sun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"></path></svg>
+          <svg class="icon-moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+        </button>
+        <button class="iconbtn nav__burger" id="nav-burger" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="nav-links">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+
+  <main id="main">
+    <article class="post">
+      <div class="shell shell--narrow">
+
+        <p class="post__back"><a href="../blog.html"><span aria-hidden="true">←</span> All writing</a></p>
+
+        <header class="post__head">
+          <div class="post__meta">
+            <time datetime="2026-08-13">13 August 2026</time>
+            <span class="dot" aria-hidden="true">·</span>
+            <span>9 min read</span>
+          </div>
+          <h1 class="post__title">Choosing ten stocks out of thirty with a QUBO</h1>
+          <ul class="tags tags--mini"><li>Optimization</li><li>Python</li><li>Quant</li></ul>
+        </header>
+
+        <div class="prose">
+          <p>
+            Suppose you have thirty candidate stocks and you want to hold ten of them. Not the ten
+            with the highest expected return — that portfolio would be concentrated in whatever
+            sector happened to run last quarter. You want ten that together give a good return for
+            the risk they take on, which means the choice of any one name depends on all the others.
+          </p>
+          <p>
+            That dependency is the whole difficulty. There are
+            <code>C(30,10) ≈ 30,045,015</code> ways to pick ten from thirty. Evaluate a portfolio in
+            a microsecond and you are still looking at half a minute for a problem that small,
+            and the count explodes from there: fifty candidates gives you ten billion. Greedy
+            selection is fast but wrong in a specific way — it will happily pick two names that are
+            individually excellent and 0.9 correlated with each other.
+          </p>
+          <p>
+            One clean way to attack this is to stop treating it as a search over subsets and start
+            treating it as minimising a quadratic function over binary variables. That object has a
+            name — a <strong>QUBO</strong>, quadratic unconstrained binary optimisation — and a
+            deep bench of solvers, including the physical annealers that gave the family its
+            reputation. I do not have a quantum annealer. I do have numpy, and simulated annealing
+            on a QUBO is a genuinely good classical solver.
+          </p>
+
+          <figure class="diagram">
+            <div class="diagram__scroll">
+<svg viewBox="0 0 900 236" role="img" aria-labelledby="d1-title">
+  <title id="d1-title">Price history produces an expected-return vector and a covariance matrix; both fold into a single upper-triangular Q matrix, which a simulated annealer minimises to select K stocks.</title>
+  <defs>
+    <marker id="d1-arw" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 Z" fill="var(--border-lit)" />
+    </marker>
+  </defs>
+
+  <!-- A · price history -->
+  <rect class="d-fill-elev d-stroke" x="14" y="82" width="118" height="66" rx="8" stroke-width="1" />
+  <text class="d-label" x="73" y="108" text-anchor="middle">price history</text>
+  <text class="d-label--sm" x="73" y="126" text-anchor="middle">N tickers · 126d</text>
+
+  <!-- B1 · expected return -->
+  <rect class="d-fill-elev d-stroke" x="180" y="30" width="150" height="60" rx="8" stroke-width="1" />
+  <text class="d-label--accent" x="196" y="54">μ</text>
+  <text class="d-label" x="214" y="54">expected return</text>
+  <text class="d-label--sm" x="196" y="72">8 clipped signals, blended</text>
+
+  <!-- B2 · covariance -->
+  <rect class="d-fill-elev d-stroke" x="180" y="140" width="150" height="60" rx="8" stroke-width="1" />
+  <text class="d-label--accent" x="196" y="164">Σ</text>
+  <text class="d-label" x="214" y="164">covariance</text>
+  <text class="d-label--sm" x="196" y="182">shrunk toward diagonal</text>
+
+  <!-- C · Q matrix -->
+  <rect class="d-fill-elev d-stroke" x="378" y="68" width="164" height="94" rx="8" stroke-width="1" />
+  <g transform="translate(394 84)">
+    <!-- 4x4 glyph: only the upper triangle carries weight -->
+    <g class="d-accent-fill">
+      <rect x="0"  y="0"  width="12" height="12" rx="2" opacity=".85" />
+      <rect x="14" y="0"  width="12" height="12" rx="2" opacity=".6" />
+      <rect x="28" y="0"  width="12" height="12" rx="2" opacity=".45" />
+      <rect x="42" y="0"  width="12" height="12" rx="2" opacity=".3" />
+      <rect x="14" y="14" width="12" height="12" rx="2" opacity=".85" />
+      <rect x="28" y="14" width="12" height="12" rx="2" opacity=".6" />
+      <rect x="42" y="14" width="12" height="12" rx="2" opacity=".45" />
+      <rect x="28" y="28" width="12" height="12" rx="2" opacity=".85" />
+      <rect x="42" y="28" width="12" height="12" rx="2" opacity=".6" />
+      <rect x="42" y="42" width="12" height="12" rx="2" opacity=".85" />
+    </g>
+    <g class="d-muted" fill="none" stroke-width="1">
+      <rect x="0"  y="14" width="12" height="12" rx="2" />
+      <rect x="0"  y="28" width="12" height="12" rx="2" />
+      <rect x="14" y="28" width="12" height="12" rx="2" />
+      <rect x="0"  y="42" width="12" height="12" rx="2" />
+      <rect x="14" y="42" width="12" height="12" rx="2" />
+      <rect x="28" y="42" width="12" height="12" rx="2" />
+    </g>
+  </g>
+  <text class="d-label" x="466" y="102">Q</text>
+  <text class="d-label--sm" x="466" y="120">upper-</text>
+  <text class="d-label--sm" x="466" y="134">triangular</text>
+  <text class="d-label--sm" x="460" y="180" text-anchor="middle">+ cardinality penalty P</text>
+
+  <!-- D · annealer -->
+  <rect class="d-fill-elev d-stroke" x="590" y="68" width="160" height="94" rx="8" stroke-width="1" />
+  <text class="d-label" x="670" y="98" text-anchor="middle">simulated</text>
+  <text class="d-label" x="670" y="114" text-anchor="middle">annealing</text>
+  <text class="d-label--sm" x="670" y="134" text-anchor="middle">60 reads ×</text>
+  <text class="d-label--sm" x="670" y="148" text-anchor="middle">1200 sweeps</text>
+
+  <!-- E · selection -->
+  <rect class="d-fill-elev d-accent" x="798" y="68" width="90" height="94" rx="8" stroke-width="1.4" />
+  <text class="d-label--accent" x="843" y="100" text-anchor="middle">x ∈ {0,1}</text>
+  <text class="d-label--sm" x="843" y="122" text-anchor="middle">Σ xᵢ = K</text>
+  <g class="d-accent-fill">
+    <rect x="816" y="134" width="8" height="8" rx="2" />
+    <rect x="828" y="134" width="8" height="8" rx="2" opacity=".25" />
+    <rect x="840" y="134" width="8" height="8" rx="2" />
+    <rect x="852" y="134" width="8" height="8" rx="2" opacity=".25" />
+    <rect x="864" y="134" width="8" height="8" rx="2" />
+  </g>
+
+  <!-- flow -->
+  <g class="d-stroke" fill="none" stroke-width="1.2" marker-end="url(#d1-arw)">
+    <path d="M132 104 C 156 104, 156 60, 178 60" />
+    <path d="M132 126 C 156 126, 156 170, 178 170" />
+    <path d="M330 60  C 354 60, 354 100, 376 100" />
+    <path d="M330 170 C 354 170, 354 132, 376 132" />
+    <path d="M542 115 L 588 115" />
+    <path d="M750 115 L 796 115" />
+  </g>
+</svg>
+
+            </div>
+            <figcaption>
+              Price history yields an expected-return vector and a covariance matrix; both fold
+              into one upper-triangular matrix Q, whose minimiser over binary vectors is the
+              portfolio. The cardinality constraint is not enforced separately — it is baked into Q.
+            </figcaption>
+          </figure>
+
+          <h2>Writing the objective</h2>
+          <p>
+            Let <code>xᵢ ∈ {0,1}</code> say whether stock <em>i</em> is held. Selected names are
+            equal-weighted, so the weight of each is <code>1/K</code> and any constant factor there
+            can be absorbed into the risk coefficient. The thing to minimise is:
+          </p>
+
+          <div class="codeblock">
+            <div class="codeblock__bar"><span class="codeblock__name">the objective</span></div>
+            <pre><code>f(x) = − Σᵢ μᵢ xᵢ          expected return, negated because we minimise
+       + γ Σᵢⱼ σᵢⱼ xᵢ xⱼ    risk: every selected pair's covariance
+       + P (Σᵢ xᵢ − K)²     penalty: zero when exactly K are chosen</code></pre>
+          </div>
+
+          <p>
+            The first two terms are ordinary mean–variance. The third is the interesting one. A
+            QUBO is <em>unconstrained</em> by definition, so "hold exactly ten" cannot be a
+            constraint — it has to become part of the thing being minimised. Squaring the deviation
+            does that: the term is zero when the count is right and grows quadratically in either
+            direction, so an eleven-stock portfolio pays for its extra name and a nine-stock one
+            pays for its missing slot.
+          </p>
+
+          <h2>Folding it into a matrix</h2>
+          <p>
+            To get a QUBO you need everything as <code>xᵀQx</code>. The trick that makes this work
+            is that binary variables are idempotent: <code>xᵢ² = xᵢ</code>, because 0² = 0 and
+            1² = 1. That single identity collapses every squared term into a linear one, and the
+            linear terms then live on the diagonal of Q.
+          </p>
+          <p>
+            Expanding the penalty with it:
+          </p>
+
+          <div class="codeblock">
+            <div class="codeblock__bar"><span class="codeblock__name">expanding P(Σxᵢ − K)²</span></div>
+            <pre><code>(Σᵢ xᵢ)²  =  Σᵢ xᵢ²  +  2 Σᵢ&lt;ⱼ xᵢxⱼ
+          =  Σᵢ xᵢ   +  2 Σᵢ&lt;ⱼ xᵢxⱼ        ← because xᵢ² = xᵢ
+
+P(Σxᵢ − K)²  =  P Σᵢ xᵢ (1 − 2K)  +  2P Σᵢ&lt;ⱼ xᵢxⱼ  +  P K²
+                └── diagonal ──┘     └── off-diagonal ──┘   └ constant ┘</code></pre>
+          </div>
+
+          <p>
+            The risk term splits the same way — its diagonal is the variances, its off-diagonal the
+            covariances, doubled because an upper-triangular matrix counts each pair once. Collect
+            the pieces and Q writes itself:
+          </p>
+
+          <div class="codeblock">
+            <div class="codeblock__bar"><span class="codeblock__name">core/qubo.py</span></div>
+            <pre><code>def build_q(mu, cov, k, gamma, penalty):
+    n = len(mu)
+
+    # Scale the penalty to the objective it has to compete with.
+    obj_diag = -mu + gamma * np.diag(cov)
+    scale = float(np.mean(np.abs(obj_diag))) or 1.0
+    p = penalty * scale
+
+    q = np.zeros((n, n))
+    np.fill_diagonal(q, obj_diag + p * (1 - 2 * k))
+
+    iu = np.triu_indices(n, k=1)
+    q[iu] = 2 * gamma * cov[iu] + 2 * p
+
+    # P·K² does not depend on x, so it cannot move the argmin. Keep it on the
+    # side anyway, or reported energies will not match hand calculations.
+    return q, p * k * k</code></pre>
+          </div>
+
+          <h2>The line that actually decides whether this works</h2>
+          <p>
+            Look again at those three lines computing <code>p</code>. They are the part I would
+            have got wrong if I had written this from the textbook.
+          </p>
+          <p>
+            The penalty coefficient P has to be large enough that violating the cardinality
+            constraint costs more than the return you gain by violating it, and small enough that
+            it does not drown out the return-versus-risk trade-off you actually care about. Between
+            those two failures there is a usable band — and where that band sits depends entirely
+            on the units of μ and Σ.
+          </p>
+          <p>
+            Daily expected returns are numbers like 0.0004. Daily covariances are numbers like
+            0.0001. A penalty of P = 5 against coefficients of that size is not a nudge, it is a
+            steamroller: the solver returns some arbitrary ten-stock portfolio, because getting the
+            count right is worth ten thousand times more than getting the stocks right. Rescale
+            your returns to annualised percentages and the same P = 5 becomes invisible, and the
+            solver returns all thirty names.
+          </p>
+
+          <div class="callout">
+            <span class="callout__label">The fix</span>
+            <p>
+              Make P a <strong>multiplier on the objective's own magnitude</strong>, not an
+              absolute number. Take the mean absolute value of the objective's diagonal — the
+              scale at which this particular problem's return and risk terms actually operate —
+              and set the penalty relative to it. Now P = 5 means "five times the typical
+              coefficient", which is meaningful for any units.
+            </p>
+          </div>
+
+          <p>
+            This is the kind of thing that is obvious once stated and invisible beforehand. It is
+            also almost undebuggable from the outside: a badly scaled penalty does not raise an
+            error, it returns a plausible-looking portfolio that ignores half the objective. So the
+            curriculum this lives in has a lab whose entire purpose is to let a reader set P by
+            hand and watch both failure modes happen. I would rather someone break it deliberately
+            than trust it silently.
+          </p>
+          <p>
+            To make that inspectable at all, the solver can decompose any candidate's energy into
+            its three parts — return, risk, penalty — and the labs assert that the three sum to the
+            total. If they ever stop summing, the expansion above has a sign error in it.
+          </p>
+
+          <figure class="diagram">
+            <div class="diagram__scroll">
+<svg viewBox="0 0 900 250" role="img" aria-labelledby="d2-title">
+  <title id="d2-title">Left: total energy split into a return term that pulls it down and risk and penalty terms that push it up. Right: as inverse temperature rises on a geometric schedule, accepted energy falls and the walk freezes.</title>
+
+  <!-- ================= left: energy decomposition ================= -->
+  <text class="d-label" x="20" y="26">energy terms at a candidate x</text>
+  <line class="d-muted" x1="20" y1="38" x2="400" y2="38" stroke-width="1" />
+
+  <!-- zero axis -->
+  <line class="d-stroke" x1="215" y1="56" x2="215" y2="214" stroke-width="1" stroke-dasharray="3 4" />
+  <text class="d-label--sm" x="215" y="230" text-anchor="middle">0</text>
+
+  <!-- return: negative, pulls energy down -->
+  <text class="d-label--sm" x="20" y="80">−μᵀx</text>
+  <rect class="d-accent2-fill" x="119" y="66" width="96" height="20" rx="3" opacity=".85" />
+  <text class="d-label--sm" x="112" y="80" text-anchor="end">return</text>
+
+  <!-- risk -->
+  <text class="d-label--sm" x="20" y="124">γ xᵀΣx</text>
+  <rect class="d-accent-fill" x="215" y="110" width="62" height="20" rx="3" opacity=".85" />
+  <text class="d-label--sm" x="285" y="124">risk</text>
+
+  <!-- penalty -->
+  <text class="d-label--sm" x="20" y="168">P(Σx−K)²</text>
+  <rect x="215" y="154" width="14" height="20" rx="3" fill="var(--border-lit)" />
+  <text class="d-label--sm" x="237" y="168">penalty · 0 when the count is right</text>
+
+  <!-- total -->
+  <line class="d-muted" x1="20" y1="190" x2="400" y2="190" stroke-width="1" />
+  <text class="d-label" x="20" y="210">total</text>
+  <rect class="d-accent2-fill" x="177" y="196" width="38" height="18" rx="3" opacity=".55" />
+  <text class="d-label--sm" x="292" y="210">the three must sum to it</text>
+
+  <!-- ================= right: the schedule ================= -->
+  <text class="d-label" x="470" y="26">1200 sweeps of Metropolis</text>
+  <line class="d-muted" x1="470" y1="38" x2="880" y2="38" stroke-width="1" />
+
+  <!-- frame -->
+  <line class="d-stroke" x1="500" y1="60" x2="500" y2="200" stroke-width="1" />
+  <line class="d-stroke" x1="500" y1="200" x2="870" y2="200" stroke-width="1" />
+  <text class="d-label--sm" x="500" y="220">β = 0.1</text>
+  <text class="d-label--sm" x="870" y="220" text-anchor="end">β = 12</text>
+  <text class="d-label--sm" x="685" y="236" text-anchor="middle">inverse temperature, geometric</text>
+
+  <!-- beta schedule (rising, dashed) -->
+  <path class="d-accent2" fill="none" stroke-width="1.4" stroke-dasharray="4 4"
+        d="M500 194 C 600 190, 680 174, 730 146 C 780 118, 820 86, 870 68" />
+  <text class="d-label--sm" x="812" y="60" fill="var(--accent-2)">β</text>
+
+  <!-- energy trace (falling, noisy early, frozen late) -->
+  <path class="d-accent" fill="none" stroke-width="1.6" stroke-linejoin="round"
+        d="M500 74 L516 96 L528 78 L544 108 L558 92 L572 122 L588 104 L604 134
+           L620 120 L636 146 L652 138 L668 158 L684 150 L700 166 L716 162
+           L732 174 L748 171 L764 179 L780 178 L796 183 L812 182 L828 185
+           L844 185 L860 186 L870 186" />
+  <circle class="d-accent-fill" cx="870" cy="186" r="3.5" />
+  <text class="d-label--sm" x="560" y="66" fill="var(--accent)">energy</text>
+
+  <!-- annotations -->
+  <text class="d-label--sm" x="540" y="192">uphill moves accepted</text>
+  <text class="d-label--sm" x="866" y="150" text-anchor="end">frozen</text>
+</svg>
+
+            </div>
+            <figcaption>
+              Left: the return term pulls energy down while risk and penalty push it up; a correct
+              decomposition must sum to the total. Right: as inverse temperature β rises
+              geometrically, the walk stops accepting uphill moves and freezes into a solution.
+            </figcaption>
+          </figure>
+
+          <h2>The annealer</h2>
+          <p>
+            Simulated annealing is a Metropolis random walk over bit strings with a temperature
+            that falls over time. Early on it accepts moves that make things worse, which is how it
+            escapes local minima; later it accepts almost nothing and settles. Written in terms of
+            inverse temperature β = 1/T, a proposed flip with energy change ΔE is accepted with
+            probability <code>min(1, e^(−β·ΔE))</code>, so raising β means "accept less".
+          </p>
+          <p>
+            The naive implementation recomputes <code>xᵀQx</code> for each candidate flip, which is
+            O(N²) per proposal and therefore O(N³) per sweep. You do not need to. Split Q into its
+            diagonal <code>d</code> and a symmetric off-diagonal matrix <code>C</code>, and
+            maintain a <em>field</em> vector <code>field = C·x</code> alongside the state. Then
+            flipping bit <em>i</em> changes the energy by a quantity you can read off in O(1), and
+            repairing the field afterwards costs O(N):
+          </p>
+
+          <div class="codeblock">
+            <div class="codeblock__bar"><span class="codeblock__name">core/annealer.py — the inner loop</span></div>
+            <pre><code>field = c @ x                       # maintained incrementally from here on
+
+for beta in np.geomspace(beta_start, beta_end, num_sweeps):
+    for i in rng.permutation(n):
+        v = x[i]
+        s = 1 - 2 * v                          # +1 turning on, −1 turning off
+        d_energy = s * (diag[i] + field[i])    # O(1), no matrix product
+
+        if d_energy &lt;= 0 or rng.random() &lt; np.exp(-beta * d_energy):
+            x[i] = 1 - v
+            field += c[:, i] * s               # O(N) repair, not O(N²)</code></pre>
+          </div>
+
+          <p>
+            The schedule is geometric rather than linear — <code>np.geomspace(0.1, 12.0, 1200)</code>
+            — because what matters is the ratio of β between consecutive sweeps, not the difference.
+            Sixty independent restarts run from different random k-hot starting states, and the best
+            of the sixty is returned. Starting from a state that already has roughly the right
+            number of bits set gives the cardinality penalty a head start; starting from a uniform
+            coin flip wastes the first few hundred sweeps just getting the count into range.
+          </p>
+
+          <h2>Making it reproducible, and proving it right</h2>
+          <p>
+            Two things I would not skip again.
+          </p>
+          <p>
+            <strong>Seed the restarts from a master generator, not a shared one.</strong> A single
+            RNG shared across sixty reads makes results depend on scheduling order. One master
+            <code>default_rng(seed)</code> that spawns a child generator per read gives you
+            bit-identical output across runs, which is what makes a regression test possible at
+            all. It also means the tracing that draws those energy curves has to be
+            <em>RNG-neutral</em> — recording β, energy and acceptance rate each sweep must not draw
+            a single number from the generator, or turning tracing on would silently change the
+            answer. There is a test that runs the same seed with and without tracing and asserts
+            the results are identical, because that is precisely the kind of thing that decays.
+          </p>
+          <p>
+            <strong>Race it against the truth while the truth is still computable.</strong> For
+            N ≤ 16 you can enumerate all 2^N states — 65,536 of them — vectorise the energies, and
+            find the exact global minimum. The tests do that and assert that annealing reaches it.
+            Above sixteen the enumeration is hopeless, which is the point of the exercise, but by
+            then you have evidence that the solver is not merely returning something
+            plausible-looking.
+          </p>
+
+          <div class="callout">
+            <span class="callout__label">Honest caveats</span>
+            <p>
+              The expected-return vector is by far the noisiest input to any of this, and no amount
+              of solver quality fixes a bad μ. The default candidate universe is today's large
+              caps, which is survivorship bias baked in — so backtests over it are biased upward
+              and are useful for <em>relative</em> ranking only. This is research and paper
+              trading, not advice, and it does not trade real money.
+            </p>
+          </div>
+
+          <h2>What I would build next</h2>
+          <p>
+            The current formulation equal-weights whatever it selects, which is a real limitation.
+            The standard extension is to give each asset several binary variables representing bits
+            of its weight and add a budget constraint as another squared penalty — a binary
+            expansion. Sector limits fall out the same way: one more squared term per sector. That
+            is the pleasant property of this formulation. Every constraint you can write as
+            "this sum should equal that" becomes another penalty and folds into the same matrix,
+            and the solver never has to know it happened.
+          </p>
+          <p>
+            The part I find genuinely interesting is not the finance. It is that a discrete
+            selection problem with interacting choices — <em>pick a subset where the value of each
+            element depends on the others</em> — shows up everywhere. Feature selection under
+            redundancy is the same shape. So is choosing a panel of markers where you want
+            coverage without measuring the same biology four times. The matrix changes; the
+            machinery does not.
+          </p>
+          <p>
+            <a class="arrowlink" href="../projects.html#quantum">The build this came from <span aria-hidden="true">→</span></a>
+          </p>
+
+        </div>
+
+        <footer class="post__foot">
+          <p>
+            Corrections and disagreements are genuinely welcome —
+            <a href="mailto:chen_junjie@outlook.com">chen_junjie@outlook.com</a> or
+            <a href="https://www.linkedin.com/in/junjie-chen-nus/" target="_blank" rel="noopener">LinkedIn</a>.
+          </p>
+        </footer>
+
+        <nav class="postnav" aria-label="More posts">
+          <a class="postnav__link postnav__link--prev" href="../posts/2026-08-13-sixty-streamlit-pages.html"><span class="postnav__dir"><span aria-hidden="true">←</span> Newer</span><span class="postnav__title">Notes from sixty Streamlit pages</span></a>
+          <a class="postnav__link postnav__link--next" href="../posts/2026-08-13-every-backtest-number-was-wrong.html"><span class="postnav__dir">Older <span aria-hidden="true">→</span></span><span class="postnav__title">Every backtest number I had was wrong</span></a>
+        </nav>
+
+      </div>
+    </article>
+
+  </main>
+
+  <footer class="footer">
+    <div class="shell footer__inner">
+      <div class="footer__col">
+        <p class="footer__sig">Junjie Chen</p>
+        <p class="footer__meta">Singapore · genomics, machine learning, and things built on evenings</p>
+      </div>
+      <nav class="footer__col footer__links" aria-label="Elsewhere">
+        <a href="mailto:chen_junjie@outlook.com">Email</a>
+        <a href="https://www.linkedin.com/in/junjie-chen-nus/" target="_blank" rel="noopener">LinkedIn</a>
+        <a href="https://github.com/Neutrophil" target="_blank" rel="noopener">GitHub</a>
+        <a href="../feed.xml">RSS</a>
+      </nav>
+      <div class="footer__col footer__end">
+        <p class="footer__meta">© <span id="year">2026</span> · static site, no trackers, no analytics</p>
+        <p><a class="footer__top" href="#top">Back to top <span aria-hidden="true">↑</span></a></p>
+      </div>
+    </div>
+  </footer>
+
+
+  <script src="../js/main.js"></script>
+</body>
+</html>

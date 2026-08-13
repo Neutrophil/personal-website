@@ -1,0 +1,38 @@
+<svg class="signal" viewBox="0 0 1200 140" preserveAspectRatio="none" role="presentation" focusable="false">
+  <defs>
+    <linearGradient id="sig-fade" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%"   stop-color="currentColor" stop-opacity="0" />
+      <stop offset="18%"  stop-color="currentColor" stop-opacity=".9" />
+      <stop offset="82%"  stop-color="currentColor" stop-opacity=".9" />
+      <stop offset="100%" stop-color="currentColor" stop-opacity="0" />
+    </linearGradient>
+  </defs>
+
+  <!-- baseline -->
+  <line class="signal__base" x1="0" y1="70" x2="1200" y2="70"
+        stroke="currentColor" stroke-width="1" stroke-dasharray="2 6"
+        opacity=".22" vector-effect="non-scaling-stroke" />
+
+  <!-- secondary trace -->
+  <polyline class="signal__trace signal__trace--2" fill="none"
+    stroke="var(--accent-2)" stroke-width="1.25" stroke-linejoin="round" stroke-linecap="round"
+    opacity=".55" vector-effect="non-scaling-stroke"
+    points="0,74 50,71 100,77 150,68 200,80 250,64 300,86 350,72 400,90 450,66
+            500,82 550,60 600,88 650,70 700,92 750,68 800,84 850,62 900,86 950,72
+            1000,78 1050,66 1100,80 1150,70 1200,74" />
+
+  <!-- primary trace -->
+  <polyline class="signal__trace" fill="none"
+    stroke="url(#sig-fade)" stroke-width="1.75" stroke-linejoin="round" stroke-linecap="round"
+    vector-effect="non-scaling-stroke"
+    points="0,70 40,66 80,74 120,58 160,78 200,50 240,84 280,44 320,68 360,32
+            400,72 440,26 480,60 520,38 560,66 600,18 640,74 680,42 720,80 760,34
+            800,88 840,52 880,62 920,40 960,76 1000,28 1040,58 1080,46 1120,66 1160,54 1200,70" />
+
+  <!-- landmarks -->
+  <g class="signal__dots" fill="var(--accent)">
+    <circle cx="600" cy="18" r="3" />
+    <circle cx="440" cy="26" r="2.2" opacity=".7" />
+    <circle cx="1000" cy="28" r="2.2" opacity=".7" />
+  </g>
+</svg>

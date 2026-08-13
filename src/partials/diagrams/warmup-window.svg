@@ -1,0 +1,33 @@
+<svg viewBox="0 0 900 250" role="img" aria-labelledby="d6-title">
+  <title id="d6-title">Before the fix, the indicator warm-up was consumed inside the requested window, so the first third of every backtest was flat and untraded but still counted in the statistics. After the fix, warm-up is drawn from bars before the window starts.</title>
+
+  <!-- ---------- before ---------- -->
+  <text class="d-label" x="20" y="30">before · warm-up eaten out of the window you asked for</text>
+
+  <rect x="20" y="48" width="820" height="38" rx="6" fill="var(--bg-sunken)" stroke="var(--border-lit)" stroke-width="1" />
+  <rect x="21" y="49" width="286" height="36" rx="5" fill="var(--border)" />
+  <text class="d-label--sm" x="164" y="72" text-anchor="middle">flat · untraded · still averaged in</text>
+  <rect class="d-accent-fill" x="307" y="49" width="532" height="36" rx="5" opacity=".22" />
+  <text class="d-label--sm" x="573" y="72" text-anchor="middle" fill="var(--accent)">the part that actually traded</text>
+
+  <line class="d-muted" x1="20" y1="94" x2="20" y2="106" stroke-width="1" />
+  <line class="d-muted" x1="840" y1="94" x2="840" y2="106" stroke-width="1" />
+  <line class="d-muted" x1="20" y1="100" x2="840" y2="100" stroke-width="1" stroke-dasharray="3 4" />
+  <text class="d-label--sm" x="430" y="118" text-anchor="middle">requested window</text>
+
+  <text class="d-label--sm" x="20" y="140">Sharpe over the padded window</text>
+  <text class="d-label--sm" x="300" y="140" fill="var(--text-faint)">0.203</text>
+  <text class="d-label--sm" x="380" y="140">·  over the segment that traded</text>
+  <text class="d-label--sm" x="640" y="140" fill="var(--accent)">0.572</text>
+  <text class="d-label--sm" x="720" y="140">— same strategy</text>
+
+  <!-- ---------- after ---------- -->
+  <line class="d-muted" x1="20" y1="164" x2="880" y2="164" stroke-width="1" />
+  <text class="d-label" x="20" y="192">after · warm-up drawn from bars before the window opens</text>
+
+  <rect x="20" y="204" width="180" height="34" rx="6" fill="none" stroke="var(--border-lit)" stroke-width="1" stroke-dasharray="4 4" />
+  <text class="d-label--sm" x="110" y="226" text-anchor="middle" fill="var(--text-faint)">warm-up</text>
+  <rect class="d-accent-fill" x="208" y="204" width="632" height="34" rx="6" opacity=".22" />
+  <rect x="208" y="204" width="632" height="34" rx="6" fill="none" class="d-accent" stroke-width="1.2" />
+  <text class="d-label--sm" x="524" y="226" text-anchor="middle" fill="var(--accent)">requested window — every bar of it traded</text>
+</svg>

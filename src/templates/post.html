@@ -1,0 +1,31 @@
+    <article class="post">
+      <div class="shell shell--narrow">
+
+        <p class="post__back"><a href="{{rel}}blog.html"><span aria-hidden="true">←</span> All writing</a></p>
+
+        <header class="post__head">
+          <div class="post__meta">
+            <time datetime="{{post_date}}">{{post_date_pretty}}</time>
+            <span class="dot" aria-hidden="true">·</span>
+            <span>{{post_minutes}} min read</span>
+          </div>
+          <h1 class="post__title">{{post_title}}</h1>
+          {{post_tags}}
+        </header>
+
+        <div class="prose">
+{{post_body}}
+        </div>
+
+        <footer class="post__foot">
+          <p>
+            Corrections and disagreements are genuinely welcome —
+            <a href="mailto:{{email}}">{{email}}</a> or
+            <a href="{{linkedin}}" target="_blank" rel="noopener">LinkedIn</a>.
+          </p>
+        </footer>
+
+{{post_nav}}
+
+      </div>
+    </article>

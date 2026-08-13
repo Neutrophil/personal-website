@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en" class="no-js">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="color-scheme" content="dark light" />
+  <title>Every backtest number I had was wrong — Junjie Chen</title>
+  <meta name="description" content="A correctness review that invalidated an entire strategy tournament: warm-up dilution, silent re-normalisation, NaN statistics, inverted risk metrics, and weekend bars traded at stale prices." />
+  <meta name="author" content="Junjie Chen" />
+
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="Every backtest number I had was wrong" />
+  <meta property="og:description" content="A correctness review that invalidated an entire strategy tournament: warm-up dilution, silent re-normalisation, NaN statistics, inverted risk metrics, and weekend bars traded at stale prices." />
+  <meta property="og:url" content="https://neutrophil.github.io/posts/2026-08-13-every-backtest-number-was-wrong.html" />
+  <meta property="og:site_name" content="Junjie Chen" />
+  <meta name="twitter:card" content="summary_large_image" />
+
+  <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg" />
+  <link rel="stylesheet" href="../css/styles.css" />
+  <link rel="alternate" type="application/rss+xml" title="Junjie Chen — writing" href="../feed.xml" />
+  <link rel="canonical" href="https://neutrophil.github.io/posts/2026-08-13-every-backtest-number-was-wrong.html" />
+
+  <!-- Resolve the theme and announce JS before first paint.
+       The no-js -> js swap matters: .reveal starts at opacity 0 only when
+       scripting is available, so a JS failure degrades to visible content
+       rather than a blank page. -->
+  <script>
+    (function () {
+      var d = document.documentElement;
+      d.classList.remove('no-js');
+      d.classList.add('js');
+      try {
+        var stored = localStorage.getItem('theme');
+        var theme = stored || (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+        d.setAttribute('data-theme', theme);
+      } catch (e) {
+        d.setAttribute('data-theme', 'dark');
+      }
+    })();
+  </script>
+</head>
+<body class="page-post">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <div class="progress" id="progress" aria-hidden="true"></div>
+
+  <header class="nav" id="top">
+    <div class="shell nav__inner">
+      <a class="nav__brand" href="../index.html" aria-label="Junjie Chen — home">
+        <span class="nav__monogram" aria-hidden="true">
+          <svg viewBox="0 0 32 32" width="30" height="30" fill="none" aria-hidden="true">
+            <rect x="1" y="1" width="30" height="30" rx="8" stroke="currentColor" stroke-width="1.25" opacity=".55"/>
+            <path d="M12 9v10.2a3.3 3.3 0 0 1-3.3 3.3H7.4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            <path d="M24.6 10.4a5.9 5.9 0 0 0-8.6 1 6.6 6.6 0 0 0 0 8.6 5.9 5.9 0 0 0 8.6 1" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </span>
+        <span class="nav__name">Junjie Chen</span>
+      </a>
+
+      <nav class="nav__links" id="nav-links" aria-label="Primary">
+        <a href="../projects.html"><span class="nav__bracket" aria-hidden="true">[</span>builds<span class="nav__bracket" aria-hidden="true">]</span></a>
+        <a href="../blog.html" class="is-active" aria-current="page"><span class="nav__bracket" aria-hidden="true">[</span>writing<span class="nav__bracket" aria-hidden="true">]</span></a>
+        <a href="../index.html#about"><span class="nav__bracket" aria-hidden="true">[</span>about<span class="nav__bracket" aria-hidden="true">]</span></a>
+        <a href="../index.html#contact"><span class="nav__bracket" aria-hidden="true">[</span>contact<span class="nav__bracket" aria-hidden="true">]</span></a>
+      </nav>
+
+      <div class="nav__actions">
+        <a class="btn btn--sm btn--primary nav__cv" href="../assets/cv/CHEN_Junjie_CV.pdf" target="_blank" rel="noopener">CV</a>
+        <button class="iconbtn" id="theme-toggle" type="button" aria-label="Switch to light theme" title="Switch theme">
+          <svg class="icon-sun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"></path></svg>
+          <svg class="icon-moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+        </button>
+        <button class="iconbtn nav__burger" id="nav-burger" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="nav-links">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+
+  <main id="main">
+    <article class="post">
+      <div class="shell shell--narrow">
+
+        <p class="post__back"><a href="../blog.html"><span aria-hidden="true">←</span> All writing</a></p>
+
+        <header class="post__head">
+          <div class="post__meta">
+            <time datetime="2026-08-13">13 August 2026</time>
+            <span class="dot" aria-hidden="true">·</span>
+            <span>8 min read</span>
+          </div>
+          <h1 class="post__title">Every backtest number I had was wrong</h1>
+          <ul class="tags tags--mini"><li>Postmortem</li><li>Testing</li><li>Quant</li></ul>
+        </header>
+
+        <div class="prose">
+          <p>
+            I have a research rig that races seventeen trading strategies against each other across
+            four markets. It runs walk-forward backtests to rank them, then runs them all forward
+            in parallel on a paper account to see whether the ranking survives contact with live
+            data. Nothing about it trades real money, which is the only reason this story is
+            comfortable to tell.
+          </p>
+          <p>
+            One strategy was scoring worse than it had any right to, and I opened the code to find
+            out why. What I found was not a bug. It was six, and between them they meant every
+            number the system had ever reported was invalid. Not <em>slightly off</em> — the
+            rankings themselves were meaningless, because different bugs hit different strategies
+            by different amounts.
+          </p>
+          <p>
+            This is the write-up. I have kept the emphasis on how each one hid, because that is the
+            transferable part; the specific bugs are unremarkable.
+          </p>
+
+          <h2>1. The warm-up was eaten out of the window I asked for</h2>
+          <p>
+            Momentum indicators need history. A twelve-month momentum signal cannot produce a
+            number until it has twelve months of bars behind it. So a backtest engine has to warm
+            up before it starts trading, and the question is where those warm-up bars come from.
+          </p>
+          <p>
+            Mine took them from the wrong end. The runner filtered the price panel down to the
+            requested start date <em>and then</em> skipped the first 273 rows of what remained. The
+            effect: ask for three years, and the first third of it is a strategy sitting flat in
+            cash, holding nothing, trading nothing — and every one of those flat days lands in the
+            denominator of the Sharpe ratio.
+          </p>
+
+          <figure class="diagram">
+            <div class="diagram__scroll">
+<svg viewBox="0 0 900 250" role="img" aria-labelledby="d6-title">
+  <title id="d6-title">Before the fix, the indicator warm-up was consumed inside the requested window, so the first third of every backtest was flat and untraded but still counted in the statistics. After the fix, warm-up is drawn from bars before the window starts.</title>
+
+  <!-- ---------- before ---------- -->
+  <text class="d-label" x="20" y="30">before · warm-up eaten out of the window you asked for</text>
+
+  <rect x="20" y="48" width="820" height="38" rx="6" fill="var(--bg-sunken)" stroke="var(--border-lit)" stroke-width="1" />
+  <rect x="21" y="49" width="286" height="36" rx="5" fill="var(--border)" />
+  <text class="d-label--sm" x="164" y="72" text-anchor="middle">flat · untraded · still averaged in</text>
+  <rect class="d-accent-fill" x="307" y="49" width="532" height="36" rx="5" opacity=".22" />
+  <text class="d-label--sm" x="573" y="72" text-anchor="middle" fill="var(--accent)">the part that actually traded</text>
+
+  <line class="d-muted" x1="20" y1="94" x2="20" y2="106" stroke-width="1" />
+  <line class="d-muted" x1="840" y1="94" x2="840" y2="106" stroke-width="1" />
+  <line class="d-muted" x1="20" y1="100" x2="840" y2="100" stroke-width="1" stroke-dasharray="3 4" />
+  <text class="d-label--sm" x="430" y="118" text-anchor="middle">requested window</text>
+
+  <text class="d-label--sm" x="20" y="140">Sharpe over the padded window</text>
+  <text class="d-label--sm" x="300" y="140" fill="var(--text-faint)">0.203</text>
+  <text class="d-label--sm" x="380" y="140">·  over the segment that traded</text>
+  <text class="d-label--sm" x="640" y="140" fill="var(--accent)">0.572</text>
+  <text class="d-label--sm" x="720" y="140">— same strategy</text>
+
+  <!-- ---------- after ---------- -->
+  <line class="d-muted" x1="20" y1="164" x2="880" y2="164" stroke-width="1" />
+  <text class="d-label" x="20" y="192">after · warm-up drawn from bars before the window opens</text>
+
+  <rect x="20" y="204" width="180" height="34" rx="6" fill="none" stroke="var(--border-lit)" stroke-width="1" stroke-dasharray="4 4" />
+  <text class="d-label--sm" x="110" y="226" text-anchor="middle" fill="var(--text-faint)">warm-up</text>
+  <rect class="d-accent-fill" x="208" y="204" width="632" height="34" rx="6" opacity=".22" />
+  <rect x="208" y="204" width="632" height="34" rx="6" fill="none" class="d-accent" stroke-width="1.2" />
+  <text class="d-label--sm" x="524" y="226" text-anchor="middle" fill="var(--accent)">requested window — every bar of it traded</text>
+</svg>
+
+            </div>
+            <figcaption>
+              The same strategy over the same period, scored two ways. Nothing about the strategy
+              changed; the only difference is whether the untraded warm-up was counted as part of
+              its performance.
+            </figcaption>
+          </figure>
+
+          <p>
+            On synthetic data where I could compute the truth, <strong>34.9% of the requested window
+            was dead</strong>, and the same strategy scored <strong>Sharpe 0.203 over the padded
+            window against 0.572 over the segment it actually traded</strong> — a factor of 2.8,
+            purely from dilution.
+          </p>
+          <p>
+            What makes this one nasty is that it is not random. A strategy that trades constantly
+            gets diluted heavily; one that trades rarely barely notices. So the bug does not add
+            noise to the leaderboard, it <em>reorders</em> it. The fix is that warm-up is drawn from
+            bars before the requested window opens, and the window you asked for is the window you
+            are scored on.
+          </p>
+
+          <h2>2. A helper that quietly re-levered every portfolio</h2>
+          <p>
+            This is the one I am least happy about, because it made an entire feature inert without
+            ever failing.
+          </p>
+          <p>
+            There is a small function that takes a dictionary of target weights, caps any single
+            position, and normalises. Its job is to keep a book from exceeding 100% invested. What
+            it actually did was rescale <em>before</em> capping — which meant it also scaled
+            <em>up</em> any book that summed to less than one.
+          </p>
+          <p>
+            Deliberate cash is not an accident. A strategy that finds three names worth holding out
+            of eight slots is saying <em>37.5% deployed, the rest in cash</em>. This helper heard
+            that and returned 75%. A committee strategy where only some members voted got its
+            partial position re-levered to full. And a volatility-targeting strategy — whose entire
+            mechanism is scaling the whole book down when realised volatility is high — had its
+            uniform scale factor divided straight back out on the next line.
+          </p>
+
+          <div class="callout">
+            <span class="callout__label">The part that stings</span>
+            <p>
+              That volatility-targeting strategy had a target-volatility parameter and a parameter
+              grid that swept it. The parameter did nothing. Every point in that sweep produced an
+              identical book — and the resulting duplicate rows then corrupted the rank-correlation
+              statistic I was using to detect overfitting. A broken measurement, feeding a broken
+              measurement of whether I was fooling myself.
+            </p>
+          </div>
+
+          <p>
+            The rule now is one sentence long and lives in the docstring:
+            <strong>this function scales down only.</strong> A book that sums to less than one is a
+            decision, not a rounding error.
+          </p>
+
+          <h2>3. The statistics that lied</h2>
+          <p>
+            A cluster of smaller bugs, each individually silly, all in the code that turns an
+            equity curve into a number you rank on.
+          </p>
+          <ul>
+            <li>
+              <strong>Standard deviation of a single observation is NaN.</strong> pandas uses
+              <code>ddof=1</code> by default, so <code>Series([x]).std()</code> divides by zero
+              degrees of freedom. Any strategy with one return observation produced NaN Sharpe and
+              NaN volatility, which then flowed into <code>sort_values</code> and into SQLite,
+              where NaN sorts wherever it likes.
+            </li>
+            <li>
+              <strong>Sortino and Calmar returned zero for a strategy that never lost money.</strong>
+              Both divide by a downside quantity — downside deviation, maximum drawdown. With no
+              losing periods, that denominator is zero, and the guard returned 0.0. Zero is the
+              <em>worst possible score</em>. A perfect run was being ranked last by two of the five
+              metrics.
+            </li>
+            <li>
+              <strong>Annualised return used N periods for an N-point series.</strong> An N-point
+              series has N−1 returns. A small error that grows as the window shrinks, which is
+              exactly where you least want it.
+            </li>
+            <li>
+              <strong>Turnover measured intentions, not trades.</strong> It differenced target
+              weights, but a trade band had already suppressed the small moves. It was reporting
+              what the strategy wanted to do, and I was charging costs on what it did.
+            </li>
+            <li>
+              <strong>A missing price fabricated a round trip.</strong> A held name with a NaN close
+              contributed zero to that day's equity and its real value the day after — a −100% move
+              followed by a +100% move, in a position nobody had touched.
+            </li>
+          </ul>
+          <p>
+            The general shape here is worth naming. Every one of these is a
+            <strong>degenerate-input</strong> bug: one observation, no losses, a missing value,
+            an empty set. Nobody writes a test for the case where the strategy did too well.
+          </p>
+
+          <h2>4. Three days of trading that happened at the weekend</h2>
+          <p>
+            The live paper race had no market-hours gate at all. I found this by reading the
+            database rather than the code, which is the right order: of the three dates the race
+            had ever recorded, <strong>one was a Saturday and one was a Sunday</strong>. Two thirds
+            of the evidence I had about live performance was phantom bars, executed against
+            Friday's stale closing prices, with modelled transaction costs faithfully charged on
+            trades that could not exist.
+          </p>
+          <p>
+            Worse, all four markets were being stamped with a single New York date, so the Asian
+            markets were being asked about a session that had not happened yet in one direction and
+            had closed hours ago in the other.
+          </p>
+          <p>
+            The obvious fix is a market calendar. I did not want one — calendars need holiday
+            tables, holiday tables go stale, and a stale holiday table fails silently in exactly
+            the same way. What replaced it is a single data-driven rule:
+          </p>
+          <blockquote>
+            A market's session is the last close date in its own freshly fetched price panel, and
+            it steps forward only when that date advances.
+          </blockquote>
+          <p>
+            Weekends skip themselves, because no new close appears. Holidays skip themselves, for
+            the same reason. Crypto needs no special case, because it always has a new close. Each
+            market gets its own local date for free. And a run against a stale cache is refused by
+            the same check that handles everything else, because the panel's last date has not
+            moved. No calendar table, nothing to rot.
+          </p>
+          <p>
+            It does impose one real constraint, which I wrote down rather than discovered later:
+            the job must run <em>after</em> the close, or the panel does not yet contain the day it
+            is meant to trade.
+          </p>
+
+          <h2>What I actually changed</h2>
+          <p>
+            The code fixes were the easy part. The habits that came out of it:
+          </p>
+          <ul>
+            <li>
+              <strong>Probe the system, do not re-read the design.</strong> I found the weekend bug
+              by querying which dates existed in the live table. I would not have found it by
+              reading the runner, because the runner looks correct — the gate was missing, and
+              missing things are invisible in code review.
+            </li>
+            <li>
+              <strong>Test on synthetic data where the answer is known.</strong> "34.9% of the
+              window was dead" is a sentence I could only write because I built a panel whose
+              correct result I could compute by hand. On real data it would have been a vague
+              feeling that the numbers looked low.
+            </li>
+            <li>
+              <strong>Write the test that would have caught it, at the level it happened.</strong>
+              The warm-up bug is now a test asserting the traded segment covers the full requested
+              window. The normalisation bug is a test asserting a book summing to 0.4 comes back
+              summing to 0.4. Neither is clever. Both are permanent.
+            </li>
+            <li>
+              <strong>Suspect the metric before the strategy.</strong> I opened this investigation
+              because a strategy scored badly. The strategy was fine. Roughly half of what I found
+              was in the scoring, not the trading — and scoring code gets far less scrutiny because
+              it feels like plumbing.
+            </li>
+          </ul>
+          <p>
+            The test count roughly doubled over the review, and all four tournaments were re-run on
+            the fixed engine. I have not promoted a champion. Short-window live performance is
+            mostly noise, and after this I am in no hurry to believe a leaderboard.
+          </p>
+
+          <h2>Why I am writing this down</h2>
+          <p>
+            My day job is machine learning on sequencing data, and the failure mode here is one I
+            recognise from it exactly.
+          </p>
+          <p>
+            A backtest is a held-out evaluation. It is the thing that tells you whether the model
+            works, and it is therefore the thing you are least equipped to check, because you have
+            nothing better to check it against. When the evaluation is subtly wrong, every downstream
+            decision is wrong in a way no amount of downstream care can recover — and it does not
+            look wrong. It looks like a leaderboard.
+          </p>
+          <p>
+            In genomics the equivalents are familiar: a normalisation step applied before the split
+            instead of after, a batch variable that correlates with the label, a metric that
+            flatters the majority class. Same shape. The evaluation pipeline deserves more tests
+            than the model, and it usually gets fewer.
+          </p>
+          <p>
+            <a class="arrowlink" href="../projects.html#tournament">The build this came from <span aria-hidden="true">→</span></a>
+          </p>
+
+        </div>
+
+        <footer class="post__foot">
+          <p>
+            Corrections and disagreements are genuinely welcome —
+            <a href="mailto:chen_junjie@outlook.com">chen_junjie@outlook.com</a> or
+            <a href="https://www.linkedin.com/in/junjie-chen-nus/" target="_blank" rel="noopener">LinkedIn</a>.
+          </p>
+        </footer>
+
+        <nav class="postnav" aria-label="More posts">
+          <a class="postnav__link postnav__link--prev" href="../posts/2026-08-13-qubo-portfolio-selection.html"><span class="postnav__dir"><span aria-hidden="true">←</span> Newer</span><span class="postnav__title">Choosing ten stocks out of thirty with a QUBO</span></a>
+          <a class="postnav__link postnav__link--next" href="../posts/2026-08-13-currency-is-a-data-model.html"><span class="postnav__dir">Older <span aria-hidden="true">→</span></span><span class="postnav__title">Multi-currency is a data-modelling problem, not a formatting problem</span></a>
+        </nav>
+
+      </div>
+    </article>
+
+  </main>
+
+  <footer class="footer">
+    <div class="shell footer__inner">
+      <div class="footer__col">
+        <p class="footer__sig">Junjie Chen</p>
+        <p class="footer__meta">Singapore · genomics, machine learning, and things built on evenings</p>
+      </div>
+      <nav class="footer__col footer__links" aria-label="Elsewhere">
+        <a href="mailto:chen_junjie@outlook.com">Email</a>
+        <a href="https://www.linkedin.com/in/junjie-chen-nus/" target="_blank" rel="noopener">LinkedIn</a>
+        <a href="https://github.com/Neutrophil" target="_blank" rel="noopener">GitHub</a>
+        <a href="../feed.xml">RSS</a>
+      </nav>
+      <div class="footer__col footer__end">
+        <p class="footer__meta">© <span id="year">2026</span> · static site, no trackers, no analytics</p>
+        <p><a class="footer__top" href="#top">Back to top <span aria-hidden="true">↑</span></a></p>
+      </div>
+    </div>
+  </footer>
+
+
+  <script src="../js/main.js"></script>
+</body>
+</html>

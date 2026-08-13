@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="{{lang}}" class="no-js">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="color-scheme" content="dark light" />
+  <title>{{title}}</title>
+  <meta name="description" content="{{description}}" />
+  <meta name="author" content="{{author}}" />
+
+  <meta property="og:type" content="{{og_type}}" />
+  <meta property="og:title" content="{{og_title}}" />
+  <meta property="og:description" content="{{og_description}}" />
+  <meta property="og:url" content="{{og_url}}" />
+  <meta property="og:site_name" content="{{site_title}}" />
+  <meta name="twitter:card" content="summary_large_image" />
+
+  <link rel="icon" type="image/svg+xml" href="{{rel}}assets/favicon.svg" />
+  <link rel="stylesheet" href="{{rel}}css/styles.css" />
+  <link rel="alternate" type="application/rss+xml" title="{{site_title}} — writing" href="{{rel}}feed.xml" />
+  <link rel="canonical" href="{{og_url}}" />
+
+  <!-- Resolve the theme and announce JS before first paint.
+       The no-js -> js swap matters: .reveal starts at opacity 0 only when
+       scripting is available, so a JS failure degrades to visible content
+       rather than a blank page. -->
+  <script>
+    (function () {
+      var d = document.documentElement;
+      d.classList.remove('no-js');
+      d.classList.add('js');
+      try {
+        var stored = localStorage.getItem('theme');
+        var theme = stored || (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+        d.setAttribute('data-theme', theme);
+      } catch (e) {
+        d.setAttribute('data-theme', 'dark');
+      }
+    })();
+  </script>
+</head>
+<body class="{{body_class}}">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <div class="progress" id="progress" aria-hidden="true"></div>
+
+{{nav}}
+
+  <main id="main">
+{{body}}
+  </main>
+
+{{footer}}
+
+  <script src="{{rel}}js/main.js"></script>
+</body>
+</html>

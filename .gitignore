@@ -91,3 +91,10 @@ Thumbs.db
 !assets/**
 # ...but never the raw CV source documents.
 CV/
+
+# Workspace convention puts a dated plan and progress doc in every project
+# directory. In THIS repo those files would be served by GitHub Pages at a
+# guessable URL — and they contain candid working notes and self-assessment
+# that are not part of the published site. Keep them on disk, out of git.
+/*_plan.md
+/*_progress.md

@@ -1,0 +1,63 @@
++++
+title   = "Bridging the bench and the model: why I'm moving toward AI for Life Science"
+date    = 2026-06-24
+summary = "A decade in the lab taught me how messy real biological data is. Here's why that makes me optimistic — and cautious — about machine learning in genomics, and what I want to build next."
+tags    = ["AI for Life Science", "Genomics", "Career"]
+description = "Why a decade at the bench makes me both optimistic and cautious about machine learning in genomics — and what I want to build next in AI for Life Science."
++++
+          <p>
+            I spent the better part of a decade at the bench — pipetting, optimizing assays,
+            chasing protein complexes through the nucleolus. These days I spend most of mine
+            writing code: building whole-genome sequencing workflows and training models to tell
+            cancer signal apart from noise. People sometimes ask whether that was a hard switch.
+            The honest answer is that it felt less like a switch and more like following the same
+            question into a new tool.
+          </p>
+
+          <h2>The data is never as clean as the slide deck</h2>
+          <p>
+            The single most useful thing the lab taught me is how a number actually comes to
+            exist. Before a variant call is a row in a table, it was a fragment of cell-free DNA in
+            a tube, a library prep that may or may not have worked, a flow cell with its own
+            quirks. FFPE tissue deaminates. cfDNA is short and scarce. Every step adds a fingerprint
+            to the data.
+          </p>
+          <p>
+            When you have stood at the bench, you read a model's errors differently. A
+            false positive isn't just a misclassification — it might be a batch effect, a
+            contamination artifact, a coverage dropout in a hard-to-map region. Knowing where the
+            data comes from tells you which features to trust and which ones the model is quietly
+            exploiting for the wrong reasons.
+          </p>
+
+          <h2>Why I'm optimistic</h2>
+          <p>
+            Genomics is, in a sense, an ideal substrate for machine learning: high-dimensional,
+            structured, and increasingly abundant. Multi-omics integration — stitching together
+            genomic, epigenomic and fragmentomic signal — is exactly the kind of problem where a
+            well-posed model can see patterns a single assay cannot. We are moving from hand-crafted
+            thresholds toward representations that the data itself suggests.
+          </p>
+
+          <h2>Why I'm cautious</h2>
+          <p>
+            And yet biology punishes overconfidence. A model that reports 99% accuracy on a clean
+            cohort can fall apart on the next sequencing batch, the next hospital, the next sample
+            type. In a clinical-diagnostics setting the cost of being wrong is not a worse metric —
+            it is a patient. So I care as much about calibration, robustness and interpretability
+            as I do about raw performance. The goal is not a model that wins a benchmark; it is one
+            a clinician can trust on a Tuesday.
+          </p>
+
+          <h2>What I want to build next</h2>
+          <p>
+            I want to keep working where wet-lab reality and computation meet — models that are
+            grounded in how the assay behaves, validated like a diagnostic and not just a
+            leaderboard entry, and honest about their uncertainty. That is what <em>AI for Life
+            Science</em> means to me: not applying a generic model to a biological dataset, but
+            building systems that respect the biology and the messy, beautiful way its data is made.
+          </p>
+          <p>
+            This blog is where I'll think out loud about that — methods I'm reading, ideas I'm
+            testing, and the occasional opinion. More soon.
+          </p>

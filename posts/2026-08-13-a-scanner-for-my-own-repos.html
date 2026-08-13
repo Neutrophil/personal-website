@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en" class="no-js">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="color-scheme" content="dark light" />
+  <title>A privacy scanner for my own repositories — Junjie Chen</title>
+  <meta name="description" content="Designing a personal-data scanner: why it must not embed what it detects, checksums over regexes, redacting its own output, per-repository policy files, and four independent enforcement layers." />
+  <meta name="author" content="Junjie Chen" />
+
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="A privacy scanner for my own repositories" />
+  <meta property="og:description" content="Designing a personal-data scanner: why it must not embed what it detects, checksums over regexes, redacting its own output, per-repository policy files, and four independent enforcement layers." />
+  <meta property="og:url" content="https://neutrophil.github.io/posts/2026-08-13-a-scanner-for-my-own-repos.html" />
+  <meta property="og:site_name" content="Junjie Chen" />
+  <meta name="twitter:card" content="summary_large_image" />
+
+  <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg" />
+  <link rel="stylesheet" href="../css/styles.css" />
+  <link rel="alternate" type="application/rss+xml" title="Junjie Chen — writing" href="../feed.xml" />
+  <link rel="canonical" href="https://neutrophil.github.io/posts/2026-08-13-a-scanner-for-my-own-repos.html" />
+
+  <!-- Resolve the theme and announce JS before first paint.
+       The no-js -> js swap matters: .reveal starts at opacity 0 only when
+       scripting is available, so a JS failure degrades to visible content
+       rather than a blank page. -->
+  <script>
+    (function () {
+      var d = document.documentElement;
+      d.classList.remove('no-js');
+      d.classList.add('js');
+      try {
+        var stored = localStorage.getItem('theme');
+        var theme = stored || (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+        d.setAttribute('data-theme', theme);
+      } catch (e) {
+        d.setAttribute('data-theme', 'dark');
+      }
+    })();
+  </script>
+</head>
+<body class="page-post">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <div class="progress" id="progress" aria-hidden="true"></div>
+
+  <header class="nav" id="top">
+    <div class="shell nav__inner">
+      <a class="nav__brand" href="../index.html" aria-label="Junjie Chen — home">
+        <span class="nav__monogram" aria-hidden="true">
+          <svg viewBox="0 0 32 32" width="30" height="30" fill="none" aria-hidden="true">
+            <rect x="1" y="1" width="30" height="30" rx="8" stroke="currentColor" stroke-width="1.25" opacity=".55"/>
+            <path d="M12 9v10.2a3.3 3.3 0 0 1-3.3 3.3H7.4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            <path d="M24.6 10.4a5.9 5.9 0 0 0-8.6 1 6.6 6.6 0 0 0 0 8.6 5.9 5.9 0 0 0 8.6 1" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </span>
+        <span class="nav__name">Junjie Chen</span>
+      </a>
+
+      <nav class="nav__links" id="nav-links" aria-label="Primary">
+        <a href="../projects.html"><span class="nav__bracket" aria-hidden="true">[</span>builds<span class="nav__bracket" aria-hidden="true">]</span></a>
+        <a href="../blog.html" class="is-active" aria-current="page"><span class="nav__bracket" aria-hidden="true">[</span>writing<span class="nav__bracket" aria-hidden="true">]</span></a>
+        <a href="../index.html#about"><span class="nav__bracket" aria-hidden="true">[</span>about<span class="nav__bracket" aria-hidden="true">]</span></a>
+        <a href="../index.html#contact"><span class="nav__bracket" aria-hidden="true">[</span>contact<span class="nav__bracket" aria-hidden="true">]</span></a>
+      </nav>
+
+      <div class="nav__actions">
+        <a class="btn btn--sm btn--primary nav__cv" href="../assets/cv/CHEN_Junjie_CV.pdf" target="_blank" rel="noopener">CV</a>
+        <button class="iconbtn" id="theme-toggle" type="button" aria-label="Switch to light theme" title="Switch theme">
+          <svg class="icon-sun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"></path></svg>
+          <svg class="icon-moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+        </button>
+        <button class="iconbtn nav__burger" id="nav-burger" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="nav-links">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+
+  <main id="main">
+    <article class="post">
+      <div class="shell shell--narrow">
+
+        <p class="post__back"><a href="../blog.html"><span aria-hidden="true">←</span> All writing</a></p>
+
+        <header class="post__head">
+          <div class="post__meta">
+            <time datetime="2026-08-13">13 August 2026</time>
+            <span class="dot" aria-hidden="true">·</span>
+            <span>9 min read</span>
+          </div>
+          <h1 class="post__title">A privacy scanner for my own repositories</h1>
+          <ul class="tags tags--mini"><li>Security</li><li>Tooling</li><li>Python</li></ul>
+        </header>
+
+        <div class="prose">
+          <p>
+            I keep a handful of personal projects that read financial documents. At some point I sat
+            down and actually audited what had ended up committed across them, rather than assuming,
+            and the answer was worse than I expected. Nothing catastrophic followed — but there were
+            no technical controls at all, and "I will be careful" is not a control.
+          </p>
+          <p>
+            So I wrote one. This is the design, which turned out to be more interesting than I
+            expected, because a tool that hunts for secrets has an awkward relationship with the
+            secrets it hunts for.
+          </p>
+
+          <h2>Rule zero: the scanner must not contain what it detects</h2>
+          <p>
+            The obvious way to catch a specific account number is to search for that account number.
+            Which means writing it into a file, which means committing it, which means the scanner
+            is now the leak. Every improvement to its accuracy makes the problem worse.
+          </p>
+          <p>
+            So the code carries only <em>generic</em> patterns: shapes, checksums, structural rules
+            — nothing that identifies anyone. The specific values live in a file outside every
+            repository, mode 0600, that is never committed and never will be. The scanner loads it
+            at startup if it is there.
+          </p>
+          <p>
+            That split has a consequence I did not anticipate, and it is the most important line in
+            the whole tool: <strong>if the local file is missing, the scan does not report
+            "clean"</strong>. It fails. A guard running without its most specific rules and
+            announcing success is more dangerous than no guard at all, because it manufactures
+            confidence. Silence has to mean "I checked", never "I could not check".
+          </p>
+
+          <h2>Checksums beat regexes</h2>
+          <p>
+            Most of the interesting detection work is in reducing false positives, because a noisy
+            scanner gets ignored and an ignored scanner is decoration.
+          </p>
+          <p>
+            Payment card numbers are the clean example. The naive rule — thirteen to nineteen
+            digits — matches timestamps, hashes, and half the numbers in a test fixture. Adding the
+            Luhn check helps, but not as much as you would hope: Luhn is a single mod-10 digit, so
+            roughly <strong>one in ten random digit strings passes it</strong>. Requiring
+            <em>both</em> Luhn <em>and</em> a plausible issuer prefix — the industry ranges are
+            narrow and public — cuts the false positive rate by another order of magnitude, because
+            a random number has to now satisfy two independent constraints.
+          </p>
+          <p>
+            National identity numbers are similar: the format is a letter, seven digits and a check
+            letter, and the check letter is computed from a weighted sum. Validating it turns a
+            pattern that matches a great many strings into one that essentially only matches real
+            identifiers.
+          </p>
+          <p>
+            The lookarounds matter too, and in a direction I got wrong first. My instinct was to
+            require a word boundary. But the code I am scanning is a <em>statement parser</em>, and
+            the way it sees a card number is embedded in a run of surrounding text with no
+            whitespace at all. So the exclusions are on adjacent <em>digits</em> only — a longer
+            number is not a card number, but a card number wedged between letters still is.
+          </p>
+
+          <h2>The rule that needs a hint, and the hole that leaves</h2>
+          <p>
+            Money is much harder than it looks, and the design here is a real trade-off rather than
+            a clean answer.
+          </p>
+          <p>
+            A monetary amount has no distinguishing structure. It is just a number. The only signal
+            available is a currency marker sitting next to it — so the rule requires one, and
+            requires the value to clear a threshold so that version strings and small constants
+            stay quiet.
+          </p>
+          <p>
+            Even that needs care. A currency <em>symbol</em> may abut its digits, because that is
+            how it is printed. A three-letter currency <em>code</em> may not, because a filename of
+            the form <code>CCY20260809</code> is a code followed by a date and not a payment of
+            twenty million. There is a helper whose entire job is to recognise a bare date so it can
+            be excluded, and the suffix form (a number followed by a code) additionally demands
+            thousands separators or decimals before it will fire.
+          </p>
+
+          <div class="callout">
+            <span class="callout__label">The hole</span>
+            <p>
+              Because the rule needs a currency marker, a bare <code>12345.67</code> sitting in a
+              variable assignment is invisible to it. That is exactly the shape a real figure takes
+              in source code and in documentation — nobody writes the currency symbol in a Python
+              literal. The generic rule cannot close this without flagging every number in every
+              file.
+            </p>
+            <p>
+              So it is closed from the other side: any figure known to be real goes into the local
+              denylist, where it is matched however it is written. The generic rule catches the
+              shape; the denylist catches the instance. Neither alone is sufficient, and knowing
+              <em>which</em> of your rules is the load-bearing one for a given class of data is
+              worth more than adding a seventh rule.
+            </p>
+          </div>
+
+          <h2>The output is part of the attack surface</h2>
+          <p>
+            This is the design decision I am most pleased with, and it is the one I would have
+            skipped if I had not thought about where findings actually go.
+          </p>
+          <p>
+            A scanner prints what it found so you can fix it. Those printed findings land in a
+            terminal, in a scrollback buffer, in a CI log, in a bug report — and, in my case,
+            straight into the context window of an AI coding assistant. An unredacted finding does
+            not report the leak. It performs it, into several new places at once.
+          </p>
+          <p>
+            So findings are redacted before they are printed, in three passes:
+          </p>
+          <ol>
+            <li>Mask the matched span itself, keeping the first and last couple of characters so a
+              human can still tell which occurrence is being discussed.</li>
+            <li><strong>Mask every <em>other</em> number remaining on that line.</strong> This is the
+              pass I would not have written unprompted. Consider a line listing three balances: the
+              rule fires on the first, and a naive redaction masks that one and publishes the other
+              two, in a message specifically designed to be copied and pasted.</li>
+            <li>Re-mask anything matching the denylist, regardless of which rule actually fired.</li>
+          </ol>
+          <p>
+            The result is that the tool's output is safe to paste anywhere — which is the property
+            that makes it usable at all. A security tool whose findings you have to handle carefully
+            has moved the problem rather than solved it.
+          </p>
+          <p>
+            The same reasoning drives the path rules. Data files are identified and blocked
+            <em>by path and extension</em>, and are never opened. A scanner that reads a database to
+            check whether it contains anything sensitive has already loaded it into memory, and
+            possibly into a log line.
+          </p>
+
+          <h2>Policy per repository, committed on purpose</h2>
+          <p>
+            Every rule has legitimate exceptions, and the exceptions are where a security tool
+            usually rots — someone adds a global suppression to unblock a deadline and it is never
+            revisited.
+          </p>
+          <p>
+            So exceptions are per-repository, in a committed file, in three explicit forms:
+          </p>
+          <ul>
+            <li>A <strong>path glob</strong> exempting a file from scanning entirely. Reserved for
+              things that are fake by definition — example templates, and the scanner's own test
+              corpus, which by necessity contains a sample of everything it detects.</li>
+            <li>A <strong>rule name</strong> disabling one rule for that repo. The site you are
+              reading uses this: publishing my name and my email address is the entire point of it,
+              so the rules that would flag them are switched off here and nowhere else.</li>
+            <li>A <strong>promotion</strong>, turning an advisory rule into a blocking one where a
+              repo wants to be stricter than the default.</li>
+          </ul>
+          <p>
+            Keeping it per-repository means one project's exception cannot silently widen another's,
+            and keeping it committed means every deviation shows up in a diff with a comment
+            explaining itself. That combination is what makes exceptions survivable.
+          </p>
+
+          <h2>Four gates, and one lesson about where they attach</h2>
+
+          <figure class="diagram">
+            <div class="diagram__scroll">
+<svg viewBox="0 0 900 300" role="img" aria-labelledby="d5-title">
+  <title id="d5-title">Four independent gates stand between an edited file and a remote: a pre-commit scan of staged blobs, a pre-push scan of every tracked file, an agent hook that intercepts shell commands, and a weekly audit that re-checks every repository and verifies the hooks are still installed.</title>
+  <defs>
+    <marker id="d5-arw" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 Z" fill="var(--border-lit)" />
+    </marker>
+  </defs>
+
+  <!-- the pipeline -->
+  <rect class="d-fill-elev d-stroke" x="16" y="96" width="112" height="58" rx="8" stroke-width="1" />
+  <text class="d-label" x="72" y="122" text-anchor="middle">working</text>
+  <text class="d-label" x="72" y="138" text-anchor="middle">tree</text>
+
+  <rect class="d-fill-elev d-accent" x="196" y="96" width="140" height="58" rx="8" stroke-width="1.3" />
+  <text class="d-label" x="266" y="120" text-anchor="middle">pre-commit</text>
+  <text class="d-label--sm" x="266" y="138" text-anchor="middle">staged blobs</text>
+
+  <rect class="d-fill-elev d-accent" x="404" y="96" width="140" height="58" rx="8" stroke-width="1.3" />
+  <text class="d-label" x="474" y="120" text-anchor="middle">pre-push</text>
+  <text class="d-label--sm" x="474" y="138" text-anchor="middle">every tracked file</text>
+
+  <rect class="d-fill-elev d-stroke" x="612" y="96" width="120" height="58" rx="8" stroke-width="1" />
+  <text class="d-label" x="672" y="130" text-anchor="middle">remote</text>
+
+  <g class="d-stroke" fill="none" stroke-width="1.2" marker-end="url(#d5-arw)">
+    <path d="M128 125 L194 125" />
+    <path d="M336 125 L402 125" />
+    <path d="M544 125 L610 125" />
+  </g>
+
+  <!-- gate 3: the agent hook, sitting above the developer -->
+  <rect class="d-fill-elev d-accent2" x="140" y="16" width="256" height="50" rx="8" stroke-width="1.3" />
+  <text class="d-label" x="268" y="38" text-anchor="middle">agent PreToolUse hook</text>
+  <text class="d-label--sm" x="268" y="55" text-anchor="middle">blocks a shell reader aimed at a private path</text>
+  <path class="d-accent2" fill="none" stroke-width="1.2" stroke-dasharray="4 4" d="M268 66 L268 94" />
+
+  <!-- gate 4: the weekly audit, looping back -->
+  <rect class="d-fill-elev d-stroke" x="404" y="216" width="330" height="50" rx="8" stroke-width="1" />
+  <text class="d-label" x="424" y="238">weekly audit</text>
+  <text class="d-label--sm" x="424" y="255">re-scans every repo — and checks the hooks are still there</text>
+  <path class="d-muted" fill="none" stroke-width="1.2" stroke-dasharray="4 4"
+        d="M404 241 C 300 241, 250 200, 250 158" marker-end="url(#d5-arw)" />
+
+  <!-- what the scanner carries, and what it does not -->
+  <rect class="d-fill-bg d-stroke" x="762" y="60" width="126" height="130" rx="8" stroke-width="1" />
+  <text class="d-label--sm" x="778" y="82">the scanner</text>
+  <line class="d-muted" x1="778" y1="92" x2="872" y2="92" stroke-width="1" />
+  <text class="d-label--sm" x="778" y="110">generic patterns</text>
+  <text class="d-label--sm" x="778" y="128">checksums</text>
+  <text class="d-label--sm" x="778" y="146">path rules</text>
+  <line class="d-muted" x1="778" y1="158" x2="872" y2="158" stroke-width="1" />
+  <text class="d-label--sm" x="778" y="176" fill="var(--accent)">no real values</text>
+
+  <text class="d-label--sm" x="16" y="200">Any one gate can be bypassed by someone determined.</text>
+  <text class="d-label--sm" x="16" y="218">The point is that an accident has to get past all four.</text>
+</svg>
+
+            </div>
+            <figcaption>
+              Independent layers: a pre-commit scan of staged content, a pre-push scan of every
+              tracked file, a hook that intercepts an agent's shell commands before they run, and a
+              weekly audit that re-scans everything and confirms the first two are still installed.
+            </figcaption>
+          </figure>
+
+          <p>
+            The layers are ordinary. What I got wrong, and would get wrong again, is
+            <em>where the hooks attach</em>.
+          </p>
+          <p>
+            The first version installed hooks into each repository and scoped them to my workspace
+            directory. It looked complete. Then I cloned one of those repos somewhere else to test
+            something, and a probe commit carrying a deliberately planted card number went straight
+            through — no hooks in the fresh clone, and the path check would have failed anyway.
+          </p>
+          <p>
+            Git does not track <code>.git/hooks</code>. A per-repo install is therefore not a
+            property of the project; it is a property of one checkout on one machine, and it
+            evaporates the moment anyone clones. The fix was to set a global hooks path so every
+            repository on the machine — including ones that do not exist yet — is covered, and to
+            decide whether to guard based on <em>either</em> the workspace path <em>or</em> the
+            origin URL. The guard follows the repository, not the directory. Third-party clones stay
+            unguarded deliberately, because their own fixtures would block their legitimate commits.
+          </p>
+          <p>
+            The weekly audit exists for the same reason. It re-scans everything, but its more useful
+            job is answering "are the hooks still there?" — because the failure mode of a
+            protection layer is not usually that it breaks loudly. It is that it quietly stops being
+            installed and nobody notices for months.
+          </p>
+
+          <h2>What it does not do</h2>
+          <p>
+            Two honest limits, both documented rather than hidden.
+          </p>
+          <p>
+            <strong>It can be bypassed.</strong> Git has a flag to skip hooks, and the tool honours
+            an environment variable that disables it. Both are deliberate. This is a guard against
+            accidents, not against a determined operator — and a tool with no escape hatch gets
+            uninstalled the first time it blocks something urgent and legitimate. What I did instead
+            was make bypassing <em>loud</em>: any use of either is treated as an incident worth
+            writing down.
+          </p>
+          <p>
+            <strong>Some exposure is structural.</strong> A tool that fetches market data discloses
+            which instruments it asks about, and the set of instruments is itself informative. No
+            amount of scanning fixes that. It goes in the risk register as accepted, which is a more
+            useful place for it than in the back of my mind.
+          </p>
+          <p>
+            The last piece is egress rather than commits: anything leaving the machine for a
+            third-party API is relativised and pseudonymised first — shares of a total instead of
+            absolute figures, opaque labels instead of real names. That works because the analysis I
+            actually want is scale-invariant. Concentration, allocation and overlap are all
+            questions about proportions, so the answers are unchanged and the magnitudes stay home.
+            The check runs over the fully assembled payload rather than its parts, and if the
+            checker cannot even be imported it refuses to send. Fail closed, or do not bother.
+          </p>
+          <p>
+            <a class="arrowlink" href="../projects.html#guard">The build this came from <span aria-hidden="true">→</span></a>
+          </p>
+
+        </div>
+
+        <footer class="post__foot">
+          <p>
+            Corrections and disagreements are genuinely welcome —
+            <a href="mailto:chen_junjie@outlook.com">chen_junjie@outlook.com</a> or
+            <a href="https://www.linkedin.com/in/junjie-chen-nus/" target="_blank" rel="noopener">LinkedIn</a>.
+          </p>
+        </footer>
+
+        <nav class="postnav" aria-label="More posts">
+          <a class="postnav__link postnav__link--prev" href="../posts/2026-08-13-currency-is-a-data-model.html"><span class="postnav__dir"><span aria-hidden="true">←</span> Newer</span><span class="postnav__title">Multi-currency is a data-modelling problem, not a formatting problem</span></a>
+          <a class="postnav__link postnav__link--next" href="../posts/2026-06-24-bridging-biology-and-ai.html"><span class="postnav__dir">Older <span aria-hidden="true">→</span></span><span class="postnav__title">Bridging the bench and the model: why I&#x27;m moving toward AI for Life Science</span></a>
+        </nav>
+
+      </div>
+    </article>
+
+  </main>
+
+  <footer class="footer">
+    <div class="shell footer__inner">
+      <div class="footer__col">
+        <p class="footer__sig">Junjie Chen</p>
+        <p class="footer__meta">Singapore · genomics, machine learning, and things built on evenings</p>
+      </div>
+      <nav class="footer__col footer__links" aria-label="Elsewhere">
+        <a href="mailto:chen_junjie@outlook.com">Email</a>
+        <a href="https://www.linkedin.com/in/junjie-chen-nus/" target="_blank" rel="noopener">LinkedIn</a>
+        <a href="https://github.com/Neutrophil" target="_blank" rel="noopener">GitHub</a>
+        <a href="../feed.xml">RSS</a>
+      </nav>
+      <div class="footer__col footer__end">
+        <p class="footer__meta">© <span id="year">2026</span> · static site, no trackers, no analytics</p>
+        <p><a class="footer__top" href="#top">Back to top <span aria-hidden="true">↑</span></a></p>
+      </div>
+    </div>
+  </footer>
+
+
+  <script src="../js/main.js"></script>
+</body>
+</html>
