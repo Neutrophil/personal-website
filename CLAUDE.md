@@ -1,5 +1,7 @@
 # CLAUDE.md — personal_website
 
+**Author:** Dr. Junjie CHEN <chen_junjie@outlook.com> — all docs, scripts and outputs here are his work. <!-- privacy-guard: allow denylist-name contact -->
+
 Static personal site on GitHub Pages. Workspace-wide rules live in
 [../CLAUDE.md](../CLAUDE.md) — this file covers only what is specific here.
 
