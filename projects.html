@@ -4,6 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="color-scheme" content="dark light" />
+  <meta name="theme-color" content="#0a0b0f" media="(prefers-color-scheme: dark)" />
+  <meta name="theme-color" content="#fbfcfd" media="(prefers-color-scheme: light)" />
   <title>Builds — Junjie Chen</title>
   <meta name="description" content="What Junjie Chen has built: whole-genome sequencing pipelines and ML for cancer classification at Lucence, plus a shelf of personal systems — a quantum-inspired portfolio optimizer, a multi-market paper-trading research rig, a multi-currency dashboard, a statement parser, and the privacy scanner that guards them all." />
   <meta name="author" content="Junjie Chen" />
@@ -20,6 +22,7 @@
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:image" content="https://neutrophil.github.io/assets/og.png" />
 
+  <link rel="preload" href="assets/fonts/jetbrains-mono-regular.woff2" as="font" type="font/woff2" crossorigin />
   <link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
   <link rel="stylesheet" href="css/styles.css" />
   <link rel="alternate" type="application/rss+xml" title="Junjie Chen — writing" href="feed.xml" />
@@ -160,7 +163,7 @@
             <ul class="tags tags--mini">
               <li>Proteomics</li><li>Mass spec</li><li>PPI</li><li>Immunology</li>
             </ul>
-            <p style="margin-top:1rem">
+            <p class="card__foot">
               <a class="arrowlink" href="index.html#publications">Publications <span aria-hidden="true">→</span></a>
             </p>
           </article>
@@ -365,7 +368,7 @@
         </div>
 
         <p class="section__foot reveal">
-          <span class="groupnote" style="display:block">
+          <span class="groupnote groupnote--block">
             Also built and running: a curriculum dashboard that turns a six-month
             AI-for-Life-Science study plan into something trackable; a job-search assistant whose
             CV tailoring is checked against the source bullets so it cannot invent experience;

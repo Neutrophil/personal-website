@@ -30,7 +30,10 @@ src/
 
 css/styles.css               # design system: dark default + light counterpart
 js/main.js                   # theme toggle, nav, reveal, tag filter, copy buttons, progress
-tools/make_og.py             # regenerates assets/og.png (needs Pillow; run by hand)
+tools/make_og.py             # regenerates assets/og.png (Pillow + fontTools; by hand)
+tools/shots.py               # screenshot matrix for a visual diff (Playwright; by hand)
+tools/audit.py               # browser-side checks --check cannot do (Playwright; by hand)
+assets/fonts/                # JetBrains Mono, subset to this site (OFL, ~75 KB, 3 weights)
 assets/cv/                   # downloadable CV (PDF)
 assets/favicon.svg
 assets/og.png                # 1200x630 social card, committed
@@ -57,9 +60,29 @@ cd /home/junjie/claude/personal_website
 - a missing `assets/og.png` — every page references it by absolute URL, which the link
   checker cannot follow, so it is checked separately;
 - **any text/background pair falling below WCAG AA contrast, in either theme** — the ratios
-  are computed from the tokens in `css/styles.css`, so changing a colour tells you immediately.
+  are computed from the tokens in `css/styles.css`, so changing a colour tells you immediately;
+- a diagram whose smallest label would render below 10px once the figure is scaled to fit;
+- a `.reveal` gating class that `js/main.js` does not actually set — the check that stops a
+  failed script from blanking the page;
+- a control declared smaller than 24px, more than one current-page marker on a page, or a
+  page with no `theme-color`.
 
 Run it before every commit.
+
+## The browser-side checks
+
+`--check` reasons about the sources and has no browser, so it cannot see a colour after alpha
+compositing, a label inside a scaled SVG, or what happens when a script fails. `tools/audit.py`
+does, and exits non-zero the same way:
+
+```bash
+export LD_LIBRARY_PATH=$HOME/miniconda3/envs/investing/lib
+~/miniconda3/envs/investing/bin/python tools/audit.py     # contrast, targets, print, no-JS
+~/miniconda3/envs/investing/bin/python tools/shots.py --out /tmp/shots/after
+```
+
+`shots.py` writes six pages x two themes x two widths, plus strips sliced to viewport height,
+which is what makes a before-and-after diff readable.
 
 ## The social card
 
@@ -92,6 +115,11 @@ To add a diagram, drop an SVG into `src/partials/diagrams/` and include it with
 `d-fill-elev`, …) so it follows the theme and matches the others.
 
 ## Design system
+
+The display and UI face is **JetBrains Mono**, self-hosted from `assets/fonts/` and subset to
+the glyphs this site actually renders — 274 KB of upstream woff2 becomes 75 KB across three
+weights. It is licensed under the OFL, whose text sits beside the files. Body copy stays on the
+system sans stack. Re-run the subsetting if the copy gains glyphs it does not cover.
 
 Dark is the default; light is a deliberate counterpart, not an inversion. Both are defined as
 custom properties at the top of `css/styles.css` — `:root` for dark, `[data-theme="light"]`

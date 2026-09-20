@@ -4,6 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="color-scheme" content="dark light" />
+  <meta name="theme-color" content="#0a0b0f" media="(prefers-color-scheme: dark)" />
+  <meta name="theme-color" content="#fbfcfd" media="(prefers-color-scheme: light)" />
   <title>Multi-currency is a data-modelling problem, not a formatting problem — Junjie Chen</title>
   <meta name="description" content="Storage currency versus display currency, why default arguments bind at import, per-date FX restatement, and why a missing price is not a zero price." />
   <meta name="author" content="Junjie Chen" />
@@ -20,6 +22,7 @@
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:image" content="https://neutrophil.github.io/assets/og.png" />
 
+  <link rel="preload" href="../assets/fonts/jetbrains-mono-regular.woff2" as="font" type="font/woff2" crossorigin />
   <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg" />
   <link rel="stylesheet" href="../css/styles.css" />
   <link rel="alternate" type="application/rss+xml" title="Junjie Chen — writing" href="../feed.xml" />
@@ -95,7 +98,20 @@
             <span>8 min read</span>
           </div>
           <h1 class="post__title">Multi-currency is a data-modelling problem, not a formatting problem</h1>
+          <p class="post__lede">Showing a number in a different currency looks like a display concern. It is not. Get it wrong and your history grows a step change through its middle, an FX move vanishes from a chart, and a function you wrote six months ago is still quietly answering in last year&#x27;s currency.</p>
           <ul class="tags tags--mini"><li>Python</li><li>Data modelling</li><li>Learning notes</li></ul>
+
+          <nav class="toc" aria-label="Sections in this post">
+            <p class="toc__title">On this page</p>
+            <ul class="toc__list">
+              <li><a href="#two-currencies-and-only-one-of-them-may-change">Two currencies, and only one of them may change</a></li>
+              <li><a href="#the-trap-a-default-argument-binds-at-import">The trap: a default argument binds at import</a></li>
+              <li><a href="#reading-history-convert-per-date-not-per-series">Reading history: convert per date, not per series</a></li>
+              <li><a href="#when-the-rate-itself-is-missing">When the rate itself is missing</a></li>
+              <li><a href="#threading-the-currency-through-without-touching-thirty-call-sites">Threading the currency through without touching thirty call sites</a></li>
+              <li><a href="#and-the-one-that-had-nothing-to-do-with-currency">And the one that had nothing to do with currency</a></li>
+            </ul>
+          </nav>
         </header>
 
         <div class="prose">
@@ -114,7 +130,7 @@
             place where the currency has to be right. This is what I learned making that true.
           </p>
 
-          <h2>Two currencies, and only one of them may change</h2>
+          <h2 id="two-currencies-and-only-one-of-them-may-change">Two currencies, and only one of them may change</h2>
           <p>
             The mistake underneath the step change was having one notion of "the currency" when the
             system needs two:
@@ -227,7 +243,7 @@
             places you have not written yet.
           </p>
 
-          <h2>The trap: a default argument binds at import</h2>
+          <h2 id="the-trap-a-default-argument-binds-at-import">The trap: a default argument binds at import</h2>
           <p>
             This one cost me an afternoon and is worth the price of the whole post.
           </p>
@@ -268,7 +284,7 @@
             Import the <em>module</em> and read the attribute at call time instead.
           </p>
 
-          <h2>Reading history: convert per date, not per series</h2>
+          <h2 id="reading-history-convert-per-date-not-per-series">Reading history: convert per date, not per series</h2>
           <p>
             The other half of the problem is what to do when someone switches currency and looks at
             three years of history. The obvious implementation converts the finished series by
@@ -304,7 +320,7 @@ def convert_series(values: pd.Series, rates: pd.Series) -> pd.Series:
             contribution — which is information, not noise.
           </p>
 
-          <h2>When the rate itself is missing</h2>
+          <h2 id="when-the-rate-itself-is-missing">When the rate itself is missing</h2>
           <p>
             Free FX data is unreliable in a specific way: the usual source returns a stale last
             close at weekends and after hours, silently. Not an error — a number, just the wrong
@@ -325,7 +341,7 @@ def convert_series(values: pd.Series, rates: pd.Series) -> pd.Series:
             unacceptable option. Degrade, but say so.
           </p>
 
-          <h2>Threading the currency through without touching thirty call sites</h2>
+          <h2 id="threading-the-currency-through-without-touching-thirty-call-sites">Threading the currency through without touching thirty call sites</h2>
           <p>
             One more piece. Reports are generated, archived as HTML, and read back weeks later. A
             report must render in the currency it was <em>built</em> in — an archived file that
@@ -345,7 +361,7 @@ def convert_series(values: pd.Series, rates: pd.Series) -> pd.Series:
             which a module-level global is not.
           </p>
 
-          <h2>And the one that had nothing to do with currency</h2>
+          <h2 id="and-the-one-that-had-nothing-to-do-with-currency">And the one that had nothing to do with currency</h2>
           <p>
             While auditing the valuation code I found a worse bug, and it belongs here because it is
             the same category of mistake: <strong>a type that cannot represent "unknown".</strong>

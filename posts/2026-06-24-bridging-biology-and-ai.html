@@ -4,6 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="color-scheme" content="dark light" />
+  <meta name="theme-color" content="#0a0b0f" media="(prefers-color-scheme: dark)" />
+  <meta name="theme-color" content="#fbfcfd" media="(prefers-color-scheme: light)" />
   <title>Bridging the bench and the model: why I'm moving toward AI for Life Science — Junjie Chen</title>
   <meta name="description" content="Why a decade at the bench makes me both optimistic and cautious about machine learning in genomics — and what I want to build next in AI for Life Science." />
   <meta name="author" content="Junjie Chen" />
@@ -20,6 +22,7 @@
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:image" content="https://neutrophil.github.io/assets/og.png" />
 
+  <link rel="preload" href="../assets/fonts/jetbrains-mono-regular.woff2" as="font" type="font/woff2" crossorigin />
   <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg" />
   <link rel="stylesheet" href="../css/styles.css" />
   <link rel="alternate" type="application/rss+xml" title="Junjie Chen — writing" href="../feed.xml" />
@@ -95,7 +98,9 @@
             <span>2 min read</span>
           </div>
           <h1 class="post__title">Bridging the bench and the model: why I&#x27;m moving toward AI for Life Science</h1>
+          <p class="post__lede">A decade in the lab taught me how messy real biological data is. Here&#x27;s why that makes me optimistic — and cautious — about machine learning in genomics, and what I want to build next.</p>
           <ul class="tags tags--mini"><li>AI for Life Science</li><li>Genomics</li><li>Career</li></ul>
+
         </header>
 
         <div class="prose">
@@ -108,7 +113,7 @@
             question into a new tool.
           </p>
 
-          <h2>The data is never as clean as the slide deck</h2>
+          <h2 id="the-data-is-never-as-clean-as-the-slide-deck">The data is never as clean as the slide deck</h2>
           <p>
             The single most useful thing the lab taught me is how a number actually comes to
             exist. Before a variant call is a row in a table, it was a fragment of cell-free DNA in
@@ -124,7 +129,7 @@
             exploiting for the wrong reasons.
           </p>
 
-          <h2>Why I'm optimistic</h2>
+          <h2 id="why-i-m-optimistic">Why I'm optimistic</h2>
           <p>
             Genomics is, in a sense, an ideal substrate for machine learning: high-dimensional,
             structured, and increasingly abundant. Multi-omics integration — stitching together
@@ -133,7 +138,7 @@
             thresholds toward representations that the data itself suggests.
           </p>
 
-          <h2>Why I'm cautious</h2>
+          <h2 id="why-i-m-cautious">Why I'm cautious</h2>
           <p>
             And yet biology punishes overconfidence. A model that reports 99% accuracy on a clean
             cohort can fall apart on the next sequencing batch, the next hospital, the next sample
@@ -143,7 +148,7 @@
             a clinician can trust on a Tuesday.
           </p>
 
-          <h2>What I want to build next</h2>
+          <h2 id="what-i-want-to-build-next">What I want to build next</h2>
           <p>
             I want to keep working where wet-lab reality and computation meet — models that are
             grounded in how the assay behaves, validated like a diagnostic and not just a

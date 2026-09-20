@@ -4,6 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="color-scheme" content="dark light" />
+  <meta name="theme-color" content="#0a0b0f" media="(prefers-color-scheme: dark)" />
+  <meta name="theme-color" content="#fbfcfd" media="(prefers-color-scheme: light)" />
   <title>Notes from sixty Streamlit pages — Junjie Chen</title>
   <meta name="description" content="Hard-won Streamlit lessons: st.navigation and the pages folder, why a 200 response proves nothing, AppTest as the real smoke test, widget keys, and the memoisation that fixed a ten-second click." />
   <meta name="author" content="Junjie Chen" />
@@ -20,6 +22,7 @@
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:image" content="https://neutrophil.github.io/assets/og.png" />
 
+  <link rel="preload" href="../assets/fonts/jetbrains-mono-regular.woff2" as="font" type="font/woff2" crossorigin />
   <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg" />
   <link rel="stylesheet" href="../css/styles.css" />
   <link rel="alternate" type="application/rss+xml" title="Junjie Chen — writing" href="../feed.xml" />
@@ -95,7 +98,23 @@
             <span>8 min read</span>
           </div>
           <h1 class="post__title">Notes from sixty Streamlit pages</h1>
+          <p class="post__lede">Five dashboards, sixty-odd pages, and a collection of failures that each took longer to find than they should have. A page that returns HTTP 200 while displaying a traceback, a sort order that puts 9.9% above 12.0%, and a single cached lookup that made every keystroke take ten seconds.</p>
           <ul class="tags tags--mini"><li>Streamlit</li><li>Learning notes</li><li>Python</li></ul>
+
+          <nav class="toc" aria-label="Sections in this post">
+            <p class="toc__title">On this page</p>
+            <ul class="toc__list">
+              <li><a href="#1-a-page-returns-http-200-even-when-its-script-raises">1. A page returns HTTP 200 even when its script raises</a></li>
+              <li><a href="#2-two-traps-inside-that-harness">2. Two traps inside that harness</a></li>
+              <li><a href="#3-once-you-use-st-navigation-the-pages-folder-is-invisible">3. Once you use st.navigation, the pages folder is invisible</a></li>
+              <li><a href="#4-every-tab-body-runs-on-every-rerun">4. Every tab body runs on every rerun</a></li>
+              <li><a href="#5-the-ten-second-click">5. The ten-second click</a></li>
+              <li><a href="#6-never-pre-format-a-number-you-want-sorted">6. Never pre-format a number you want sorted</a></li>
+              <li><a href="#7-key-widgets-by-identity-never-by-position">7. Key widgets by identity, never by position</a></li>
+              <li><a href="#8-sidebar-ordering-is-load-bearing">8. Sidebar ordering is load-bearing</a></li>
+              <li><a href="#the-thread-running-through-all-of-these">The thread running through all of these</a></li>
+            </ul>
+          </nav>
         </header>
 
         <div class="prose">
@@ -112,7 +131,7 @@
             wish I had at the start, roughly in order of how much time each one cost me.
           </p>
 
-          <h2>1. A page returns HTTP 200 even when its script raises</h2>
+          <h2 id="1-a-page-returns-http-200-even-when-its-script-raises">1. A page returns HTTP 200 even when its script raises</h2>
           <p>
             This is the one that matters most, so it goes first.
           </p>
@@ -142,7 +161,7 @@ def test_page_renders_without_exception(page, seeded_db, fake_providers):
             combined, because it exercises the layer where the pieces actually meet.
           </p>
 
-          <h2>2. Two traps inside that harness</h2>
+          <h2 id="2-two-traps-inside-that-harness">2. Two traps inside that harness</h2>
           <p>
             <strong>Patch the provider, not the accessor.</strong> I spent an hour convinced the
             test harness was broken because my fake quote source was being ignored. It was not
@@ -158,7 +177,7 @@ def test_page_renders_without_exception(page, seeded_db, fake_providers):
             and an assertion about it fails for reasons that have nothing to do with the page.
           </p>
 
-          <h2>3. Once you use st.navigation, the pages folder is invisible</h2>
+          <h2 id="3-once-you-use-st-navigation-the-pages-folder-is-invisible">3. Once you use st.navigation, the pages folder is invisible</h2>
           <p>
             Streamlit has two navigation systems. The old one derives the menu from filenames in a
             <code>pages/</code> directory. The new one takes an explicit list of page objects.
@@ -183,7 +202,7 @@ def test_page_renders_without_exception(page, seeded_db, fake_providers):
             takes down the router — which means the whole app, not just that page.
           </p>
 
-          <h2>4. Every tab body runs on every rerun</h2>
+          <h2 id="4-every-tab-body-runs-on-every-rerun">4. Every tab body runs on every rerun</h2>
           <p>
             Tabs look like lazy loading. They are not. Streamlit executes the body of every tab on
             every rerun and then hides all but one with CSS. A tab conceals content; it does not
@@ -195,7 +214,7 @@ def test_page_renders_without_exception(page, seeded_db, fake_providers):
             to be either cached or put behind an explicit control that the user has to press.
           </p>
 
-          <h2>5. The ten-second click</h2>
+          <h2 id="5-the-ten-second-click">5. The ten-second click</h2>
           <p>
             My favourite one, because the fix was six lines and the measurement was the entire job.
           </p>
@@ -231,7 +250,7 @@ resolve 336 names, second pass  3.46 s   →   0.000 s</code></pre>
             — and the only way to know that factor is to measure the page, not the function.
           </p>
 
-          <h2>6. Never pre-format a number you want sorted</h2>
+          <h2 id="6-never-pre-format-a-number-you-want-sorted">6. Never pre-format a number you want sorted</h2>
           <p>
             I had tables where every numeric column was converted to a formatted string before
             display — percentages with signs, thousands separators, fixed decimals. It looked right.
@@ -249,7 +268,7 @@ resolve 336 names, second pass  3.46 s   →   0.000 s</code></pre>
             which tells you something about how easy it is to miss.
           </p>
 
-          <h2>7. Key widgets by identity, never by position</h2>
+          <h2 id="7-key-widgets-by-identity-never-by-position">7. Key widgets by identity, never by position</h2>
           <p>
             A widget's key is its identity across reruns. Key a text area by its index in a list and
             you have tied it to a <em>slot</em>, not to the thing in the slot.
@@ -264,7 +283,7 @@ resolve 336 names, second pass  3.46 s   →   0.000 s</code></pre>
             Key by something stable about the item itself.
           </p>
 
-          <h2>8. Sidebar ordering is load-bearing</h2>
+          <h2 id="8-sidebar-ordering-is-load-bearing">8. Sidebar ordering is load-bearing</h2>
           <p>
             One of the apps has a language toggle. The toggle lives in the sidebar; the sidebar is
             drawn by the router; the page body is drawn afterwards.
@@ -278,7 +297,7 @@ resolve 336 names, second pass  3.46 s   →   0.000 s</code></pre>
             per rerun, before anything reads it.
           </p>
 
-          <h2>The thread running through all of these</h2>
+          <h2 id="the-thread-running-through-all-of-these">The thread running through all of these</h2>
           <p>
             Every one of these is the same misunderstanding wearing a different hat: I wrote code as
             though it ran once, in a framework that runs it constantly.

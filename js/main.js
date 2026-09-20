@@ -10,6 +10,11 @@
   var root = document.documentElement;
   var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+  /* Announce that THIS file is running. The stylesheet hides .reveal content
+     only under .reveal-on, so a failed or blocked main.js leaves the page
+     complete rather than blank. Must happen before anything that can throw. */
+  root.classList.add('reveal-on');
+
   /* ---- Theme toggle (persisted) ---- */
   var toggle = document.getElementById('theme-toggle');
 
@@ -34,26 +39,34 @@
   var burger = document.getElementById('nav-burger');
   var links = document.getElementById('nav-links');
 
-  function closeNav() {
+  function setNav(open) {
     if (!links) return;
-    links.classList.remove('is-open');
+    links.classList.toggle('is-open', open);
+    /* Hold the page still while the overlay is up. */
+    document.body.style.overflow = open ? 'hidden' : '';
     if (burger) {
-      burger.setAttribute('aria-expanded', 'false');
-      burger.setAttribute('aria-label', 'Open menu');
+      burger.setAttribute('aria-expanded', open ? 'true' : 'false');
+      burger.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
     }
   }
 
+  function closeNav() { setNav(false); }
+
   if (burger && links) {
-    burger.addEventListener('click', function () {
-      var open = links.classList.toggle('is-open');
-      burger.setAttribute('aria-expanded', open ? 'true' : 'false');
-      burger.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+    burger.addEventListener('click', function (e) {
+      e.stopPropagation();
+      setNav(!links.classList.contains('is-open'));
     });
     links.addEventListener('click', function (e) {
       if (e.target.closest('a')) closeNav();
     });
     document.addEventListener('keydown', function (e) {
       if (e.key === 'Escape') closeNav();
+    });
+    /* Tapping the scrim — anything outside the panel — dismisses it. */
+    document.addEventListener('click', function (e) {
+      if (!links.classList.contains('is-open')) return;
+      if (!links.contains(e.target) && !burger.contains(e.target)) closeNav();
     });
   }
 
@@ -93,7 +106,10 @@
       entries.forEach(function (entry) {
         if (!entry.isIntersecting) return;
         spied.forEach(function (pair) {
-          pair.anchor.classList.toggle('is-active', pair.section === entry.target);
+          var on = pair.section === entry.target;
+          pair.anchor.classList.toggle('is-active', on);
+          if (on) pair.anchor.setAttribute('aria-current', 'page');
+          else pair.anchor.removeAttribute('aria-current');
         });
       });
     }, { rootMargin: '-45% 0px -50% 0px', threshold: 0 });

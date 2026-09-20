@@ -4,6 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="color-scheme" content="dark light" />
+  <meta name="theme-color" content="#0a0b0f" media="(prefers-color-scheme: dark)" />
+  <meta name="theme-color" content="#fbfcfd" media="(prefers-color-scheme: light)" />
   <title>A privacy scanner for my own repositories — Junjie Chen</title>
   <meta name="description" content="Designing a personal-data scanner: why it must not embed what it detects, checksums over regexes, redacting its own output, per-repository policy files, and four independent enforcement layers." />
   <meta name="author" content="Junjie Chen" />
@@ -20,6 +22,7 @@
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:image" content="https://neutrophil.github.io/assets/og.png" />
 
+  <link rel="preload" href="../assets/fonts/jetbrains-mono-regular.woff2" as="font" type="font/woff2" crossorigin />
   <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg" />
   <link rel="stylesheet" href="../css/styles.css" />
   <link rel="alternate" type="application/rss+xml" title="Junjie Chen — writing" href="../feed.xml" />
@@ -95,7 +98,21 @@
             <span>9 min read</span>
           </div>
           <h1 class="post__title">A privacy scanner for my own repositories</h1>
+          <p class="post__lede">I audited the repositories on my own machine and did not like what I found. The result is a stdlib-only scanner wired into every commit — and a set of design constraints that turn out to be more interesting than the regexes, starting with the fact that a scanner must not contain the things it looks for.</p>
           <ul class="tags tags--mini"><li>Security</li><li>Tooling</li><li>Python</li></ul>
+
+          <nav class="toc" aria-label="Sections in this post">
+            <p class="toc__title">On this page</p>
+            <ul class="toc__list">
+              <li><a href="#rule-zero-the-scanner-must-not-contain-what-it-detects">Rule zero: the scanner must not contain what it detects</a></li>
+              <li><a href="#checksums-beat-regexes">Checksums beat regexes</a></li>
+              <li><a href="#the-rule-that-needs-a-hint-and-the-hole-that-leaves">The rule that needs a hint, and the hole that leaves</a></li>
+              <li><a href="#the-output-is-part-of-the-attack-surface">The output is part of the attack surface</a></li>
+              <li><a href="#policy-per-repository-committed-on-purpose">Policy per repository, committed on purpose</a></li>
+              <li><a href="#four-gates-and-one-lesson-about-where-they-attach">Four gates, and one lesson about where they attach</a></li>
+              <li><a href="#what-it-does-not-do">What it does not do</a></li>
+            </ul>
+          </nav>
         </header>
 
         <div class="prose">
@@ -111,7 +128,7 @@
             secrets it hunts for.
           </p>
 
-          <h2>Rule zero: the scanner must not contain what it detects</h2>
+          <h2 id="rule-zero-the-scanner-must-not-contain-what-it-detects">Rule zero: the scanner must not contain what it detects</h2>
           <p>
             The obvious way to catch a specific account number is to search for that account number.
             Which means writing it into a file, which means committing it, which means the scanner
@@ -131,7 +148,7 @@
             confidence. Silence has to mean "I checked", never "I could not check".
           </p>
 
-          <h2>Checksums beat regexes</h2>
+          <h2 id="checksums-beat-regexes">Checksums beat regexes</h2>
           <p>
             Most of the interesting detection work is in reducing false positives, because a noisy
             scanner gets ignored and an ignored scanner is decoration.
@@ -159,7 +176,7 @@
             number is not a card number, but a card number wedged between letters still is.
           </p>
 
-          <h2>The rule that needs a hint, and the hole that leaves</h2>
+          <h2 id="the-rule-that-needs-a-hint-and-the-hole-that-leaves">The rule that needs a hint, and the hole that leaves</h2>
           <p>
             Money is much harder than it looks, and the design here is a real trade-off rather than
             a clean answer.
@@ -197,7 +214,7 @@
             </p>
           </div>
 
-          <h2>The output is part of the attack surface</h2>
+          <h2 id="the-output-is-part-of-the-attack-surface">The output is part of the attack surface</h2>
           <p>
             This is the design decision I am most pleased with, and it is the one I would have
             skipped if I had not thought about where findings actually go.
@@ -232,7 +249,7 @@
             possibly into a log line.
           </p>
 
-          <h2>Policy per repository, committed on purpose</h2>
+          <h2 id="policy-per-repository-committed-on-purpose">Policy per repository, committed on purpose</h2>
           <p>
             Every rule has legitimate exceptions, and the exceptions are where a security tool
             usually rots — someone adds a global suppression to unblock a deadline and it is never
@@ -257,7 +274,7 @@
             explaining itself. That combination is what makes exceptions survivable.
           </p>
 
-          <h2>Four gates, and one lesson about where they attach</h2>
+          <h2 id="four-gates-and-one-lesson-about-where-they-attach">Four gates, and one lesson about where they attach</h2>
 
           <figure class="diagram">
             <div class="diagram__scroll">
@@ -352,7 +369,7 @@
             installed and nobody notices for months.
           </p>
 
-          <h2>What it does not do</h2>
+          <h2 id="what-it-does-not-do">What it does not do</h2>
           <p>
             Two honest limits, both documented rather than hidden.
           </p>

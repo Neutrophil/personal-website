@@ -48,7 +48,10 @@ src/blog.html             writing index; the post list is generated into it
 src/posts/*.html          one fragment per post (+ _TEMPLATE.html, skipped by the build)
 css/styles.css            design system — dark default, light counterpart
 js/main.js                theme toggle, nav, reveal, tag filter, copy buttons, progress bar
-tools/make_og.py          regenerates assets/og.png — needs Pillow, run by hand, NOT in build.py
+tools/make_og.py          regenerates assets/og.png — needs Pillow + fontTools, by hand
+tools/shots.py            screenshot matrix (6 pages x 2 themes x 2 widths) — needs Playwright
+tools/audit.py            browser checks --check cannot do — needs Playwright; exits non-zero
+assets/fonts/             JetBrains Mono, subset to this site's glyphs (OFL, ~75 KB total)
 assets/                   favicon + CV (PDF) + og.png (1200x630 social card, committed)
 → index.html projects.html blog.html 404.html feed.xml posts/*.html    generated, committed
 ```
@@ -63,19 +66,35 @@ rebuild — the next build overwrites root-level changes without warning.
   chips, nav links) is assembled in Python, in `build.py`. Keep it that way; the value of this
   generator is that it fits in one readable file.
 - **`--check` is the test suite.** It fails on unresolved tokens, dead local links, incomplete
-  frontmatter, a malformed feed, a missing social card, and **any text/background pair below
-  WCAG AA in either theme** — contrast is computed from the CSS tokens, not eyeballed. Add a
-  gate here rather than relying on a manual look.
+  frontmatter, a malformed feed, a missing social card, **any text/background pair below WCAG AA
+  in either theme**, a diagram whose labels would render under 10px, a `.reveal` gating class the
+  script does not actually set, an undersized control, more than one current-page marker, and a
+  missing `theme-color`. All of it is arithmetic over the sources — no browser. Add a gate here
+  rather than relying on a manual look.
+- **`tools/audit.py` is the other half of the suite**, and needs a browser. It measures what the
+  sources cannot express: contrast after alpha compositing and inherited opacity, rendered
+  diagram label sizes, clipped scroll content, tap targets, print colours, and whether the page
+  survives `main.js` failing to load. Run it before committing a visual change.
 - **`build.py` stays dependency-free.** Anything needing a third-party package (currently just
   the social-card renderer) lives in `tools/` and is run by hand, with its output committed.
-- **JS is enhancement only.** The inline head script swaps `no-js` for `js` on `<html>`, and
-  `.reveal` is hidden only under `.js`. If `main.js` fails to load, the page must still be
-  complete — do not add content that only appears after script runs.
+- **JS is enhancement only, and this is now enforced.** The inline head script swaps `no-js`
+  for `js`, but `.reveal` is hidden under `.reveal-on`, which `js/main.js` adds as its first
+  action. Gating on the inline script's class meant a blocked `main.js` left all 37 revealed
+  elements at `opacity: 0` — a blank page. `--check` fails if the two ever drift apart. Do not
+  add content that appears only after script runs.
 - **Diagrams** go in `src/partials/diagrams/` as inline SVG using the shared `d-*` classes, so
-  they follow the theme. Wrap them in `.diagram > .diagram__scroll`: they carry a `min-width`
-  so a narrow screen scrolls the figure rather than shrinking 11px labels into illegibility.
-- No automated screenshots — Playwright's browser cannot be installed on this OS. Visual
-  checks are manual in a real browser, in both themes.
+  they follow the theme. Wrap them in `.diagram > .diagram__scroll`. Inside `.shell--narrow` a
+  figure breaks out of the reading column up to `--shell-wide`, and `.diagram svg` carries a
+  `min-width` so a narrow screen scrolls the figure instead of shrinking its labels. Sizes are
+  set in the CSS `d-*` classes, not inside the drawings: growing type in a fixed 900-unit
+  coordinate space pushes labels straight through their own boxes.
+- **Automated screenshots do work here**, contrary to what this file said until 2026-09-21.
+  `tools/shots.py` drives the Chromium that Playwright already installed for `Media_search`.
+  Two things are required and neither is optional: `channel="chromium"` (the default headless
+  path uses `chrome-headless-shell`, a different binary), and
+  `LD_LIBRARY_PATH=$HOME/miniconda3/envs/investing/lib`, because `libnss3` and friends are
+  missing system-wide but ship inside the conda env. Capture before and after a visual change
+  and compare. A real browser is still worth a look for motion and focus order.
 
 ## Privacy — read this before adding anything
 

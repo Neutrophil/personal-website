@@ -9,15 +9,25 @@ and commit the result.
 
 The card is drawn to match css/styles.css — same canvas, same cyan and violet,
 same waveform. If those tokens change, change them here too; nothing enforces it.
+
+The wordmark is set in the site's own webfont, read straight out of
+assets/fonts/. Pillow cannot open woff2, so fontTools decompresses it to a
+TrueType file in a temp directory first. That keeps the card and the page on one
+typeface without shipping a second copy of it.
 """
 
 from __future__ import annotations
 
+import atexit
+import shutil
+import tempfile
 from pathlib import Path
 
 from PIL import Image, ImageDraw, ImageFilter, ImageFont
 
-OUT = Path(__file__).resolve().parent.parent / "assets" / "og.png"
+ROOT = Path(__file__).resolve().parent.parent
+OUT = ROOT / "assets" / "og.png"
+FONT_DIR = ROOT / "assets" / "fonts"
 
 W, H = 1200, 630
 PAD = 88
@@ -29,8 +39,34 @@ FAINT = (125, 135, 158)    # --text-faint
 CYAN = (34, 211, 238)      # --accent
 VIOLET = (167, 139, 250)   # --accent-2
 
-MONO = "/usr/share/fonts/truetype/dejavu/DejaVuSansMono.ttf"
-MONO_BOLD = "/usr/share/fonts/truetype/dejavu/DejaVuSansMono-Bold.ttf"
+# Fallbacks only, for a machine without the site's fonts checked out.
+FALLBACK = "/usr/share/fonts/truetype/dejavu/DejaVuSansMono.ttf"
+FALLBACK_BOLD = "/usr/share/fonts/truetype/dejavu/DejaVuSansMono-Bold.ttf"
+
+_TMP = Path(tempfile.mkdtemp(prefix="og-fonts-"))
+atexit.register(shutil.rmtree, _TMP, True)
+
+
+def _ttf(weight: str, fallback: str) -> str:
+    """Return a TrueType path for one of the site's woff2 weights."""
+    woff2 = FONT_DIR / f"jetbrains-mono-{weight}.woff2"
+    if not woff2.is_file():
+        return fallback
+    try:
+        from fontTools.ttLib import TTFont
+    except ImportError:  # pragma: no cover - fontTools is a by-hand dependency
+        print("fontTools not installed; falling back to DejaVu for the card")
+        return fallback
+    out = _TMP / f"{weight}.ttf"
+    if not out.exists():
+        face = TTFont(str(woff2))
+        face.flavor = None
+        face.save(str(out))
+    return str(out)
+
+
+MONO = _ttf("regular", FALLBACK)
+MONO_BOLD = _ttf("bold", FALLBACK_BOLD)
 
 
 def font(path: str, size: int) -> ImageFont.FreeTypeFont:
@@ -83,7 +119,7 @@ def main() -> None:
     dot_grid(img)
     draw = ImageDraw.Draw(img)
 
-    # corner ticks, echoing .card--tick
+    # corner ticks, echoing .card--tick (square on both, since 2026-09)
     t, ln = 34, 26
     for (cx, cy, dx, dy) in ((t, t, 1, 1), (W - t, t, -1, 1),
                              (t, H - t, 1, -1), (W - t, H - t, -1, -1)):

@@ -4,6 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="color-scheme" content="dark light" />
+  <meta name="theme-color" content="#0a0b0f" media="(prefers-color-scheme: dark)" />
+  <meta name="theme-color" content="#fbfcfd" media="(prefers-color-scheme: light)" />
   <title>Every backtest number I had was wrong — Junjie Chen</title>
   <meta name="description" content="A correctness review that invalidated an entire strategy tournament: warm-up dilution, silent re-normalisation, NaN statistics, inverted risk metrics, and weekend bars traded at stale prices." />
   <meta name="author" content="Junjie Chen" />
@@ -20,6 +22,7 @@
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:image" content="https://neutrophil.github.io/assets/og.png" />
 
+  <link rel="preload" href="../assets/fonts/jetbrains-mono-regular.woff2" as="font" type="font/woff2" crossorigin />
   <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg" />
   <link rel="stylesheet" href="../css/styles.css" />
   <link rel="alternate" type="application/rss+xml" title="Junjie Chen — writing" href="../feed.xml" />
@@ -95,7 +98,20 @@
             <span>8 min read</span>
           </div>
           <h1 class="post__title">Every backtest number I had was wrong</h1>
+          <p class="post__lede">I went looking for one suspicious result in a strategy tournament and found that the whole leaderboard was invalid — warm-up eaten out of the window, a helper quietly re-levering every portfolio, metrics that ranked a strategy which never lost money as the worst in the field, and three days of trading that happened at the weekend.</p>
           <ul class="tags tags--mini"><li>Postmortem</li><li>Testing</li><li>Quant</li></ul>
+
+          <nav class="toc" aria-label="Sections in this post">
+            <p class="toc__title">On this page</p>
+            <ul class="toc__list">
+              <li><a href="#1-the-warm-up-was-eaten-out-of-the-window-i-asked-for">1. The warm-up was eaten out of the window I asked for</a></li>
+              <li><a href="#2-a-helper-that-quietly-re-levered-every-portfolio">2. A helper that quietly re-levered every portfolio</a></li>
+              <li><a href="#3-the-statistics-that-lied">3. The statistics that lied</a></li>
+              <li><a href="#4-three-days-of-trading-that-happened-at-the-weekend">4. Three days of trading that happened at the weekend</a></li>
+              <li><a href="#what-i-actually-changed">What I actually changed</a></li>
+              <li><a href="#why-i-am-writing-this-down">Why I am writing this down</a></li>
+            </ul>
+          </nav>
         </header>
 
         <div class="prose">
@@ -118,7 +134,7 @@
             transferable part; the specific bugs are unremarkable.
           </p>
 
-          <h2>1. The warm-up was eaten out of the window I asked for</h2>
+          <h2 id="1-the-warm-up-was-eaten-out-of-the-window-i-asked-for">1. The warm-up was eaten out of the window I asked for</h2>
           <p>
             Momentum indicators need history. A twelve-month momentum signal cannot produce a
             number until it has twelve months of bars behind it. So a backtest engine has to warm
@@ -190,7 +206,7 @@
             are scored on.
           </p>
 
-          <h2>2. A helper that quietly re-levered every portfolio</h2>
+          <h2 id="2-a-helper-that-quietly-re-levered-every-portfolio">2. A helper that quietly re-levered every portfolio</h2>
           <p>
             This is the one I am least happy about, because it made an entire feature inert without
             ever failing.
@@ -227,7 +243,7 @@
             decision, not a rounding error.
           </p>
 
-          <h2>3. The statistics that lied</h2>
+          <h2 id="3-the-statistics-that-lied">3. The statistics that lied</h2>
           <p>
             A cluster of smaller bugs, each individually silly, all in the code that turns an
             equity curve into a number you rank on.
@@ -269,7 +285,7 @@
             an empty set. Nobody writes a test for the case where the strategy did too well.
           </p>
 
-          <h2>4. Three days of trading that happened at the weekend</h2>
+          <h2 id="4-three-days-of-trading-that-happened-at-the-weekend">4. Three days of trading that happened at the weekend</h2>
           <p>
             The live paper race had no market-hours gate at all. I found this by reading the
             database rather than the code, which is the right order: of the three dates the race
@@ -305,7 +321,7 @@
             is meant to trade.
           </p>
 
-          <h2>What I actually changed</h2>
+          <h2 id="what-i-actually-changed">What I actually changed</h2>
           <p>
             The code fixes were the easy part. The habits that came out of it:
           </p>
@@ -341,7 +357,7 @@
             mostly noise, and after this I am in no hurry to believe a leaderboard.
           </p>
 
-          <h2>Why I am writing this down</h2>
+          <h2 id="why-i-am-writing-this-down">Why I am writing this down</h2>
           <p>
             My day job is machine learning on sequencing data, and the failure mode here is one I
             recognise from it exactly.

@@ -150,6 +150,55 @@ class Post:
         return f"{self.date.day} {self.date:%b %Y}"
 
 
+SLUG_STRIP_RE = re.compile(r"<[^>]+>")
+H2_RE = re.compile(r"<h2>(.*?)</h2>", re.S)
+# Below this, a contents list is noise rather than navigation.
+TOC_MIN_SECTIONS = 5
+
+
+def slugify(text: str) -> str:
+    text = html.unescape(SLUG_STRIP_RE.sub("", text)).lower()
+    return re.sub(r"[^a-z0-9]+", "-", text).strip("-") or "section"
+
+
+def add_heading_ids(body: str) -> tuple[str, list[tuple[str, str]]]:
+    """Give every h2 a stable id and collect them for the contents list.
+
+    Deep links into a nine-section postmortem are worth more than the four
+    lines this costs, and the same pass is what the contents list is built from.
+    """
+    headings: list[tuple[str, str]] = []
+    seen: dict[str, int] = {}
+
+    def sub(match: re.Match) -> str:
+        inner = match.group(1)
+        title = html.unescape(SLUG_STRIP_RE.sub("", inner)).strip()
+        slug = slugify(inner)
+        seen[slug] = seen.get(slug, 0) + 1
+        if seen[slug] > 1:
+            slug = f"{slug}-{seen[slug]}"
+        headings.append((slug, title))
+        return f'<h2 id="{slug}">{inner}</h2>'
+
+    return H2_RE.sub(sub, body), headings
+
+
+def toc_html(headings: list[tuple[str, str]]) -> str:
+    if len(headings) < TOC_MIN_SECTIONS:
+        return ""
+    items = "".join(
+        f'\n              <li><a href="#{slug}">{esc(title)}</a></li>' for slug, title in headings
+    )
+    # Deliberately a <ul>: several posts number their own sections, and an <ol>
+    # printed "1. 1. A page returns HTTP 200".
+    return (
+        '\n          <nav class="toc" aria-label="Sections in this post">'
+        '\n            <p class="toc__title">On this page</p>'
+        f'\n            <ul class="toc__list">{items}\n            </ul>'
+        "\n          </nav>"
+    )
+
+
 def reading_minutes(body: str) -> int:
     words = len(re.sub(r"<[^>]+>", " ", body).split())
     return max(1, round(words / WORDS_PER_MINUTE))
@@ -201,7 +250,10 @@ def nav_links_html(site: dict, rel: str, active: str) -> str:
     for item in site["nav"]:
         href = item["href"]
         page = href.split("#", 1)[0]
-        is_active = page == active
+        # Compare the whole href, fragment included. Matching on the page alone
+        # marked both "index.html#about" and "index.html#contact" as the current
+        # page on the home page; the scrollspy in main.js owns that state now.
+        is_active = href == active
         target = href if href.startswith("http") else rel + href
         attrs = ' class="is-active" aria-current="page"' if is_active else ""
         out.append(
@@ -388,7 +440,9 @@ def build(check: bool = False) -> list[Path]:
             post_nav=post_nav_html(post, rel="../"),
         )
         wrapper = (TEMPLATES / "post.html").read_text(encoding="utf-8")
-        body = resolve(wrapper, {**ctx, "post_body": post.body})
+        numbered, headings = add_heading_ids(post.body)
+        ctx.update(post_summary=esc(post.summary), post_toc=toc_html(headings))
+        body = resolve(wrapper, {**ctx, "post_body": numbered})
         out = POSTS_OUT / f"{post.doc.slug}.html"
         out.write_text(render_page(site, template, ctx, body), encoding="utf-8")
         written.append(out)
@@ -494,13 +548,91 @@ CONTRAST_RULES = [
     ("accent", "bg-elev", 4.5, "links on cards"),
     ("accent-2", "bg", 4.5, "secondary accent"),
     ("accent-2", "bg-elev", 4.5, "secondary accent on cards"),
+    ("on-accent", "accent", 4.5, "text on the primary button and the active chip"),
+    ("text", "bg-sunken", 4.5, "headings in banded sections"),
+    ("accent", "bg-sunken", 4.5, "links in banded sections"),
+    ("accent-2", "bg-sunken", 4.5, "secondary accent in banded sections"),
+    ("text-soft", "code-bg", 4.5, "code block text"),
+    ("text-faint", "code-bg", 4.5, "code block filename"),
 ]
+
+# Smallest a diagram label may render at, in CSS pixels, on the narrowest
+# supported viewport. Below this the figure is decoration, not information.
+MIN_DIAGRAM_LABEL_PX = 10.0
+MIN_CONTROL_PX = 24  # WCAG 2.2 pointer-target minimum
+
+
+def diagram_label_sizes(css: str, svg_dir: Path) -> list[tuple[str, float]]:
+    """Work out how big each diagram's smallest label actually renders.
+
+    The figures are drawn in a 900-unit coordinate space and scaled to fit, so
+    a label's declared size says nothing about what a reader sees. The scale is
+    fixed by the `min-width` on `.diagram svg`: that is the width the figure
+    takes on a phone, and the worst case. This gate is the one that would have
+    caught labels arriving at 7px.
+    """
+    min_width = re.search(r"\.diagram svg \{[^}]*min-width:\s*([0-9.]+)px", css)
+    if not min_width:
+        return [("css: .diagram svg has no min-width to scale from", 0.0)]
+    render_px = float(min_width.group(1))
+    declared = {
+        name: float(size)
+        for name, size in re.findall(r"\.(d-label[a-z-]*)\s*\{[^}]*font-size:\s*([0-9.]+)px", css)
+    }
+    if not declared:
+        return [("css: no .d-label font sizes found", 0.0)]
+
+    out: list[tuple[str, float]] = []
+    for path in sorted(svg_dir.glob("*.svg")):
+        text = path.read_text(encoding="utf-8")
+        box = re.search(r'viewBox="0 0 ([0-9.]+)', text)
+        if not box:
+            continue
+        used = [declared[cls] for cls in declared if f'"{cls}' in text or f" {cls}" in text]
+        if not used:
+            continue
+        scale = render_px / float(box.group(1))
+        out.append((path.name, round(min(used) * scale, 1)))
+    return out
+
+
+def strip_at_rules(css: str) -> str:
+    """Drop every `@media`/`@supports` block, braces balanced.
+
+    The theme palette lives in the unconditional `:root` and `[data-theme]`
+    blocks. A `:root` inside `@media print` is a different palette entirely, and
+    folding it into the real one would have the contrast gate checking colours
+    no visitor ever sees.
+    """
+    out, i = [], 0
+    while i < len(css):
+        at = css.find("@", i)
+        if at == -1:
+            out.append(css[i:])
+            break
+        head_end = css.find("{", at)
+        if head_end == -1 or not css[at:head_end].lstrip("@").split()[0] in ("media", "supports", "container"):
+            out.append(css[i:at + 1])
+            i = at + 1
+            continue
+        out.append(css[i:at])
+        depth, j = 0, head_end
+        while j < len(css):
+            if css[j] == "{":
+                depth += 1
+            elif css[j] == "}":
+                depth -= 1
+                if depth == 0:
+                    break
+            j += 1
+        i = j + 1
+    return "".join(out)
 
 
 def theme_tokens(css: str) -> dict[str, dict[str, str]]:
     """Pull the flat hex tokens out of the `:root` and `[data-theme=...]` blocks."""
     themes: dict[str, dict[str, str]] = {}
-    for selector, block in re.findall(r"(:root|\[data-theme=\"[a-z]+\"\])\s*\{([^}]*)\}", css):
+    for selector, block in re.findall(r"(:root|\[data-theme=\"[a-z]+\"\])\s*\{([^}]*)\}", strip_at_rules(css)):
         name = "dark" if selector == ":root" else selector.split('"')[1]
         found = dict(re.findall(r"--([a-z0-9-]+)\s*:\s*(#[0-9a-fA-F]{3,8})\s*;", block))
         if found:
@@ -573,7 +705,52 @@ def run_checks(site: dict, written: list[Path], posts: list[Post]) -> None:
         problems.append(f"{OG_IMAGE} is referenced by every page but does not exist "
                         f"— run tools/make_og.py")
 
-    # 6. posts carry everything the index and the feed need
+    # 6. diagrams stay legible at the size they are actually drawn
+    for name, rendered in diagram_label_sizes(
+        (ROOT / "css" / "styles.css").read_text(encoding="utf-8"), PARTIALS / "diagrams"
+    ):
+        if rendered < MIN_DIAGRAM_LABEL_PX:
+            problems.append(
+                f"{name}: smallest label renders at {rendered}px, below {MIN_DIAGRAM_LABEL_PX}px"
+            )
+
+    # 7. nothing that matters may depend on a script that might not load.
+    #    The stylesheet hides .reveal behind a class; main.js must be what adds it.
+    css_text = (ROOT / "css" / "styles.css").read_text(encoding="utf-8")
+    js_text = (ROOT / "js" / "main.js").read_text(encoding="utf-8")
+    gate = re.search(r"\.([a-z-]+)\s+\.reveal\s*\{[^}]*opacity:\s*0", css_text)
+    if not gate:
+        problems.append("css: .reveal is no longer gated on a class — check it cannot blank the page")
+    elif f"classList.add('{gate.group(1)}')" not in js_text:
+        problems.append(
+            f"js/main.js does not add '{gate.group(1)}', so a failed script would leave "
+            f".reveal content hidden forever"
+        )
+
+    # 8. controls stay large enough to hit
+    for pattern, what in (
+        (r"--control:\s*([0-9.]+)px", "icon buttons"),
+        (r"\.chip \{[^}]*min-height:\s*([0-9.]+)px", "filter chips"),
+        (r"\.codeblock__copy \{[^}]*min-height:\s*([0-9.]+)px", "the copy button"),
+    ):
+        found = re.search(pattern, css_text)
+        if not found:
+            problems.append(f"css: no declared size for {what}")
+        elif float(found.group(1)) < MIN_CONTROL_PX:
+            problems.append(f"css: {what} are {found.group(1)}px, below {MIN_CONTROL_PX}px")
+
+    # 9. one current page per page, and a theme colour on every one of them
+    for path in written:
+        if path.suffix != ".html":
+            continue
+        text = path.read_text(encoding="utf-8")
+        marked = text.count('aria-current="page"')
+        if marked > 1:
+            problems.append(f"{_rel(path)}: {marked} links marked as the current page")
+        if 'name="theme-color"' not in text:
+            problems.append(f"{_rel(path)}: no theme-color meta tag")
+
+    # 10. posts carry everything the index and the feed need
     for post in posts:
         if len(post.summary) < 40:
             problems.append(f"{_rel(post.doc.path)}: summary is too short to be useful")
@@ -585,7 +762,7 @@ def run_checks(site: dict, written: list[Path], posts: list[Post]) -> None:
         for problem in problems:
             print(f"  {problem}", file=sys.stderr)
         raise SystemExit(1)
-    print("✓ checks passed — tokens, links, feed, contrast, frontmatter")
+    print("✓ checks passed — tokens, links, feed, contrast, diagrams, no-JS, controls, frontmatter")
 
 
 # --------------------------------------------------------------------------

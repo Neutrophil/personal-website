@@ -4,6 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="color-scheme" content="dark light" />
+  <meta name="theme-color" content="#0a0b0f" media="(prefers-color-scheme: dark)" />
+  <meta name="theme-color" content="#fbfcfd" media="(prefers-color-scheme: light)" />
   <title>Choosing ten stocks out of thirty with a QUBO — Junjie Chen</title>
   <meta name="description" content="How to pose K-of-N portfolio selection as a QUBO, why the cardinality penalty must be scaled relative to the objective, and how a 170-line simulated annealer solves it." />
   <meta name="author" content="Junjie Chen" />
@@ -20,6 +22,7 @@
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:image" content="https://neutrophil.github.io/assets/og.png" />
 
+  <link rel="preload" href="../assets/fonts/jetbrains-mono-regular.woff2" as="font" type="font/woff2" crossorigin />
   <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg" />
   <link rel="stylesheet" href="../css/styles.css" />
   <link rel="alternate" type="application/rss+xml" title="Junjie Chen — writing" href="../feed.xml" />
@@ -95,7 +98,20 @@
             <span>9 min read</span>
           </div>
           <h1 class="post__title">Choosing ten stocks out of thirty with a QUBO</h1>
+          <p class="post__lede">Portfolio selection is a combinatorial problem hiding inside a linear-algebra costume. Posing it as a QUBO and solving it by simulated annealing takes about 200 lines of numpy — and one scaling decision that quietly decides whether any of it works.</p>
           <ul class="tags tags--mini"><li>Optimization</li><li>Python</li><li>Quant</li></ul>
+
+          <nav class="toc" aria-label="Sections in this post">
+            <p class="toc__title">On this page</p>
+            <ul class="toc__list">
+              <li><a href="#writing-the-objective">Writing the objective</a></li>
+              <li><a href="#folding-it-into-a-matrix">Folding it into a matrix</a></li>
+              <li><a href="#the-line-that-actually-decides-whether-this-works">The line that actually decides whether this works</a></li>
+              <li><a href="#the-annealer">The annealer</a></li>
+              <li><a href="#making-it-reproducible-and-proving-it-right">Making it reproducible, and proving it right</a></li>
+              <li><a href="#what-i-would-build-next">What I would build next</a></li>
+            </ul>
+          </nav>
         </header>
 
         <div class="prose">
@@ -217,7 +233,7 @@
             </figcaption>
           </figure>
 
-          <h2>Writing the objective</h2>
+          <h2 id="writing-the-objective">Writing the objective</h2>
           <p>
             Let <code>xᵢ ∈ {0,1}</code> say whether stock <em>i</em> is held. Selected names are
             equal-weighted, so the weight of each is <code>1/K</code> and any constant factor there
@@ -240,7 +256,7 @@
             pays for its missing slot.
           </p>
 
-          <h2>Folding it into a matrix</h2>
+          <h2 id="folding-it-into-a-matrix">Folding it into a matrix</h2>
           <p>
             To get a QUBO you need everything as <code>xᵀQx</code>. The trick that makes this work
             is that binary variables are idempotent: <code>xᵢ² = xᵢ</code>, because 0² = 0 and
@@ -287,7 +303,7 @@ P(Σxᵢ − K)²  =  P Σᵢ xᵢ (1 − 2K)  +  2P Σᵢ&lt;ⱼ xᵢxⱼ  +  P
     return q, p * k * k</code></pre>
           </div>
 
-          <h2>The line that actually decides whether this works</h2>
+          <h2 id="the-line-that-actually-decides-whether-this-works">The line that actually decides whether this works</h2>
           <p>
             Look again at those three lines computing <code>p</code>. They are the part I would
             have got wrong if I had written this from the textbook.
@@ -405,7 +421,7 @@ P(Σxᵢ − K)²  =  P Σᵢ xᵢ (1 − 2K)  +  2P Σᵢ&lt;ⱼ xᵢxⱼ  +  P
             </figcaption>
           </figure>
 
-          <h2>The annealer</h2>
+          <h2 id="the-annealer">The annealer</h2>
           <p>
             Simulated annealing is a Metropolis random walk over bit strings with a temperature
             that falls over time. Early on it accepts moves that make things worse, which is how it
@@ -446,7 +462,7 @@ for beta in np.geomspace(beta_start, beta_end, num_sweeps):
             coin flip wastes the first few hundred sweeps just getting the count into range.
           </p>
 
-          <h2>Making it reproducible, and proving it right</h2>
+          <h2 id="making-it-reproducible-and-proving-it-right">Making it reproducible, and proving it right</h2>
           <p>
             Two things I would not skip again.
           </p>
@@ -481,7 +497,7 @@ for beta in np.geomspace(beta_start, beta_end, num_sweeps):
             </p>
           </div>
 
-          <h2>What I would build next</h2>
+          <h2 id="what-i-would-build-next">What I would build next</h2>
           <p>
             The current formulation equal-weights whatever it selects, which is a real limitation.
             The standard extension is to give each asset several binary variables representing bits
