@@ -98,3 +98,7 @@ CV/
 # that are not part of the published site. Keep them on disk, out of git.
 /*_plan.md
 /*_progress.md
+
+# A live SQLite database keeps its recent pages in sidecar files, and '*.db'
+# does not match a name ending in .db-shm. That gap has surfaced twice.
+*.db-shm
