@@ -14,10 +14,13 @@ Not a Python app: no `core/`, `storage/` or pytest suite. Verification is `build
 ## Commands
 
 ```
-python build.py --check    # build + every gate; run before committing
-python build.py --serve    # build, then http://localhost:8910
-python tools/audit.py      # browser checks --check cannot do (Playwright)
-python tools/shots.py      # screenshot matrix (Playwright)
+PY=~/miniconda3/envs/investing/bin/python
+$PY build.py --check    # build + every gate; run before committing
+$PY build.py --serve    # build, then http://localhost:8910
+# Playwright tools need the conda env's libnss3:
+export LD_LIBRARY_PATH=$HOME/miniconda3/envs/investing/lib
+$PY tools/audit.py                        # browser checks --check cannot do; exits non-zero on failure
+$PY tools/shots.py --out /tmp/shots/after # screenshot matrix (--out is required)
 ```
 
 ## Architecture
