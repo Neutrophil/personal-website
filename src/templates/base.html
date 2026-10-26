@@ -27,6 +27,7 @@
   <link rel="stylesheet" href="{{rel}}css/styles.css" />
   <link rel="alternate" type="application/rss+xml" title="{{site_title}} — writing" href="{{rel}}feed.xml" />
   <link rel="canonical" href="{{og_url}}" />
+{{alternates}}
 
   <!-- Resolve the theme and announce JS before first paint.
        The no-js -> js swap matters: .reveal starts at opacity 0 only when
@@ -48,7 +49,7 @@
   </script>
 </head>
 <body class="{{body_class}}">
-  <a class="skip-link" href="#main">Skip to content</a>
+  <a class="skip-link" href="#main">{{s_skip}}</a>
   <div class="progress" id="progress" aria-hidden="true"></div>
 
 {{nav}}

@@ -17,6 +17,34 @@ linkedin = "https://www.linkedin.com/in/junjie-chen-nus/"
 github   = "https://github.com/Neutrophil"
 cv       = "assets/cv/CHEN_Junjie_CV.pdf"
 
+# Chrome strings, per language. A page's `lang` frontmatter picks the set;
+# templates read them as {{s_<key>}}.
+[strings.en]
+skip       = "Skip to content"
+footer_about = "AI for life science, clinical genomics, and things built on evenings"
+footer_tech  = "static site, no trackers, no analytics"
+top        = "Back to top"
+elsewhere  = "Elsewhere"
+email      = "Email"
+lang_name  = "English version"
+lang_short = "EN"
+theme      = "Switch theme"
+menu       = "Open menu"
+place      = "Singapore"
+
+[strings.zh]
+skip       = "跳到正文"
+footer_about = "AI 赋能生命科学、临床基因组学，以及业余时间的各种构建"
+footer_tech  = "静态网站，无追踪，无统计"
+top        = "回到顶部"
+elsewhere  = "其他链接"
+email      = "邮件"
+lang_name  = "中文版本"
+lang_short = "中"
+theme      = "切换主题"
+menu       = "打开菜单"
+place      = "新加坡"
+
 # The writing index offers a filter chip only for tags two or more posts share,
 # plus these: the site's own subject, worth a chip while it has a single post.
 [blog]
@@ -43,3 +71,25 @@ href  = "blog.html"
 [[nav]]
 label = "contact"
 href  = "index.html#contact"
+
+# Navigation for the 中文 home page. "#section" links stay on that page; the
+# research and writing pages exist in English only and say so.
+[[nav_zh]]
+label = "经历"
+href  = "#experience"
+
+[[nav_zh]]
+label = "研究（英文）"
+href  = "projects.html"
+
+[[nav_zh]]
+label = "论文"
+href  = "#publications"
+
+[[nav_zh]]
+label = "文章（英文）"
+href  = "blog.html"
+
+[[nav_zh]]
+label = "联系"
+href  = "#contact"

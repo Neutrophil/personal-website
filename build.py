@@ -254,16 +254,17 @@ def esc(text: str) -> str:
     return html.escape(str(text), quote=True)
 
 
-def nav_links_html(site: dict, rel: str, active: str) -> str:
+def nav_links_html(site: dict, rel: str, active: str, key: str = "nav") -> str:
     out = []
-    for item in site["nav"]:
+    for item in site[key]:
         href = item["href"]
         page = href.split("#", 1)[0]
         # Compare the whole href, fragment included. Matching on the page alone
         # marked both "index.html#about" and "index.html#contact" as the current
         # page on the home page; the scrollspy in main.js owns that state now.
         is_active = href == active
-        target = href if href.startswith("http") else rel + href
+        # "#section" stays on this page: a translated page links its own sections.
+        target = href if href.startswith(("http", "#")) else rel + href
         attrs = ' class="is-active" aria-current="page"' if is_active else ""
         out.append(
             f'        <a href="{esc(target)}"{attrs}>'
@@ -368,10 +369,15 @@ def latest_posts_html(posts: list[Post], rel: str, limit: int = 3) -> str:
 # Rendering
 # --------------------------------------------------------------------------
 
-def base_context(site: dict, rel: str) -> dict:
+def base_context(site: dict, rel: str, lang: str | None = None) -> dict:
+    lang = lang or site["lang"]
+    strings = site["strings"].get(lang.split("-")[0], site["strings"]["en"])
     return {
+        **{f"s_{k}": v for k, v in strings.items()},
         "rel": rel,
-        "lang": site["lang"],
+        "lang": lang,
+        "alternates": "",
+        "lang_toggle": "",
         "site_title": site["title"],
         "tagline": site["tagline"],
         "author": site["author"],
@@ -385,11 +391,30 @@ def base_context(site: dict, rel: str) -> dict:
     }
 
 
+def _translation_context(site: dict, here: str, other: str, page_lang: dict, rel: str) -> dict:
+    def url(page: str) -> str:
+        return f"{site['url']}/{page.removesuffix('index.html')}"
+
+    pair = {here: page_lang[here], other: page_lang[other]}
+    default = next((p for p, lang in pair.items() if lang == site["lang"]), here)
+    links = [f'  <link rel="alternate" hreflang="{lang}" href="{url(p)}" />' for p, lang in sorted(pair.items())]
+    links.append(f'  <link rel="alternate" hreflang="x-default" href="{url(default)}" />')
+    to_lang = page_lang[other]
+    label = site["strings"].get(to_lang.split("-")[0], site["strings"]["en"])["lang_name"]
+    short = site["strings"].get(to_lang.split("-")[0], site["strings"]["en"])["lang_short"]
+    toggle = (
+        f'<a class="iconbtn nav__lang" href="{(rel + other.removesuffix("index.html")) or "./"}" '
+        f'hreflang="{to_lang}" lang="{to_lang}" aria-label="{esc(label)}" title="{esc(label)}">{esc(short)}</a>'
+    )
+    return {"alternates": "\n".join(links), "lang_toggle": toggle}
+
+
 def render_page(site: dict, template: str, ctx: dict, body: str) -> str:
     rel = ctx["rel"]
+    nav_key = "nav_" + ctx["lang"].split("-")[0]
     nav = resolve(
         (PARTIALS / "nav.html").read_text(encoding="utf-8"),
-        {**ctx, "nav_links": nav_links_html(site, rel, ctx["active"])},
+        {**ctx, "nav_links": nav_links_html(site, rel, ctx["active"], nav_key if nav_key in site else "nav")},
     )
     footer = resolve((PARTIALS / "footer.html").read_text(encoding="utf-8"), ctx)
     return resolve(template, {**ctx, "body": resolve(body, ctx), "nav": nav, "footer": footer})
@@ -402,7 +427,11 @@ def build(check: bool = False) -> list[Path]:
     written: list[Path] = []
 
     # --- standalone pages ---------------------------------------------------
-    for path in sorted(PAGES.rglob("*.html")):
+    sources = sorted(PAGES.rglob("*.html"))
+    # Pages that exist in two languages name each other; both sides get the
+    # hreflang pair and a toggle, so neither can drift out of the pairing.
+    page_lang = {p.relative_to(PAGES).as_posix(): parse_doc(p).meta.get("lang", site["lang"]) for p in sources}
+    for path in sources:
         doc = parse_doc(path)
         rel_out = path.relative_to(PAGES)
         out = ROOT / rel_out
@@ -413,7 +442,11 @@ def build(check: bool = False) -> list[Path]:
         if doc.meta.get("root_relative"):
             rel = urlparse(site["url"]).path.rstrip("/") + "/"
         url_path = rel_out.as_posix().removesuffix("index.html")
-        ctx = base_context(site, rel=rel)
+        ctx = base_context(site, rel=rel, lang=doc.meta.get("lang"))
+        if other := doc.meta.get("translation"):
+            if other not in page_lang:
+                raise BuildError(f"{_rel(path)}: translation {other!r} is not a page")
+            ctx.update(_translation_context(site, rel_out.as_posix(), other, page_lang, rel))
         ctx.update(
             title=doc.meta.get("page_title") or f"{doc.meta['title']} — {site['author']}",
             description=doc.meta.get("description", site["description"]),

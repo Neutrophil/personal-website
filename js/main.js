@@ -9,6 +9,13 @@
 
   var root = document.documentElement;
   var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  /* The few labels this script writes itself, in the page's language. */
+  var zh = /^zh/.test(root.lang);
+  var say = zh
+    ? { light: '切换到浅色主题', dark: '切换到深色主题', open: '打开菜单', close: '关闭菜单',
+        copy: '复制', copied: '已复制', failed: '复制失败' }
+    : { light: 'Switch to light theme', dark: 'Switch to dark theme', open: 'Open menu', close: 'Close menu',
+        copy: 'copy', copied: 'copied', failed: 'failed' };
 
   /* Announce that THIS file is running. The stylesheet hides .reveal content
      only under .reveal-on, so a failed or blocked main.js leaves the page
@@ -21,8 +28,8 @@
   function describeToggle() {
     if (!toggle) return;
     var goingTo = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
-    toggle.setAttribute('aria-label', 'Switch to ' + goingTo + ' theme');
-    toggle.setAttribute('title', 'Switch to ' + goingTo + ' theme');
+    toggle.setAttribute('aria-label', say[goingTo]);
+    toggle.setAttribute('title', say[goingTo]);
   }
 
   if (toggle) {
@@ -46,7 +53,7 @@
     root.style.overflow = open ? 'hidden' : '';
     if (burger) {
       burger.setAttribute('aria-expanded', open ? 'true' : 'false');
-      burger.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+      burger.setAttribute('aria-label', open ? say.close : say.open);
     }
   }
 
@@ -169,14 +176,14 @@
     var button = document.createElement('button');
     button.type = 'button';
     button.className = 'codeblock__copy';
-    button.textContent = 'copy';
+    button.textContent = say.copy;
     button.addEventListener('click', function () {
       navigator.clipboard.writeText(code.textContent.replace(/\s+$/, '')).then(function () {
-        button.textContent = 'copied';
-        setTimeout(function () { button.textContent = 'copy'; }, 1600);
+        button.textContent = say.copied;
+        setTimeout(function () { button.textContent = say.copy; }, 1600);
       }, function () {
-        button.textContent = 'failed';
-        setTimeout(function () { button.textContent = 'copy'; }, 1600);
+        button.textContent = say.failed;
+        setTimeout(function () { button.textContent = say.copy; }, 1600);
       });
     });
     bar.appendChild(button);

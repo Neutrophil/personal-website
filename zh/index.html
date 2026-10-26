@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="zh-Hans" class="no-js">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="color-scheme" content="dark light" />
+  <meta name="theme-color" content="#0a0b0f" media="(prefers-color-scheme: dark)" />
+  <meta name="theme-color" content="#fbfcfd" media="(prefers-color-scheme: light)" />
+  <title>Junjie Chen — AI 赋能生命科学 · 临床基因组学</title>
+  <meta name="description" content="Junjie Chen，Lucence Diagnostics 研究科学家 II。工程师出身的科学家与转化医学研究者，从事 AI 赋能生命科学、临床基因组学（人群全基因组测序、cfDNA MRD 与 MCED）、从实验室到临床的项目开发，以及湿实验与生物信息学。" />
+  <meta name="author" content="Junjie Chen" />
+
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Junjie Chen — AI 赋能生命科学 · 临床基因组学" />
+  <meta property="og:description" content="Lucence Diagnostics 研究科学家 II。人群全基因组测序、cfDNA MRD 与 MCED、临床基因组学机器学习，以及十二年以上从实验室到临床的经验。" />
+  <meta property="og:url" content="https://neutrophil.github.io/zh/" />
+  <meta property="og:site_name" content="Junjie Chen" />
+  <meta property="og:image" content="https://neutrophil.github.io/assets/og.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="Junjie Chen — AI for Life Science · Clinical Genomics" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:image" content="https://neutrophil.github.io/assets/og.png" />
+
+  <link rel="preload" href="../assets/fonts/jetbrains-mono-regular.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg" />
+  <link rel="stylesheet" href="../css/styles.css" />
+  <link rel="alternate" type="application/rss+xml" title="Junjie Chen — writing" href="../feed.xml" />
+  <link rel="canonical" href="https://neutrophil.github.io/zh/" />
+  <link rel="alternate" hreflang="en" href="https://neutrophil.github.io/" />
+  <link rel="alternate" hreflang="zh-Hans" href="https://neutrophil.github.io/zh/" />
+  <link rel="alternate" hreflang="x-default" href="https://neutrophil.github.io/" />
+
+  <!-- Resolve the theme and announce JS before first paint.
+       The no-js -> js swap matters: .reveal starts at opacity 0 only when
+       scripting is available, so a JS failure degrades to visible content
+       rather than a blank page. -->
+  <script>
+    (function () {
+      var d = document.documentElement;
+      d.classList.remove('no-js');
+      d.classList.add('js');
+      try {
+        var stored = localStorage.getItem('theme');
+        var theme = stored || (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+        d.setAttribute('data-theme', theme);
+      } catch (e) {
+        d.setAttribute('data-theme', 'dark');
+      }
+    })();
+  </script>
+</head>
+<body class="page-index">
+  <a class="skip-link" href="#main">跳到正文</a>
+  <div class="progress" id="progress" aria-hidden="true"></div>
+
+  <header class="nav" id="top">
+    <div class="shell nav__inner">
+      <a class="nav__brand" href="../index.html" aria-label="Junjie Chen — home">
+        <span class="nav__monogram" aria-hidden="true">
+          <svg viewBox="0 0 32 32" width="30" height="30" fill="none" aria-hidden="true">
+            <rect x="1" y="1" width="30" height="30" rx="8" stroke="currentColor" stroke-width="1.25" opacity=".55"/>
+            <path d="M12 9v10.2a3.3 3.3 0 0 1-3.3 3.3H7.4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            <path d="M24.6 10.4a5.9 5.9 0 0 0-8.6 1 6.6 6.6 0 0 0 0 8.6 5.9 5.9 0 0 0 8.6 1" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </span>
+        <span class="nav__name">Junjie Chen</span>
+      </a>
+
+      <nav class="nav__links" id="nav-links" aria-label="Primary">
+        <a href="#experience"><span class="nav__bracket" aria-hidden="true">[</span>经历<span class="nav__bracket" aria-hidden="true">]</span></a>
+        <a href="../projects.html"><span class="nav__bracket" aria-hidden="true">[</span>研究（英文）<span class="nav__bracket" aria-hidden="true">]</span></a>
+        <a href="#publications"><span class="nav__bracket" aria-hidden="true">[</span>论文<span class="nav__bracket" aria-hidden="true">]</span></a>
+        <a href="../blog.html"><span class="nav__bracket" aria-hidden="true">[</span>文章（英文）<span class="nav__bracket" aria-hidden="true">]</span></a>
+        <a href="#contact"><span class="nav__bracket" aria-hidden="true">[</span>联系<span class="nav__bracket" aria-hidden="true">]</span></a>
+      </nav>
+
+      <div class="nav__actions">
+        <a class="iconbtn nav__lang" href="../" hreflang="en" lang="en" aria-label="English version" title="English version">EN</a>
+        <a class="btn btn--sm btn--primary nav__cv" href="../assets/cv/CHEN_Junjie_CV.pdf" target="_blank" rel="noopener">CV</a>
+        <button class="iconbtn" id="theme-toggle" type="button" aria-label="切换主题" title="切换主题">
+          <svg class="icon-sun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"></path></svg>
+          <svg class="icon-moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+        </button>
+        <button class="iconbtn nav__burger" id="nav-burger" type="button" aria-label="打开菜单" aria-expanded="false" aria-controls="nav-links">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+
+  <main id="main">
+    <section class="hero">
+      <div class="grid-bg" aria-hidden="true"></div>
+      <div class="aurora" aria-hidden="true"></div>
+      <div class="shell hero__inner">
+        <div class="hero__main">
+          <p class="eyebrow"><span aria-hidden="true">▸</span> 研究科学家 II · Lucence Diagnostics · 新加坡</p>
+          <h1 class="hero__title" lang="en">Junjie&nbsp;Chen</h1>
+          <p class="hero__role">AI 赋能生命科学 <span class="hero__plus" aria-hidden="true">·</span> 临床基因组学</p>
+          <p class="hero__lede">
+            工程师出身的科学家与转化医学研究者，拥有<strong>十二年以上将基础发现从实验室推向临床的经验</strong>。我端到端负责全基因组测序工作流——文库制备、生物信息分析、机器学习、临床验证——服务于人群基因组学和基于血液的癌症检测。
+          </p>
+          <div class="hero__cta">
+            <a class="btn btn--primary" href="../projects.html" hreflang="en">查看研究（英文）</a>
+            <a class="btn btn--ghost" href="../assets/cv/CHEN_Junjie_CV.pdf" hreflang="en" target="_blank" rel="noopener">简历（英文）</a>
+          </div>
+          <p class="hero__links">
+            <a href="mailto:chen_junjie@outlook.com">chen_junjie@outlook.com</a>
+            <span class="dot" aria-hidden="true">·</span>
+            <a href="https://www.linkedin.com/in/junjie-chen-nus/" target="_blank" rel="noopener">LinkedIn</a>
+            <span class="dot" aria-hidden="true">·</span>
+            <a href="https://github.com/Neutrophil" target="_blank" rel="noopener">GitHub</a>
+          </p>
+        </div>
+
+        <aside class="facts card card--tick" aria-label="一览">
+          <h2 class="facts__title">一览</h2>
+          <dl class="facts__list">
+            <div class="facts__row"><dt>在做</dt><dd>肿瘤分类器 · 临床基因组学机器学习</dd></div>
+            <div class="facts__row"><dt>训练</dt><dd>微生物学与免疫学博士（新加坡国立大学）</dd></div>
+            <div class="facts__row"><dt>语言</dt><dd>英语 · 中文</dd></div>
+          </dl>
+        </aside>
+      </div>
+
+      <div class="shell">
+        <ul class="metrics" aria-label="数字一览">
+          <li><span class="metrics__n">12+</span><span class="metrics__k">年，从实验室到临床</span></li>
+          <li><span class="metrics__n">4</span><span class="metrics__k">项临床 WGS 应用</span></li>
+          <li><span class="metrics__n">7</span><span class="metrics__k">篇同行评议论文</span></li>
+          <li><span class="metrics__n">5</span><span class="metrics__k">场学术会议报告</span></li>
+        </ul>
+      </div>
+      <div class="hero__signal" aria-hidden="true">
+<svg class="signal" viewBox="0 0 1200 140" preserveAspectRatio="none" role="presentation" focusable="false">
+  <defs>
+    <linearGradient id="sig-fade" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%"   stop-color="currentColor" stop-opacity="0" />
+      <stop offset="18%"  stop-color="currentColor" stop-opacity=".9" />
+      <stop offset="82%"  stop-color="currentColor" stop-opacity=".9" />
+      <stop offset="100%" stop-color="currentColor" stop-opacity="0" />
+    </linearGradient>
+  </defs>
+
+  <!-- baseline -->
+  <line class="signal__base" x1="0" y1="70" x2="1200" y2="70"
+        stroke="currentColor" stroke-width="1" stroke-dasharray="2 6"
+        opacity=".22" vector-effect="non-scaling-stroke" />
+
+  <!-- secondary trace -->
+  <polyline class="signal__trace signal__trace--2" fill="none"
+    stroke="var(--accent-2)" stroke-width="1.25" stroke-linejoin="round" stroke-linecap="round"
+    opacity=".55" vector-effect="non-scaling-stroke"
+    points="0,74 50,71 100,77 150,68 200,80 250,64 300,86 350,72 400,90 450,66
+            500,82 550,60 600,88 650,70 700,92 750,68 800,84 850,62 900,86 950,72
+            1000,78 1050,66 1100,80 1150,70 1200,74" />
+
+  <!-- primary trace -->
+  <polyline class="signal__trace" fill="none"
+    stroke="url(#sig-fade)" stroke-width="1.75" stroke-linejoin="round" stroke-linecap="round"
+    vector-effect="non-scaling-stroke"
+    points="0,70 40,66 80,74 120,58 160,78 200,50 240,84 280,44 320,68 360,32
+            400,72 440,26 480,60 520,38 560,66 600,18 640,74 680,42 720,80 760,34
+            800,88 840,52 880,62 920,40 960,76 1000,28 1040,58 1080,46 1120,66 1160,54 1200,70" />
+
+  <!-- landmarks -->
+  <g class="signal__dots" fill="var(--accent)">
+    <circle cx="600" cy="18" r="3" />
+    <circle cx="440" cy="26" r="2.2" opacity=".7" />
+    <circle cx="1000" cy="28" r="2.2" opacity=".7" />
+  </g>
+</svg>
+
+      </div>
+    </section>
+
+    <!-- ============ 四个方向 ============ -->
+    <section class="section" id="about">
+      <div class="shell">
+        <header class="section__head reveal">
+          <h2 class="section__title"><span class="section__num">// 01</span> 我做什么</h2>
+          <p class="section__lede">
+            我是化学工程出身，读了免疫学博士，用十年时间把疗法从实验室推进到临床前研究，如今负责从样本到报告的临床基因组学。贯穿始终的是同一件事：<strong>掌控整条路径</strong>——因为实验台上的决定，决定了算法最终能学到什么。
+          </p>
+        </header>
+        <div class="pillars">
+          <article class="pillar card card--tick reveal">
+            <p class="pillar__kicker"><span class="pillar__n">01</span> AI 赋能生命科学</p>
+            <h3 class="pillar__claim">经得起临床检测考验的机器学习。</h3>
+            <ul class="pillar__list">
+              <li>基于测序衍生特征的肿瘤分类器，重在校准与批次稳健性，而非排行榜成绩。</li>
+              <li>构建了 12 级 AI 赋能生命科学图谱与课程：约 100 个工具按证据分级，20 个纯 numpy 实验。</li>
+              <li>以智能体优先的方式工作（Claude Code、Cowork 与智能体框架），并为此编写了一门 12 个模块的课程。</li>
+            </ul>
+            <ul class="tags tags--mini">
+              <li class="is-core">肿瘤分类器</li><li class="is-core">Python</li><li>片段组学</li><li>智能体工作流</li>
+            </ul>
+            <p class="pillar__foot"><a class="arrowlink" href="../projects.html#ai4ls" hreflang="en">AI 赋能生命科学项目（英文） <span aria-hidden="true">→</span></a></p>
+          </article>
+          <article class="pillar pillar--alt card card--tick reveal">
+            <p class="pillar__kicker"><span class="pillar__n">02</span> 临床基因组学</p>
+            <h3 class="pillar__claim">全基因组测序，从全国人群队列到一滴血浆。</h3>
+            <ul class="pillar__list">
+              <li>人群规模的种系 WGS，文库质控（标准化深度下的片段筛选、深度梯度）是设计的一部分。</li>
+              <li>低深度 cfDNA CNV 共识方法，在 ≤5x 深度下估计肿瘤分数、倍性与杂合性缺失（LOH），用于 <strong>MRD</strong> 与 <strong>MCED</strong>。</li>
+              <li>每个变异检测工具都以 GIAB 与 SEQC2 真值集进行基准测试（hap.py、vcfeval、Truvari）。</li>
+            </ul>
+            <ul class="tags tags--mini">
+              <li class="is-core">人群 WGS</li><li class="is-core">MRD</li><li class="is-core">MCED</li><li>FFPE-WGS</li><li>临床验证</li>
+            </ul>
+            <p class="pillar__foot"><a class="arrowlink" href="../projects.html#lucence" hreflang="en">Lucence 的临床基因组学（英文） <span aria-hidden="true">→</span></a></p>
+          </article>
+          <article class="pillar pillar--alt card card--tick reveal">
+            <p class="pillar__kicker"><span class="pillar__n">03</span> 项目开发</p>
+            <h3 class="pillar__claim">把想法从实验室推进到临床前，并管理整个项目。</h3>
+            <ul class="pillar__list">
+              <li>mRNA 与 siRNA 的设计、化学修饰及 LNP 制剂；配体介导与细胞穿透肽递送。</li>
+              <li>基于人工抗原呈递细胞的 TCR-T 与树突状细胞疫苗平台，抗原在哺乳动物、细菌和酵母体系中表达。</li>
+              <li>撰写推动项目从实验室走向临床前的 SOP、报告、专利草稿与论文。</li>
+            </ul>
+            <ul class="tags tags--mini">
+              <li class="is-core">转化研发</li><li class="is-core">mRNA–LNP</li><li>肿瘤疫苗</li><li>TCR-T</li><li>GMP</li>
+            </ul>
+            <p class="pillar__foot"><a class="arrowlink" href="../projects.html#translational" hreflang="en">新加坡国立大学的转化研究（英文） <span aria-hidden="true">→</span></a></p>
+          </article>
+          <article class="pillar card card--tick reveal">
+            <p class="pillar__kicker"><span class="pillar__n">04</span> 湿实验 + 生物信息学</p>
+            <h3 class="pillar__claim">既能做文库制备，也能编写围绕它的变异检测流程。</h3>
+            <ul class="pillar__list">
+              <li>模块化 WGS 流程：fastp → BWA-MEM → GATK → DeepVariant / Mutect2 / DeepSomatic → CNVkit / ichorCNA。</li>
+              <li>种系与体细胞 CNV/SV 分析体系；用于 ≤5x 深度肿瘤分数估计的低深度 cfDNA CNV 共识。</li>
+              <li>实验技能：文库制备与片段筛选、qPCR、NGS、FISH、HLA 分型、CRISPR、蛋白表达、流式细胞术。</li>
+            </ul>
+            <ul class="tags tags--mini">
+              <li class="is-core">GATK</li><li class="is-core">文库制备</li><li>CNV / SV</li><li>R · Bash · Docker</li><li>流式细胞术</li>
+            </ul>
+            <p class="pillar__foot"><a class="arrowlink" href="../projects.html#lucence" hreflang="en">分析流程与实验（英文） <span aria-hidden="true">→</span></a></p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ 经历 ============ -->
+    <section class="section section--alt" id="experience">
+      <div class="shell">
+        <header class="section__head reveal">
+          <h2 class="section__title"><span class="section__num">// 02</span> 研究与工作经历</h2>
+          <p class="section__lede">
+            从雅培的制剂研发，到新加坡国立大学十一年的转化研究，再到如今在 Lucence 从事临床基因组学。完整内容见简历（英文）。
+          </p>
+        </header>
+        <ol class="timeline">
+          <li class="timeline__item reveal">
+            <div class="timeline__meta"><span class="timeline__date">2025.11 – 至今</span></div>
+            <div class="timeline__body">
+              <h3>研究科学家 II</h3>
+              <p class="timeline__org">Lucence Diagnostics · 新加坡</p>
+              <ul>
+                <li>牵头新加坡全国人群（PRECISE）全基因组测序（WGS）工作流的端到端开发，涵盖湿实验文库制备、生物信息分析、报告、临床验证与部署。</li>
+                <li>牵头 cfDNA 微小残留病灶（MRD）、多癌种早期检测（MCED）及肿瘤组织体细胞 FFPE-WGS 的湿实验流程与生物信息分析流程开发。</li>
+                <li>开发并训练机器学习模型，包括肿瘤分类器。</li>
+                <li>开发并临床验证基于纳米抗体–NGS 的多组学检测方法。</li>
+              </ul>
+              <ul class="tags tags--mini timeline__tags">
+                <li class="is-core">临床基因组学</li><li class="is-core">AI 赋能生命科学</li><li>湿实验 + 生物信息学</li>
+              </ul>
+            </div>
+          </li>
+          <li class="timeline__item reveal">
+            <div class="timeline__meta"><span class="timeline__date">2022.01 – 2025.10</span></div>
+            <div class="timeline__body">
+              <h3>研究员</h3>
+              <p class="timeline__org">新加坡国立大学杨潞龄医学院 · 免疫学转化研究项目</p>
+              <ul>
+                <li>主导多学科项目，推动核酸治疗与肿瘤免疫治疗从实验室走向临床前开发，涵盖 mRNA–LNP、肿瘤药物递送、肿瘤疫苗和 TCR-T。</li>
+                <li>设计并开展肿瘤模型中的体内生物分布与疗效研究。</li>
+              </ul>
+              <ul class="tags tags--mini timeline__tags">
+                <li class="is-core">项目开发</li><li>湿实验</li>
+              </ul>
+            </div>
+          </li>
+          <li class="timeline__item reveal">
+            <div class="timeline__meta"><span class="timeline__date">2014.08 – 2022.01</span></div>
+            <div class="timeline__body">
+              <h3>研究助理</h3>
+              <p class="timeline__org">新加坡国立大学杨潞龄医学院 · 免疫学转化研究项目</p>
+              <ul>
+                <li>研究核仁自身抗原（UBF、NCL、NPM1）在自身免疫疾病中的蛋白质组学及蛋白–蛋白相互作用。</li>
+                <li>发现连接组蛋白 H1.2 为核仁组织区的新组分（<em>J Biol Chem</em>，2018）。</li>
+              </ul>
+              <ul class="tags tags--mini timeline__tags">
+                <li>湿实验</li><li>蛋白质组学</li>
+              </ul>
+            </div>
+          </li>
+          <li class="timeline__item reveal">
+            <div class="timeline__meta"><span class="timeline__date">2013.01 – 2013.08</span></div>
+            <div class="timeline__body">
+              <h3>药物制剂科学家（实习）</h3>
+              <p class="timeline__org">雅培 / 艾伯维 · 新加坡</p>
+              <ul>
+                <li>参与覆盖新加坡、美国和德国三地的丙型肝炎药物全球研发项目，探索多颗粒即释剂型。</li>
+                <li>在实验设计中应用 GMP 原则，并维护符合 GMP 要求的文档。</li>
+              </ul>
+              <ul class="tags tags--mini timeline__tags">
+                <li>项目开发</li><li>GMP</li>
+              </ul>
+            </div>
+          </li>
+        </ol>
+
+        <h3 class="subhead reveal"><span class="subhead__num">// 02.1</span> 教育背景</h3>
+        <div class="edu reveal">
+          <div class="edu__row">
+            <span class="edu__date">2017 – 2022</span>
+            <div>
+              <p class="edu__title">微生物学与免疫学博士</p>
+              <p class="edu__org">新加坡国立大学杨潞龄医学院</p>
+              <p class="edu__note">博士论文：《核仁自身抗原上游结合因子（UBF）与组蛋白 H1x 邻近蛋白网络的研究》</p>
+            </div>
+          </div>
+          <div class="edu__row">
+            <span class="edu__date">2010 – 2014</span>
+            <div>
+              <p class="edu__title">化学与生物分子工程学士（荣誉学位）</p>
+              <p class="edu__org">新加坡国立大学工程学院</p>
+              <p class="edu__note">新加坡教育部 SM3 本科生奖学金。</p>
+            </div>
+          </div>
+        </div>
+
+        <h3 class="subhead reveal"><span class="subhead__num">// 02.2</span> 学术服务与审稿</h3>
+        <div class="edu reveal">
+          <div class="edu__row">
+            <span class="edu__date">2022 – 2025</span>
+            <div><p class="edu__title">指导并培训 5 名博士生和 10 名本科生</p><p class="edu__org">新加坡国立大学</p></div>
+          </div>
+          <div class="edu__row">
+            <span class="edu__date">2023</span>
+            <div><p class="edu__title">新加坡国立大学代表，第五届亚洲疫苗世界大会</p></div>
+          </div>
+          <div class="edu__row">
+            <span class="edu__date">2018 – 2019</span>
+            <div><p class="edu__title">新加坡国立大学微生物学与免疫学研究生学会联合创始人兼副主席</p></div>
+          </div>
+          <div class="edu__row">
+            <span class="edu__date">审稿</span>
+            <div><p class="edu__title">受邀担任同行评议期刊审稿人（如 <em>PLOS One</em>）</p></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ 论文与报告 ============ -->
+    <section class="section" id="publications">
+      <div class="shell">
+        <header class="section__head reveal">
+          <h2 class="section__title"><span class="section__num">// 03</span> 论文与学术报告</h2>
+          <p class="section__lede">七篇同行评议论文与五场学术会议报告。按学术惯例保留英文原文，本人姓名加粗。</p>
+        </header>
+        <div class="chips" id="pub-filter" role="group" aria-label="按主题筛选论文" hidden>
+          <button type="button" class="chip is-on" data-tag="*" aria-pressed="true">全部 <span class="chip__n">7</span></button>
+          <button type="button" class="chip" data-tag="immunology" aria-pressed="false">免疫学 <span class="chip__n">3</span></button>
+          <button type="button" class="chip" data-tag="nucleolus" aria-pressed="false">染色质与核仁 <span class="chip__n">2</span></button>
+          <button type="button" class="chip" data-tag="clinical" aria-pressed="false">临床研究 <span class="chip__n">2</span></button>
+        </div>
+        <ol class="pubs" id="pub-list" lang="en">
+          <li class="pub reveal" data-tags="clinical"><span class="pub__year">2026</span><p class="pub__cite">Zhang, J., Tam, W. W. S., Lu, J., <strong>Chen, J.</strong>, Montayre, J., et al. (2026). A technology-blended exercise intervention for cognitive risk reduction and brain health in middle-aged and older adults with type 2 diabetes in Singapore: A mixed-methods study. <em>J Gerontol A</em>, 81(9), glag192. <a href="https://doi.org/10.1093/gerona/glag192" target="_blank" rel="noopener">DOI</a></p>
+          </li>
+          <li class="pub reveal" data-tags="clinical"><span class="pub__year">2025</span><p class="pub__cite">Zhang, J., Tam, W. W. S., Lu, J., <strong>Chen, J.</strong>, Kusuyama, J., et al. (2025). Cognitive risk stratification score in middle-aged and older adults with type 2 diabetes: A cross-sectional study. <em>J Clin Endocrinol Metab</em>, dgaf063. <a href="https://doi.org/10.1210/clinem/dgaf063" target="_blank" rel="noopener">DOI</a></p>
+          </li>
+          <li class="pub reveal" data-tags="immunology"><span class="pub__year">2023</span><p class="pub__cite">Wu, S., <strong>Chen, J.</strong>, Teo, B. H. D., Wee, S. Y. K., Wong, M. H. M., et al. (2023). The axis of complement C1 and nucleolus in antinuclear autoimmunity. <em>Front Immunol</em>, 14, 1196544. <a href="https://doi.org/10.3389/fimmu.2023.1196544" target="_blank" rel="noopener">DOI</a></p>
+          </li>
+          <li class="pub reveal" data-tags="immunology"><span class="pub__year">2021</span><p class="pub__cite">Wu, S., Teo, B. H. D., Wee, S. Y. K., <strong>Chen, J.</strong>, &amp; Lu, J. (2021). The GAR/RGG motif defines a family of nuclear alarmins. <em>Cell Death Dis</em>, 12(5), 477. <a href="https://doi.org/10.1038/s41419-021-03766-w" target="_blank" rel="noopener">DOI</a></p>
+          </li>
+          <li class="pub reveal" data-tags="nucleolus"><span class="pub__year">2018</span><p class="pub__cite"><strong>Chen, J.</strong>, Teo, B. H. D., Cai, Y., Wee, S. Y. K., &amp; Lu, J. (2018). The linker histone H1.2 is a novel component of the nucleolar organizer regions. <em>J Biol Chem</em>, 293(7), 2358–2369. <a href="https://doi.org/10.1074/jbc.M117.810184" target="_blank" rel="noopener">DOI</a></p>
+          </li>
+          <li class="pub reveal" data-tags="nucleolus"><span class="pub__year">2018</span><p class="pub__cite"><strong>Chen, J.</strong>, Teo, B., &amp; Lu, J. (2018). A method for extracting the nuclear scaffold from the chromatin network. <em>Bio-Protocol</em>, 8(8), e2821. <a href="https://doi.org/10.21769/BioProtoc.2821" target="_blank" rel="noopener">DOI</a></p>
+          </li>
+          <li class="pub reveal" data-tags="immunology"><span class="pub__year">2017</span><p class="pub__cite">Cai, Y., Wee, S. Y. K., <strong>Chen, J.</strong>, Teo, B. H. D., Ng, Y. L. C., Leong, K. P., &amp; Lu, J. (2017). Broad susceptibility of nucleolar proteins and autoantigens to complement C1 protease degradation. <em>J Immunol</em>, 199(12), 3981–3990. <a href="https://doi.org/10.4049/jimmunol.1700728" target="_blank" rel="noopener">DOI</a></p>
+          </li>
+        </ol>
+        <p class="postlist__empty" id="pub-empty" hidden>该主题下暂无论文。</p>
+
+        <h3 class="subhead reveal"><span class="subhead__num">// 03.1</span> 学术会议报告</h3>
+        <ol class="talks reveal">
+          <li class="talk"><span class="talk__kind">墙报</span><p><strong>A novel peptide adjuvant demonstrates alarmin activities.</strong> 7th Singaporean Society for Immunology Student/Postdoc Retreat, Singapore, 2023.</p></li>
+          <li class="talk"><span class="talk__kind">口头报告</span><p><strong>A nucleolar GAR/RGG motif activates dendritic cell maturation.</strong> 16th International Symposium on Dendritic Cells, Cairns, Australia, 2022.</p></li>
+          <li class="talk"><span class="talk__kind">口头报告</span><p><strong>The linker histone H1x uniquely localizes to the nucleolar granular component and regulates ribosome biogenesis.</strong> Microbiology &amp; Immunology Research in Progress Seminar, NUS, 2020.</p></li>
+          <li class="talk"><span class="talk__kind">口头 · 墙报</span><p><strong>The linker histone H1x localizes to nucleolar pre-ribosomes and regulates ribosome biogenesis.</strong> 2nd Microbiology &amp; Immunology Graduate Students Symposium, NUS, 2018.</p></li>
+          <li class="talk"><span class="talk__kind">口头报告</span><p><strong>Understanding the role of linker histone H1 and its subtypes in nuclear structure.</strong> Microbiology &amp; Immunology Research in Progress Seminar, NUS, 2017.</p></li>
+        </ol>
+      </div>
+    </section>
+
+    <!-- ============ 联系 ============ -->
+    <section class="section section--alt" id="contact">
+      <div class="shell">
+        <header class="section__head reveal">
+          <h2 class="section__title"><span class="section__num">// 04</span> 联系</h2>
+          <p class="section__lede">
+            欢迎就 <strong>AI 赋能生命科学</strong>、<strong>临床基因组学</strong>与<strong>转化项目开发</strong>方向的职位、合作与编辑工作联系我。邮件最快。文章与项目详情目前只有英文版。
+          </p>
+        </header>
+        <div class="contact reveal">
+          <a class="contact__link card--tick" href="mailto:chen_junjie@outlook.com">
+            <span class="contact__label">邮件</span>
+            <span class="contact__value">chen_junjie@outlook.com</span>
+          </a>
+          <a class="contact__link card--tick" href="https://www.linkedin.com/in/junjie-chen-nus/" target="_blank" rel="noopener">
+            <span class="contact__label">LinkedIn</span>
+            <span class="contact__value">in/junjie-chen-nus</span>
+          </a>
+          <a class="contact__link card--tick" href="https://github.com/Neutrophil" target="_blank" rel="noopener">
+            <span class="contact__label">GitHub</span>
+            <span class="contact__value">@Neutrophil</span>
+          </a>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="footer">
+    <div class="shell footer__inner">
+      <div class="footer__col">
+        <p class="footer__sig">Junjie Chen</p>
+        <p class="footer__meta">新加坡 · AI 赋能生命科学、临床基因组学，以及业余时间的各种构建</p>
+      </div>
+      <nav class="footer__col footer__links" aria-label="其他链接">
+        <a href="mailto:chen_junjie@outlook.com">邮件</a>
+        <a href="https://www.linkedin.com/in/junjie-chen-nus/" target="_blank" rel="noopener">LinkedIn</a>
+        <a href="https://github.com/Neutrophil" target="_blank" rel="noopener">GitHub</a>
+        <a href="../feed.xml">RSS</a>
+      </nav>
+      <div class="footer__col footer__end">
+        <p class="footer__meta">© <span id="year">2026</span> · 静态网站，无追踪，无统计</p>
+        <p><a class="footer__top" href="#top">回到顶部 <span aria-hidden="true">↑</span></a></p>
+      </div>
+    </div>
+  </footer>
+
+
+  <script src="../js/main.js"></script>
+</body>
+</html>

@@ -32,6 +32,7 @@ PORT = 8912
 
 PAGES = {
     "home": "index.html",
+    "home-zh": "zh/index.html",
     "builds": "projects.html",
     "writing": "blog.html",
     "404": "404.html",

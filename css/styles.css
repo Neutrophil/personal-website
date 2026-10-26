@@ -527,6 +527,28 @@ em { color: var(--text); }
 .measure { max-width: 72ch; }
 .section__foot { margin: var(--space-4) 0 0; }
 
+/* ---------- 中文 ----------
+   JetBrains Mono has no CJK glyphs, and the labels, nav and headings that use
+   it would otherwise fall back glyph by glyph to whatever the system picks.
+   Name a CJK face first in both stacks; Latin inside still renders in the
+   faces it always did, because those come first for the glyphs they have.
+   Tracking and capitals are for Latin labels: on hanzi they only add gaps. */
+:lang(zh) {
+  --sans: -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", "Noto Sans SC",
+          "Noto Sans CJK SC", "Microsoft YaHei", "Source Han Sans SC", system-ui, sans-serif;
+  --mono: "JetBrains Mono", "PingFang SC", "Noto Sans SC", "Noto Sans CJK SC", "Microsoft YaHei",
+          ui-monospace, monospace;
+}
+:lang(zh) body { line-height: 1.8; }
+:lang(zh) :is(.eyebrow, .facts__title, .facts__row dt, .contact__label, .metrics__k, .pillar__kicker,
+              .talk__kind, .nav__links a, .section__title, .hero__role, .subhead) {
+  letter-spacing: 0;
+  text-transform: none;
+}
+:lang(zh) :is(h1, h2, h3, .pillar__claim) { font-weight: 600; }
+.nav__lang { font-family: var(--sans); font-size: var(--step--1); font-weight: 600; text-decoration: none; }
+.nav__lang:hover { color: var(--accent); border-color: var(--accent); text-decoration: none; }
+
 /* ---------- Page headers (blog, builds, 404) ---------- */
 .pagehead {
   position: relative;
