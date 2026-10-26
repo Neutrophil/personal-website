@@ -116,6 +116,34 @@
     spied.forEach(function (pair) { spy.observe(pair.section); });
   }
 
+  /* ---- Contents list: folded on a phone, so the first paragraph is on the
+   * first screen. It ships open; a reader without this script keeps it so. */
+  if (window.matchMedia('(max-width: 760px)').matches) {
+    Array.prototype.forEach.call(document.querySelectorAll('.toc__fold'), function (d) { d.open = false; });
+  }
+  /* A closed <details> prints closed, and CSS cannot open it. */
+  window.addEventListener('beforeprint', function () {
+    Array.prototype.forEach.call(document.querySelectorAll('.toc__fold'), function (d) { d.open = true; });
+  });
+
+  /* ---- Jump bar: mark the section in view. Visual only — the nav's own
+   * aria-current already names the page, and a page has one of those. */
+  var jumps = Array.prototype.slice.call(document.querySelectorAll('.jump a'));
+  var jumped = jumps.map(function (a) {
+    return { anchor: a, section: document.getElementById((a.getAttribute('href') || '').slice(1)) };
+  }).filter(function (pair) { return pair.section; });
+  if (jumped.length && 'IntersectionObserver' in window) {
+    var jumpSpy = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (!entry.isIntersecting) return;
+        jumped.forEach(function (pair) {
+          pair.anchor.classList.toggle('is-active', pair.section === entry.target);
+        });
+      });
+    }, { rootMargin: '-40% 0px -55% 0px', threshold: 0 });
+    jumped.forEach(function (pair) { jumpSpy.observe(pair.section); });
+  }
+
   /* ---- Reading progress (post pages only) ---- */
   var progress = document.getElementById('progress');
   var article = document.querySelector('.post');

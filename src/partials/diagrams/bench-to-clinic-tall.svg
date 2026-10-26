@@ -1,0 +1,68 @@
+<svg viewBox="0 0 250 506" role="img" aria-labelledby="d7t-title">
+  <title id="d7t-title">Seven stages from sample to clinical report: sample, library prep and sequencing are wet-lab; the pipeline is bioinformatics; the model is AI; validation and the report are clinical. The bench and the clinic are drawn in violet, the computational middle in cyan. One person works across all of them.</title>
+
+  <!-- discipline rail -->
+  <line class="d-accent2" x1="6" y1="4" x2="6" y2="178" stroke-width="2" />
+  <text class="d-label--violet" x="16" y="14">wet-lab</text>
+  <line class="d-accent" x1="6" y1="188" x2="6" y2="252" stroke-width="2" />
+  <text class="d-label--accent" x="16" y="199">bioinformatics</text>
+  <line class="d-accent" x1="6" y1="262" x2="6" y2="326" stroke-width="2" />
+  <text class="d-label--accent" x="16" y="273">AI</text>
+  <line class="d-accent2" x1="6" y1="336" x2="6" y2="458" stroke-width="2" />
+  <text class="d-label--violet" x="16" y="347">clinical</text>
+
+  <!-- sample -->
+  <rect class="d-fill-bg d-accent2" x="16" y="22" width="206" height="40" rx="6" stroke-width="1.25" />
+  <text class="d-label" x="24" y="46">sample</text>
+  <text class="d-label--sm" x="214" y="39" text-anchor="end">blood · tissue</text>
+  <text class="d-label--sm" x="214" y="53" text-anchor="end">cfDNA · FFPE</text>
+  <path class="d-stroke" d="M119 65 V77 M114 72 L119 77 L124 72" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+
+  <!-- library prep -->
+  <rect class="d-fill-bg d-accent2" x="16" y="80" width="206" height="40" rx="6" stroke-width="1.25" />
+  <text class="d-label" x="24" y="104">library prep</text>
+  <text class="d-label--sm" x="214" y="97" text-anchor="end">size selection</text>
+  <text class="d-label--sm" x="214" y="111" text-anchor="end">QC · titration</text>
+  <path class="d-stroke" d="M119 123 V135 M114 130 L119 135 L124 130" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+
+  <!-- sequencing -->
+  <rect class="d-fill-bg d-accent2" x="16" y="138" width="206" height="40" rx="6" stroke-width="1.25" />
+  <text class="d-label" x="24" y="162">sequencing</text>
+  <text class="d-label--sm" x="214" y="155" text-anchor="end">deep WGS</text>
+  <text class="d-label--sm" x="214" y="169" text-anchor="end">low-pass ≤5x</text>
+  <path class="d-stroke" d="M119 181 V209 M114 204 L119 209 L124 204" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+
+  <!-- pipeline -->
+  <rect class="d-fill-bg d-accent" x="16" y="212" width="206" height="40" rx="6" stroke-width="1.25" />
+  <text class="d-label" x="24" y="236">pipeline</text>
+  <text class="d-label--sm" x="214" y="229" text-anchor="end">align · dedup</text>
+  <text class="d-label--sm" x="214" y="243" text-anchor="end">SNV · CNV · SV</text>
+  <path class="d-stroke" d="M119 255 V283 M114 278 L119 283 L124 278" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+
+  <!-- ML model -->
+  <rect class="d-fill-bg d-accent" x="16" y="286" width="206" height="40" rx="6" stroke-width="1.25" />
+  <text class="d-label" x="24" y="310">ML model</text>
+  <text class="d-label--sm" x="214" y="303" text-anchor="end">fragmentomics</text>
+  <text class="d-label--sm" x="214" y="317" text-anchor="end">tumour classes</text>
+  <path class="d-stroke" d="M119 329 V357 M114 352 L119 357 L124 352" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+
+  <!-- validation -->
+  <rect class="d-fill-bg d-accent2" x="16" y="360" width="206" height="40" rx="6" stroke-width="1.25" />
+  <text class="d-label" x="24" y="384">validation</text>
+  <text class="d-label--sm" x="214" y="377" text-anchor="end">GIAB · SEQC2</text>
+  <text class="d-label--sm" x="214" y="391" text-anchor="end">cell-line mixes</text>
+  <path class="d-stroke" d="M119 403 V415 M114 410 L119 415 L124 410" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+
+  <!-- report -->
+  <rect class="d-fill-bg d-accent2" x="16" y="418" width="206" height="40" rx="6" stroke-width="1.25" />
+  <text class="d-label" x="24" y="442">report</text>
+  <text class="d-label--sm" x="214" y="435" text-anchor="end">clinical</text>
+  <text class="d-label--sm" x="214" y="449" text-anchor="end">deployment</text>
+
+  <!-- feedback loop: validation back up to library prep -->
+  <path class="d-accent2" d="M225 380 H240 V100 H228" fill="none" stroke-width="1.75" stroke-dasharray="4 3" stroke-linecap="round" stroke-linejoin="round" />
+  <path class="d-accent2" d="M232 95 L226 100 L232 105" fill="none" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" />
+  <line class="d-muted" x1="6" y1="470" x2="244" y2="470" stroke-width="1" />
+  <text class="d-label--sm" x="6" y="484">dashed: a failed validation changes</text>
+  <text class="d-label--sm" x="6" y="498">the library prep, not just the model</text>
+</svg>

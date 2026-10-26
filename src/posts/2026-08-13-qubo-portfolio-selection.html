@@ -29,8 +29,11 @@ description = "How to pose K-of-N portfolio selection as a QUBO, why the cardina
           </p>
 
           <figure class="diagram">
-            <div class="diagram__scroll">
+            <div class="diagram__scroll diagram__alt--wide">
 {{ include:diagrams/qubo-pipeline.svg }}
+            </div>
+            <div class="diagram__alt--tall">
+{{ include:diagrams/qubo-pipeline-tall.svg }}
             </div>
             <figcaption>
               Price history yields an expected-return vector and a covariance matrix; both fold
@@ -160,6 +163,7 @@ P(Σ_i x_i − K)²  =  P Σ_i x_i (1 − 2K)  +  2P Σ_i&lt;j x_i x_j  +  P K²
 {{ include:diagrams/anneal-energy.svg }}
             </div>
             <figcaption>
+              <span class="diagram__swipe">Swipe the chart sideways to see all of it. </span>
               Left: the return term pulls energy down while risk and penalty push it up; a correct
               decomposition must sum to the total. Right: as inverse temperature β rises
               geometrically, the walk stops accepting uphill moves and freezes into a solution.

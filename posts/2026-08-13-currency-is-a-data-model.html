@@ -103,15 +103,17 @@
           <ul class="tags tags--mini"><li>Python</li><li>Data modelling</li><li>Learning notes</li></ul>
 
           <nav class="toc" aria-label="Sections in this post">
-            <p class="toc__title">On this page</p>
-            <ul class="toc__list">
+            <details class="toc__fold" open>
+              <summary class="toc__title">On this page <span class="toc__n">6</span></summary>
+              <ul class="toc__list">
               <li><a href="#two-currencies-and-only-one-of-them-may-change">Two currencies, and only one of them may change</a></li>
               <li><a href="#the-trap-a-default-argument-binds-at-import">The trap: a default argument binds at import</a></li>
               <li><a href="#reading-history-convert-per-date-not-per-series">Reading history: convert per date, not per series</a></li>
               <li><a href="#when-the-rate-itself-is-missing">When the rate itself is missing</a></li>
               <li><a href="#threading-the-currency-through-without-touching-thirty-call-sites">Threading the currency through without touching thirty call sites</a></li>
               <li><a href="#and-the-one-that-had-nothing-to-do-with-currency">And the one that had nothing to do with currency</a></li>
-            </ul>
+              </ul>
+            </details>
           </nav>
         </header>
 
@@ -228,6 +230,7 @@
 
             </div>
             <figcaption>
+              <span class="diagram__swipe">Swipe the chart sideways to see all of it. </span>
               The storage track is written once and never restated. The display track is derived on
               read — each point converted at the rate that applied on its own date, not at today's
               rate applied to the finished series.

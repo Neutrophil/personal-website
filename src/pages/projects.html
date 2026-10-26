@@ -16,14 +16,16 @@ og_description = "Clinical genomics and AI for life science at Lucence, translat
           development at NUS before that; and, on evenings, AI-for-Life-Science systems plus the
           engineering practice that keeps them honest.
         </p>
-        <nav class="jump" aria-label="On this page">
-          <a href="#lucence">clinical genomics</a>
-          <a href="#translational">translational</a>
-          <a href="#ai4ls">AI for life science</a>
-          <a href="#engineering">engineering</a>
-        </nav>
       </div>
     </section>
+    <nav class="jump" aria-label="On this page">
+      <div class="shell jump__inner">
+        <a href="#lucence">genomics</a>
+        <a href="#translational">translational</a>
+        <a href="#ai4ls">AI for LS</a>
+        <a href="#engineering">engineering</a>
+      </div>
+    </nav>
 
     <!-- ============ LUCENCE ============ -->
     <section class="section" id="lucence">
@@ -394,14 +396,17 @@ og_description = "Clinical genomics and AI for life science at Lucence, translat
             queue and a rate cap. Around 11,000 more lines and 160 more tests between them.
           </span>
         </p>
-        <h3 class="subhead reveal" id="how">The shape they share</h3>
-        <p class="reveal">
+        <h3 class="subhead reveal" id="how"><span class="subhead__num">// 04.1</span> The shape they share</h3>
+        <p class="measure reveal">
           Every one of these repositories converged on one architecture, largely because each rule
           in it replaced a bug.
         </p>
         <figure class="diagram reveal">
-          <div class="diagram__scroll">
+          <div class="diagram__scroll diagram__alt--wide">
 {{ include:diagrams/layered-architecture.svg }}
+          </div>
+          <div class="diagram__alt--tall">
+{{ include:diagrams/layered-architecture-tall.svg }}
           </div>
           <figcaption>
             The house layering. Pages call domain logic or the router, never a concrete provider;
@@ -409,7 +414,7 @@ og_description = "Clinical genomics and AI for life science at Lucence, translat
             that touches the network does so through one door with a cache in front of it.
           </figcaption>
         </figure>
-        <p class="reveal">
+        <p class="measure reveal">
           The habit underneath is narrower than the diagram: <strong>write the check that would
           have caught it</strong>. A colour palette that has to pass a computed colour-blindness
           check. A test that asserts an optimizer never sees a future bar. A build that fails if a

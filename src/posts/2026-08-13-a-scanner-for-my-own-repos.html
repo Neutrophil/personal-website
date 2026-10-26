@@ -166,8 +166,11 @@ description = "Designing a personal-data scanner: why it must not embed what it 
           <h2>Four gates, and one lesson about where they attach</h2>
 
           <figure class="diagram">
-            <div class="diagram__scroll">
+            <div class="diagram__scroll diagram__alt--wide">
 {{ include:diagrams/guard-layers.svg }}
+            </div>
+            <div class="diagram__alt--tall">
+{{ include:diagrams/guard-layers-tall.svg }}
             </div>
             <figcaption>
               Independent layers: a pre-commit scan of staged content, a pre-push scan of every

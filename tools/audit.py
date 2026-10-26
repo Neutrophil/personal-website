@@ -48,6 +48,8 @@ TEXT_SELECTORS = [
     ".build__note", ".groupnote", ".pindex__tag", ".postcard__meta", ".post__meta",
     ".facts__title", ".facts__row dd", ".timeline__date", ".footer__meta", ".section__lede",
     ".pub p", ".postnav__title", ".codeblock__copy", ".nav__links a", ".eyebrow", ".section__num",
+    ".pillar--alt .tags li", ".pillar--alt .tags li.is-core", ".build__kind", ".subhead__num", ".jump a",
+    ".pillar__foot a", ".timeline__org", ".edu__org",
 ]
 
 MIN_DIAGRAM_LABEL_PX = 10.0
@@ -126,8 +128,10 @@ JS_PAGE = r"""() => {
       const over = Math.max(box.x + 3 - b.x, b.x + b.width - (box.x + box.width - 3));
       if (over > 0.5) overflow.push(`"${t.textContent.trim().slice(0, 40)}" by ${over.toFixed(1)} units`);
     });
+    const variant = svg.closest('.diagram__alt--tall') ? 'tall'
+                  : svg.closest('.diagram__alt--wide') ? 'wide' : 'single';
     return {viewBox: vb.width, scale: +scale.toFixed(2), smallest: sizes.length ? +Math.min(...sizes).toFixed(1) : null,
-            overflow, clipped: Math.max(0, Math.round(svg.parentElement.scrollWidth - svg.parentElement.clientWidth))};
+            overflow, variant, clipped: Math.max(0, Math.round(svg.parentElement.scrollWidth - svg.parentElement.clientWidth))};
   });
   /* WCAG 2.2 exempts a target that sits inside a sentence, which is most of the
      links in prose and in the footer row. Those are reported as advice, not as
@@ -144,7 +148,20 @@ JS_PAGE = r"""() => {
     clipped: Math.max(0, Math.round(el.scrollWidth - el.clientWidth)),
     cued: getComputedStyle(el).backgroundImage !== 'none',
   }));
+  /* Characters per rendered line, from the line boxes a Range reports. Over
+     ~85 the eye loses its way back to the next line. */
+  const longLines = [];
+  if (vw >= 1200) {
+    document.querySelectorAll('main p, main li').forEach(el => {
+      if (el.closest('pre, .chips, .tags, .metrics, nav') || !el.textContent.trim()) return;
+      const r = document.createRange(); r.selectNodeContents(el);
+      const tops = new Set([...r.getClientRects()].map(q => Math.round(q.top)));
+      const lines = tops.size, chars = el.textContent.replace(/\s+/g, ' ').trim().length;
+      if (lines >= 2 && chars / lines > 90) longLines.push(`${el.textContent.trim().slice(0, 40)}… ≈${Math.round(chars / lines)} chars/line`);
+    });
+  }
   return {
+    longLines,
     pageOverflow: Math.max(0, document.documentElement.scrollWidth - vw),
     ariaCurrent: document.querySelectorAll('[aria-current="page"]').length,
     themeColor: document.querySelectorAll('meta[name="theme-color"]').length,
@@ -174,7 +191,7 @@ def main() -> int:
             )
 
             for theme in ("dark", "light"):
-                for width in (1440, 390):
+                for width in (1440, 390, 320):
                     ctx = browser.new_context(
                         viewport={"width": width, "height": 900}, reduced_motion="reduce"
                     )
@@ -210,6 +227,10 @@ def main() -> int:
                                     f"{where}: diagram label renders at {d['smallest']}px "
                                     f"(viewBox {d['viewBox']:.0f} at {d['scale']} scale)"
                                 )
+                            if width < 760 and d["variant"] == "wide":
+                                problems.append(f"{where}: a phone is shown the wide drawing although a tall one exists")
+                            if d["variant"] == "tall" and d["clipped"] > 0:
+                                problems.append(f"{where}: the tall drawing still scrolls {d['clipped']}px sideways")
                             for o in d["overflow"]:
                                 problems.append(f"{where}: diagram label overflows its box — {o}")
                         for t in facts["targets"]:
@@ -224,6 +245,8 @@ def main() -> int:
                                 problems.append(
                                     f"{where}: {s['kind']} hides {s['clipped']}px with no scroll cue"
                                 )
+                        for row in facts["longLines"]:
+                            problems.append(f"{where}: line too long — {row}")
                         notes.append(f"{where}: {facts['docHeight']}px tall")
                     ctx.close()
 
@@ -248,6 +271,36 @@ def main() -> int:
                         continue  # the open menu holds the page still; scrollY stays 0
                     if top[0] < 2000 or abs(top[1]) > 1:
                         problems.append(f"sticky nav/{width}: after scrolling to {top[0]}px the nav sits at {top[1]}px")
+                ctx.close()
+
+            # A phone reader must reach the first paragraph of a post without
+            # scrolling past a screenful of header.
+            ctx = browser.new_context(viewport={"width": 390, "height": 844}, reduced_motion="reduce")
+            page = ctx.new_page()
+            for name, path in PAGES.items():
+                if not name.startswith("post"):
+                    continue
+                page.goto(base + path, wait_until="networkidle")
+                top = page.evaluate("() => document.querySelector('.prose > p').getBoundingClientRect().top")
+                if top >= 844:
+                    problems.append(f"{name}/390: the first paragraph starts at {top:.0f}px, below the fold")
+            ctx.close()
+
+            # A jump link lands its heading below the sticky bars, not under them.
+            for width in (1440, 390):
+                ctx = browser.new_context(viewport={"width": width, "height": 844}, reduced_motion="reduce")
+                page = ctx.new_page()
+                for target in ("engineering", "ai4ls", "how"):
+                    page.goto(base + f"projects.html#{target}", wait_until="networkidle")
+                    page.wait_for_timeout(100)
+                    geo = page.evaluate(
+                        "(id) => { const t = document.getElementById(id);"
+                        " const h = t.matches('h2,h3') ? t : t.querySelector('h2,h3');"
+                        " return [h.getBoundingClientRect().top, document.querySelector('.jump').getBoundingClientRect().bottom]; }",
+                        target,
+                    )
+                    if geo[0] < geo[1]:
+                        problems.append(f"builds/{width}: #{target} heading lands at {geo[0]:.0f}px, under the jump bar ({geo[1]:.0f}px)")
                 ctx.close()
 
             # A miss anywhere serves the 404 page, and it must still be styled and

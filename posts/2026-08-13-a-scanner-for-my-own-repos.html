@@ -103,8 +103,9 @@
           <ul class="tags tags--mini"><li>Security</li><li>Tooling</li><li>Python</li></ul>
 
           <nav class="toc" aria-label="Sections in this post">
-            <p class="toc__title">On this page</p>
-            <ul class="toc__list">
+            <details class="toc__fold" open>
+              <summary class="toc__title">On this page <span class="toc__n">7</span></summary>
+              <ul class="toc__list">
               <li><a href="#rule-zero-the-scanner-must-not-contain-what-it-detects">Rule zero: the scanner must not contain what it detects</a></li>
               <li><a href="#checksums-beat-regexes">Checksums beat regexes</a></li>
               <li><a href="#the-rule-that-needs-a-hint-and-the-hole-that-leaves">The rule that needs a hint, and the hole that leaves</a></li>
@@ -112,7 +113,8 @@
               <li><a href="#policy-per-repository-committed-on-purpose">Policy per repository, committed on purpose</a></li>
               <li><a href="#four-gates-and-one-lesson-about-where-they-attach">Four gates, and one lesson about where they attach</a></li>
               <li><a href="#what-it-does-not-do">What it does not do</a></li>
-            </ul>
+              </ul>
+            </details>
           </nav>
         </header>
 
@@ -278,7 +280,7 @@
           <h2 id="four-gates-and-one-lesson-about-where-they-attach">Four gates, and one lesson about where they attach</h2>
 
           <figure class="diagram">
-            <div class="diagram__scroll">
+            <div class="diagram__scroll diagram__alt--wide">
 <svg viewBox="0 0 900 300" role="img" aria-labelledby="d5-title">
   <title id="d5-title">Four independent gates stand between an edited file and a remote: a pre-commit scan of staged blobs, a pre-push scan of every tracked file, an agent hook that intercepts shell commands, and a weekly audit that re-checks every repository and verifies the hooks are still installed.</title>
   <defs>
@@ -334,6 +336,68 @@
 
   <text class="d-label--sm" x="16" y="200">Any one gate can be bypassed by someone determined.</text>
   <text class="d-label--sm" x="16" y="218">The point is that an accident has to get past all four.</text>
+</svg>
+
+            </div>
+            <div class="diagram__alt--tall">
+<svg viewBox="0 0 250 600" role="img" aria-labelledby="d5t-title">
+  <title id="d5t-title">Four independent gates stand between an edited file and a remote: a pre-commit scan of staged blobs, a pre-push scan of every tracked file, an agent hook that intercepts shell commands, and a weekly audit that re-checks every repository and verifies the hooks are still installed.</title>
+  <defs>
+    <marker id="d5t-arw" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 Z" fill="var(--border-lit)" />
+    </marker>
+  </defs>
+
+  <!-- gate 3: the agent hook, sitting above the developer -->
+  <rect class="d-fill-elev d-accent2" x="4" y="4" width="242" height="50" rx="8" stroke-width="1.3" />
+  <text class="d-label" x="125" y="26" text-anchor="middle">agent PreToolUse hook</text>
+  <text class="d-label--sm" x="125" y="43" text-anchor="middle">blocks shell reads of private paths</text>
+  <path class="d-accent2" fill="none" stroke-width="1.2" stroke-dasharray="4 4" d="M150 54 L150 126" />
+
+  <!-- the pipeline -->
+  <rect class="d-fill-elev d-stroke" x="4" y="72" width="116" height="34" rx="8" stroke-width="1" />
+  <text class="d-label" x="62" y="93" text-anchor="middle">working tree</text>
+
+  <rect class="d-fill-elev d-accent" x="4" y="128" width="172" height="46" rx="8" stroke-width="1.3" />
+  <text class="d-label" x="90" y="148" text-anchor="middle">pre-commit</text>
+  <text class="d-label--sm" x="90" y="165" text-anchor="middle">staged blobs</text>
+
+  <rect class="d-fill-elev d-accent" x="4" y="198" width="172" height="46" rx="8" stroke-width="1.3" />
+  <text class="d-label" x="90" y="218" text-anchor="middle">pre-push</text>
+  <text class="d-label--sm" x="90" y="235" text-anchor="middle">every tracked file</text>
+
+  <rect class="d-fill-elev d-stroke" x="4" y="268" width="172" height="34" rx="8" stroke-width="1" />
+  <text class="d-label" x="90" y="289" text-anchor="middle">remote</text>
+
+  <g class="d-stroke" fill="none" stroke-width="1.2" marker-end="url(#d5t-arw)">
+    <path d="M62 106 L62 126" />
+    <path d="M90 174 L90 196" />
+    <path d="M90 244 L90 266" />
+  </g>
+
+  <!-- gate 4: the weekly audit, looping back -->
+  <rect class="d-fill-elev d-stroke" x="4" y="320" width="242" height="66" rx="8" stroke-width="1" />
+  <text class="d-label" x="16" y="342">weekly audit</text>
+  <text class="d-label--sm" x="16" y="359">re-scans every repo,</text>
+  <text class="d-label--sm" x="16" y="375">checks hooks exist</text>
+  <path class="d-muted" fill="none" stroke-width="1.2" stroke-dasharray="4 4"
+        d="M214 320 L214 163 C 214 155, 208 151, 200 151 L178 151" marker-end="url(#d5t-arw)" />
+
+  <!-- what the scanner carries, and what it does not -->
+  <rect class="d-fill-bg d-stroke" x="4" y="404" width="242" height="112" rx="8" stroke-width="1" />
+  <text class="d-label--sm" x="16" y="424">the scanner</text>
+  <line class="d-muted" x1="16" y1="434" x2="234" y2="434" stroke-width="1" />
+  <text class="d-label--sm" x="16" y="452">generic patterns</text>
+  <text class="d-label--sm" x="16" y="468">checksums</text>
+  <text class="d-label--sm" x="16" y="484">path rules</text>
+  <line class="d-muted" x1="16" y1="494" x2="234" y2="494" stroke-width="1" />
+  <text class="d-label--accent" x="16" y="508">no real values</text>
+
+  <!-- the point of having four -->
+  <text class="d-label--sm" x="4" y="538">Any one gate can be bypassed by</text>
+  <text class="d-label--sm" x="4" y="554">someone determined.</text>
+  <text class="d-label--sm" x="4" y="574">The point is that an accident has</text>
+  <text class="d-label--sm" x="4" y="590">to get past all four.</text>
 </svg>
 
             </div>

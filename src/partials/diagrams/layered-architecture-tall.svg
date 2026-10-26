@@ -1,0 +1,72 @@
+<svg viewBox="0 0 250 546" role="img" aria-labelledby="d3t-title">
+  <title id="d3t-title">Four layers: Streamlit pages on top, then pure domain logic, then storage and a TTL cache, then the provider router — the only layer permitted to reach the network. A page calling a provider directly is forbidden.</title>
+  <defs>
+    <marker id="d3t-arw" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 Z" fill="var(--border-lit)" />
+    </marker>
+  </defs>
+
+  <!-- layer 1 -->
+  <rect class="d-fill-elev d-stroke" x="20" y="8" width="206" height="64" rx="8" stroke-width="1" />
+  <text class="d-label" x="30" y="30">app/ · Streamlit pages</text>
+  <text class="d-label--sm" x="30" y="48">one router, N page modules —</text>
+  <text class="d-label--sm" x="30" y="62">no business logic here</text>
+
+  <!-- layer 2 -->
+  <rect class="d-fill-elev d-accent" x="20" y="90" width="206" height="78" rx="8" stroke-width="1.3" />
+  <text class="d-label" x="30" y="112">core/ · domain logic</text>
+  <text class="d-label--sm" x="30" y="130">pure, injectable, zero</text>
+  <text class="d-label--sm" x="30" y="144">Streamlit imports — this is</text>
+  <text class="d-label--sm" x="30" y="158">what the tests exercise</text>
+
+  <!-- layer 3 -->
+  <rect class="d-fill-elev d-stroke" x="20" y="188" width="206" height="94" rx="8" stroke-width="1" />
+  <text class="d-label" x="30" y="210">storage/ · SQLite +</text>
+  <text class="d-label" x="30" y="226">TTL cache</text>
+  <text class="d-label--sm" x="30" y="244">cache-aside; a failed refresh</text>
+  <text class="d-label--sm" x="30" y="258">degrades to stale, never</text>
+  <text class="d-label--sm" x="30" y="272">to a crash</text>
+
+  <!-- layer 4 -->
+  <rect class="d-fill-elev d-stroke" x="20" y="300" width="206" height="50" rx="8" stroke-width="1" />
+  <text class="d-label" x="30" y="322">data/providers/router.py</text>
+  <text class="d-label--sm" x="30" y="340">the only door to the network</text>
+
+  <!-- vertical flow -->
+  <g class="d-stroke" fill="none" stroke-width="1.2" marker-end="url(#d3t-arw)">
+    <path d="M123 72 L123 88" />
+    <path d="M123 168 L123 186" />
+    <path d="M123 282 L123 298" />
+  </g>
+
+  <!-- boundary bracket -->
+  <path class="d-accent" fill="none" stroke-width="1.2"
+        d="M16 8 L8 8 L8 350 L16 350" opacity=".55" />
+  <text class="d-label--accent" x="6" y="372">testable · offline</text>
+
+  <!-- the network, outside the box -->
+  <g class="d-stroke" fill="none" stroke-width="1.2" marker-end="url(#d3t-arw)">
+    <path d="M190 350 L190 382" />
+  </g>
+  <rect x="4" y="384" width="242" height="58" rx="8" fill="none" stroke="var(--border-lit)"
+        stroke-width="1" stroke-dasharray="5 4" />
+  <text class="d-label--sm" x="125" y="404" text-anchor="middle">Yahoo · akshare · FX</text>
+  <text class="d-label--sm" x="125" y="418" text-anchor="middle">free, rate-limited,</text>
+  <text class="d-label--sm" x="125" y="432" text-anchor="middle">occasionally wrong</text>
+
+  <!-- the forbidden shortcut -->
+  <path d="M226 40 C 236 40, 238 48, 238 60 L238 382" fill="none" stroke="var(--text-faint)"
+        stroke-width="1.2" stroke-dasharray="4 5" opacity=".8" />
+  <g stroke="var(--text-faint)" stroke-width="1.8" stroke-linecap="round">
+    <line x1="232" y1="184" x2="244" y2="196" />
+    <line x1="244" y1="184" x2="232" y2="196" />
+    <line x1="6" y1="462" x2="16" y2="472" />
+    <line x1="16" y1="462" x2="6" y2="472" />
+  </g>
+  <text class="d-label--sm" x="24" y="466">a page must never</text>
+  <text class="d-label--sm" x="24" y="480">reach past the router</text>
+
+  <text class="d-label--sm" x="4" y="506">Every project in the workspace</text>
+  <text class="d-label--sm" x="4" y="520">has this shape. Deviating from it</text>
+  <text class="d-label--sm" x="4" y="534">is what the review catches.</text>
+</svg>

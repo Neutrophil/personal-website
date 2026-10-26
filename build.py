@@ -194,10 +194,15 @@ def toc_html(headings: list[tuple[str, str]]) -> str:
     )
     # Deliberately a <ul>: several posts number their own sections, and an <ol>
     # printed "1. 1. A page returns HTTP 200".
+    # A <details> that ships open: without script it is a plain list. main.js
+    # folds it on a phone, where six entries stood between the title and the
+    # first paragraph.
     return (
         '\n          <nav class="toc" aria-label="Sections in this post">'
-        '\n            <p class="toc__title">On this page</p>'
-        f'\n            <ul class="toc__list">{items}\n            </ul>'
+        '\n            <details class="toc__fold" open>'
+        f'\n              <summary class="toc__title">On this page <span class="toc__n">{len(headings)}</span></summary>'
+        f'\n              <ul class="toc__list">{items}\n              </ul>'
+        '\n            </details>'
         "\n          </nav>"
     )
 
@@ -592,6 +597,9 @@ CONTRAST_RULES = [
 # Smallest a diagram label may render at, in CSS pixels, on the narrowest
 # supported viewport. Below this the figure is decoration, not information.
 MIN_DIAGRAM_LABEL_PX = 10.0
+# The tall phone variants (`*-tall.svg`) render in the box a 320px screen
+# leaves: 320 - 2 x 17.6 gutter - 2 border - 2 x 16 padding ≈ 250px.
+TALL_RENDER_PX = 250.0
 MIN_CONTROL_PX = 24  # WCAG 2.2 pointer-target minimum
 
 # What must never be published, however it got into a page. The workspace guard
@@ -631,10 +639,10 @@ def diagram_label_sizes(css: str, svg_dir: Path) -> list[tuple[str, float]]:
     min_width = re.search(r"\.diagram svg \{[^}]*min-width:\s*([0-9.]+)px", css)
     if not min_width:
         return [("css: .diagram svg has no min-width to scale from", 0.0)]
-    render_px = float(min_width.group(1))
+    wide_px = float(min_width.group(1))
     declared = {
         name: float(size)
-        for name, size in re.findall(r"\.(d-label[a-z-]*)\s*\{[^}]*font-size:\s*([0-9.]+)px", css)
+        for name, size in re.findall(r"\.(d-label[a-z0-9-]*)\s*\{[^}]*font-size:\s*([0-9.]+)px", css)
     }
     if not declared:
         return [("css: no .d-label font sizes found", 0.0)]
@@ -645,9 +653,11 @@ def diagram_label_sizes(css: str, svg_dir: Path) -> list[tuple[str, float]]:
         box = re.search(r'viewBox="0 0 ([0-9.]+)', text)
         if not box:
             continue
-        used = [declared[cls] for cls in declared if f'"{cls}' in text or f" {cls}" in text]
+        classes = {c for attr in re.findall(r'class="([^"]+)"', text) for c in attr.split()}
+        used = [declared[cls] for cls in declared if cls in classes]
         if not used:
             continue
+        render_px = TALL_RENDER_PX if path.stem.endswith("-tall") else wide_px
         scale = render_px / float(box.group(1))
         out.append((path.name, round(min(used) * scale, 1)))
     return out
