@@ -132,6 +132,7 @@ class Post:
     description: str
     minutes: int
     body: str
+    featured: bool = False
     prev: "Post | None" = field(default=None, repr=False)
     next: "Post | None" = field(default=None, repr=False)
 
@@ -230,6 +231,7 @@ def load_posts() -> list[Post]:
                 description=doc.meta.get("description", doc.meta["summary"]).strip(),
                 minutes=doc.meta.get("minutes") or reading_minutes(doc.body),
                 body=doc.body,
+                featured=bool(doc.meta.get("featured", False)),
             )
         )
     posts.sort(key=lambda p: (p.date, p.doc.slug), reverse=True)
@@ -289,12 +291,22 @@ def postcard_html(post: Post, rel: str) -> str:
           </li>"""
 
 
-def tag_filter_html(posts: list[Post]) -> str:
+def tag_filter_html(posts: list[Post], pinned: list[str]) -> str:
+    """A chip per tag worth filtering by: shared by two posts, or pinned.
+
+    A chip that matches one post is a link to that post with extra steps, and
+    eleven of them buried the four that actually group anything. Pinned tags
+    are the site's own subject, shown even while only one post carries them.
+    Cards keep every tag either way.
+    """
     counts: dict[str, int] = {}
     for post in posts:
         for tag in post.tags:
             counts[tag] = counts.get(tag, 0) + 1
-    ordered = sorted(counts.items(), key=lambda kv: (-kv[1], kv[0]))
+    ordered = sorted(
+        ((t, n) for t, n in counts.items() if n >= 2 or t in pinned),
+        key=lambda kv: (kv[0] not in pinned, -kv[1], kv[0]),
+    )
     chips = [
         '<button type="button" class="chip is-on" data-tag="*" aria-pressed="true">'
         f'all <span class="chip__n">{len(posts)}</span></button>'
@@ -332,8 +344,11 @@ def post_nav_html(post: Post, rel: str) -> str:
 
 
 def latest_posts_html(posts: list[Post], rel: str, limit: int = 3) -> str:
+    # Featured posts lead, newest first within each group. Only this list is
+    # reordered: prev/next and the feed stay in date order.
+    chosen = sorted(posts, key=lambda p: not p.featured)[:limit]
     rows = []
-    for post in posts[:limit]:
+    for post in chosen:
         rows.append(
             f'          <a class="pindex__row" href="{rel}{post.href}">\n'
             f'            <span class="pindex__date"><time datetime="{post.iso}">{post.short_date}</time></span>\n'
@@ -424,7 +439,7 @@ def build(check: bool = False) -> list[Path]:
         body_class="page-blog",
         active="blog.html",
         post_list="\n".join(postcard_html(p, rel="") for p in posts),
-        tag_filter=tag_filter_html(posts),
+        tag_filter=tag_filter_html(posts, site.get("blog", {}).get("pinned_tags", [])),
         post_count=str(len(posts)),
     )
     blog_out = ROOT / "blog.html"

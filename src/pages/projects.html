@@ -184,9 +184,6 @@ og_description = "Clinical genomics and AI for life science at Lucence, translat
               <div class="spec__row"><span class="spec__k">feed</span><span class="spec__v">Europe PMC · arXiv · bioRxiv, button-only, cached</span></div>
               <div class="spec__row"><span class="spec__k">tests</span><span class="spec__v">462, offline</span></div>
             </div>
-            <div class="build__foot">
-              <p class="build__note">private repo · educational use</p>
-            </div>
           </article>
           <article class="card card--tick build reveal" id="learn-ai">
             <div class="build__head">
@@ -206,9 +203,6 @@ og_description = "Clinical genomics and AI for life science at Lucence, translat
               <div class="spec__row"><span class="spec__k">content</span><span class="spec__v">10 levels · 57 lessons · 21 labs</span></div>
               <div class="spec__row"><span class="spec__k">tests</span><span class="spec__v">345, offline</span></div>
             </div>
-            <div class="build__foot">
-              <p class="build__note">private repo · educational use</p>
-            </div>
           </article>
           <article class="card card--tick build reveal" id="agents">
             <div class="build__head">
@@ -225,9 +219,6 @@ og_description = "Clinical genomics and AI for life science at Lucence, translat
               <div class="spec__row"><span class="spec__k">content</span><span class="spec__v">12 modules · 55 lessons · 28 missions · 5 simulators</span></div>
               <div class="spec__row"><span class="spec__k">checks</span><span class="spec__v">19 practice-repo checks with a passing reference</span></div>
               <div class="spec__row"><span class="spec__k">tests</span><span class="spec__v">257, offline</span></div>
-            </div>
-            <div class="build__foot">
-              <p class="build__note">private repo · educational use</p>
             </div>
           </article>
         </div>
@@ -270,13 +261,6 @@ og_description = "Clinical genomics and AI for life science at Lucence, translat
                 schedule, an O(N) incremental energy update per bit flip, and a seeded
                 master/sub RNG so two runs are bit-identical.
               </p>
-              <p>
-                It sits inside a nine-level learn-to-trade curriculum, where sixteen interactive
-                labs let a reader break the thing themselves — including one whose entire purpose
-                is to show what happens when the cardinality penalty is scaled wrong. Small
-                instances are checked against brute-force enumeration, so the annealer has to
-                prove it finds the true minimum rather than merely a good one.
-              </p>
             </div>
             <div class="spec">
               <div class="spec__row"><span class="spec__k">stack</span><span class="spec__v">Python · numpy · Streamlit · SQLite</span></div>
@@ -303,13 +287,6 @@ og_description = "Clinical genomics and AI for life science at Lucence, translat
                 scikit-learn models, an online multiplicative-weights ensemble, and an LLM
                 allocator. A walk-forward backtest tournament ranks them offline; a live paper
                 A/B runs them all forward in parallel; exactly one champion is promoted by hand.
-              </p>
-              <p>
-                The most useful thing it produced was a correctness review that invalidated every
-                number it had reported until then — warm-up silently eaten out of the requested
-                window, a normalisation helper quietly re-levering every book to fully invested,
-                and metrics that ranked a strategy which never lost money as the worst in the
-                field. That review roughly doubled the test count.
               </p>
             </div>
             <div class="spec">
@@ -339,12 +316,6 @@ og_description = "Clinical genomics and AI for life science at Lucence, translat
                 someone touches a dropdown. Confuse them and the net-worth chart grows a step
                 change through its middle.
               </p>
-              <p>
-                It is also where I learned that a missing price is not a zero price. A failed
-                quote returning zero, paired with a real cost basis, books a fabricated total loss
-                — and then tops the chart of biggest movers, which is exactly where you are least
-                likely to question it.
-              </p>
             </div>
             <div class="spec">
               <div class="spec__row"><span class="spec__k">stack</span><span class="spec__v">Python · pandas · Streamlit · SQLite</span></div>
@@ -371,13 +342,6 @@ og_description = "Clinical genomics and AI for life science at Lucence, translat
                 presents a month in a bilingual dashboard. Routing moved from filenames to
                 content early on — a folder of original download names now works untouched,
                 because the parser identifies an issuer from the text of the first page.
-              </p>
-              <p>
-                Two decisions carried it. Bank rows are read as a running-balance delta rather
-                than by parsing amounts, so a sign is never guessed. And every parsed total is
-                reconciled against the total the statement itself prints — a failed
-                reconciliation is reported as a failure, because silently correcting it would
-                defeat the point of having an oracle.
               </p>
             </div>
             <div class="spec">
@@ -406,14 +370,6 @@ og_description = "Clinical genomics and AI for life science at Lucence, translat
                 verifies the hooks are still installed. Stdlib only, so it runs on whatever
                 Python is on the box with no environment to set up.
               </p>
-              <p>
-                Its central constraint is self-referential and pleasing: a scanner must not embed
-                the secrets it hunts for, or it becomes another copy of the leak. So the code
-                carries only generic patterns and checksums, and the specific values live in an
-                uncommitted local file. Findings are redacted before printing — including every
-                other number on the same line, since a line listing three balances would
-                otherwise mask one and publish two.
-              </p>
             </div>
             <div class="spec">
               <div class="spec__row"><span class="spec__k">stack</span><span class="spec__v">Python stdlib only · git hooks · systemd timer</span></div>
@@ -438,19 +394,11 @@ og_description = "Clinical genomics and AI for life science at Lucence, translat
             queue and a rate cap. Around 11,000 more lines and 160 more tests between them.
           </span>
         </p>
-      </div>
-    </section>
-
-    <!-- ============ HOW ============ -->
-    <section class="section" id="how">
-      <div class="shell shell--narrow">
-        <header class="section__head reveal">
-          <h2 class="section__title"><span class="section__num">// 05</span> The shape they share</h2>
-          <p class="section__lede">
-            Every repository on this page converged on one architecture, largely because each rule in it
-            replaced a bug.
-          </p>
-        </header>
+        <h3 class="subhead reveal" id="how">The shape they share</h3>
+        <p class="reveal">
+          Every one of these repositories converged on one architecture, largely because each rule
+          in it replaced a bug.
+        </p>
         <figure class="diagram reveal">
           <div class="diagram__scroll">
 {{ include:diagrams/layered-architecture.svg }}

@@ -703,7 +703,6 @@ a.card:hover {
 /* 0.97rem was written as var(--step--0, …), a token that has never existed. */
 .pub p { margin: 0; font-size: 0.97rem; max-width: 76ch; }
 
-.pub--pending .pub__year { color: var(--accent-2); }
 .pub[hidden] { display: none; }
 
 /* ---------- Four pillars (home: what I do) ----------
@@ -736,8 +735,9 @@ a.card:hover {
 .pillar__list li::marker { color: var(--pillar); }
 .pillar__list strong { color: var(--text); }
 .pillar .tags { margin-top: auto; }
+.pillar__foot { margin: 0; padding-top: var(--space-2); border-top: 1px solid var(--border); font-size: var(--step--1); }
 
-/* ---------- Education, interests, talks ---------- */
+/* ---------- Education, service, talks ---------- */
 .subhead {
   font-family: var(--mono);
   font-size: var(--step-0);
@@ -756,17 +756,6 @@ a.card:hover {
 .edu__title { font-weight: 600; color: var(--text); margin: 0; }
 .edu__org { font-family: var(--mono); font-size: var(--step--1); color: var(--text); margin: 0.1rem 0 0.3rem; }
 .edu__note { margin: 0; color: var(--text-soft); font-size: 0.95rem; }
-
-.checklist { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.6rem; }
-.checklist li { position: relative; padding-left: 1.3rem; color: var(--text-soft); }
-.checklist li::before {
-  content: "▸";
-  position: absolute;
-  left: 0;
-  color: var(--accent);
-  font-family: var(--mono);
-}
-.checklist strong { color: var(--text); }
 
 .talks { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--border); }
 .subhead + .talks { border-top: 0; }

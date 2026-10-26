@@ -17,11 +17,16 @@ linkedin = "https://www.linkedin.com/in/junjie-chen-nus/"
 github   = "https://github.com/Neutrophil"
 cv       = "assets/cv/CHEN_Junjie_CV.pdf"
 
+# The writing index offers a filter chip only for tags two or more posts share,
+# plus these: the site's own subject, worth a chip while it has a single post.
+[blog]
+pinned_tags = ["AI for Life Science"]
+
 # Primary navigation. `href` is resolved against {{rel}} at build time unless
 # it starts with http. Keep this short — five is the ceiling; seven reads as a menu.
 [[nav]]
-label = "about"
-href  = "index.html#about"
+label = "experience"
+href  = "index.html#experience"
 
 [[nav]]
 label = "research"
