@@ -833,6 +833,8 @@ a.card:hover {
 
 /* ---------- Blog index ---------- */
 .chips { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: var(--space-4); }
+/* Shipped hidden where a chip would be a dead button without main.js. */
+.chips[hidden] { display: none; }
 /* Square-ish, so an interactive filter chip is not mistaken for one of the
    pill-shaped tags that merely label a post. */
 .chip {
@@ -1403,6 +1405,9 @@ a.card:hover {
   /* Anything still waiting for the intersection observer must print anyway. */
   .reveal-on .reveal, .reveal { opacity: 1 !important; transform: none !important; }
   .nav, .footer, .progress, .aurora, .grid-bg, .hero__signal, .postnav, .chips, .skip-link { display: none !important; }
+  /* A topic filter on screen must not silently drop papers from the printout. */
+  .pub[hidden] { display: grid !important; }
+  #pub-empty { display: none !important; }
   body { background: #fff; color: #000; font-size: 11pt; }
   .section--alt { background: none; }
   a { color: #000; text-decoration: underline; }

@@ -134,7 +134,7 @@ def main() -> None:
 
     draw.text((PAD, y + 46), "JUNJIE CHEN", font=font(MONO_BOLD, 92), fill=TEXT)
 
-    # role line, with the plus picked out in the accent
+    # role line, with the separator dot picked out in the accent
     role_font = font(MONO, 38)
     ry = y + 172
     parts = [("AI for Life Science ", SOFT), ("·", CYAN), (" Clinical Genomics", SOFT)]

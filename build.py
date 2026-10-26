@@ -490,7 +490,7 @@ def build_feed(site: dict, posts: list[Post]) -> str:
     <title>{esc(site['author'])} — writing</title>
     <link>{esc(site['url'])}/blog.html</link>
     <atom:link href="{esc(site['url'])}/feed.xml" rel="self" type="application/rss+xml" />
-    <description>Notes on genomics, machine learning, and systems built on evenings.</description>
+    <description>Notes on AI for life science, clinical genomics, and systems built on evenings.</description>
     <language>{esc(site['lang'])}</language>
     <lastBuildDate>{now}</lastBuildDate>
 {chr(10).join(items)}
@@ -756,6 +756,18 @@ def run_checks(site: dict, written: list[Path], posts: list[Post]) -> None:
             problems.append(f"{_rel(post.doc.path)}: summary is too short to be useful")
         if not post.tags:
             problems.append(f"{_rel(post.doc.path)}: no tags")
+
+    # 11. an element shipped `hidden` stays hidden: a component rule that sets
+    # `display` outranks the browser's own [hidden] rule, so it needs its own
+    for path in written:
+        if path.suffix != ".html":
+            continue
+        tags = re.findall(r"<[a-z][^>]*>", path.read_text(encoding="utf-8"))
+        shipped = [t for t in tags if re.search(r"(?<![\w-])hidden(?=[\s>/])", t)]
+        for cls in {m.group(1) for t in shipped if (m := re.search(r'class="([\w-]+)', t))}:
+            sets_display = re.search(rf"\.{re.escape(cls)} \{{[^}}]*display:", css_text)
+            if sets_display and f".{cls}[hidden]" not in css_text:
+                problems.append(f"{_rel(path)}: .{cls} ships hidden but its display rule overrides [hidden]")
 
     if problems:
         print(f"\n✗ {len(problems)} problem(s):", file=sys.stderr)

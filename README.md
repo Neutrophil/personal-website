@@ -66,6 +66,8 @@ cd /home/junjie/claude/personal_website
   failed script from blanking the page;
 - a control declared smaller than 24px, more than one current-page marker on a page, or a
   page with no `theme-color`.
+- an element shipped with `hidden` whose component rule sets `display` without a matching
+  `.class[hidden]` rule — the author rule would otherwise show a control meant to stay hidden.
 
 Run it before every commit.
 
