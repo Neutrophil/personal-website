@@ -387,6 +387,8 @@ em { color: var(--text); }
 .callout__label,
 .toc__title,
 .metrics__k,
+.pillar__kicker,
+.talk__kind,
 .prose .datatable th {
   font-family: var(--mono);
   text-transform: uppercase;
@@ -694,6 +696,98 @@ a.card:hover {
 }
 /* 0.97rem was written as var(--step--0, …), a token that has never existed. */
 .pub p { margin: 0; font-size: 0.97rem; max-width: 76ch; }
+
+.pub--pending .pub__year { color: var(--accent-2); }
+.pub[hidden] { display: none; }
+
+/* ---------- Four pillars (home: what I do) ----------
+   A coloured rule on the top edge says which family a pillar belongs to:
+   cyan for the computational pair, violet for the bench-to-clinic pair. The
+   2x2 grid puts them on a diagonal so neither colour owns a row. */
+.pillars { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--space-3); }
+.pillar { --pillar: var(--accent); display: flex; flex-direction: column; gap: var(--space-3); }
+.pillar--alt { --pillar: var(--accent-2); }
+.pillar > .pillar__kicker::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 3px;
+  border-radius: var(--radius) var(--radius) 0 0;
+  background: linear-gradient(90deg, var(--pillar), transparent 85%);
+}
+.pillar__kicker {
+  font-size: var(--step--2);
+  color: var(--pillar);
+  margin: 0;
+  display: flex;
+  align-items: baseline;
+  gap: 0.6rem;
+}
+.pillar__n { color: var(--text-faint); font-weight: 500; }
+.pillar__claim { font-size: var(--step-1); line-height: 1.35; margin: 0; }
+.pillar__list { margin: 0; padding-left: 1.1rem; color: var(--text-soft); }
+.pillar__list li { margin-bottom: 0.4rem; }
+.pillar__list li::marker { color: var(--pillar); }
+.pillar__list strong { color: var(--text); }
+.pillar .tags { margin-top: auto; }
+
+/* ---------- Education, interests, talks ---------- */
+.subhead {
+  font-family: var(--mono);
+  font-size: var(--step-0);
+  font-weight: 600;
+  color: var(--text);
+  margin: var(--space-6) 0 var(--space-3);
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--border);
+}
+.timeline__tags { margin-top: 0.75rem; }
+
+.edu { display: grid; gap: var(--space-3); }
+.edu__row { display: grid; grid-template-columns: 118px 1fr; gap: var(--space-4); }
+.edu__date { font-family: var(--mono); font-size: var(--step--1); color: var(--text-faint); padding-top: 0.15rem; }
+.edu__title { font-weight: 600; color: var(--text); margin: 0; }
+.edu__org { font-family: var(--mono); font-size: var(--step--1); color: var(--text-soft); margin: 0.1rem 0 0.3rem; }
+.edu__note { margin: 0; color: var(--text-soft); font-size: 0.95rem; }
+
+.checklist { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.6rem; }
+.checklist li { position: relative; padding-left: 1.3rem; color: var(--text-soft); }
+.checklist li::before {
+  content: "▸";
+  position: absolute;
+  left: 0;
+  color: var(--accent);
+  font-family: var(--mono);
+}
+.checklist strong { color: var(--text); }
+
+.talks { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--border); }
+.talk {
+  display: grid;
+  grid-template-columns: 7.5rem 1fr;
+  gap: var(--space-3);
+  padding: 0.75rem 0;
+  border-bottom: 1px solid var(--border);
+}
+.talk__kind { font-size: var(--step--2); color: var(--accent); padding-top: 0.2rem; }
+.talk p { margin: 0; font-size: 0.95rem; color: var(--text-soft); max-width: 76ch; }
+.talk strong { color: var(--text); font-weight: 600; }
+
+/* ---------- Jump links (page heads) ---------- */
+.jump { display: flex; flex-wrap: wrap; gap: 0.45rem; margin-top: var(--space-4); }
+.jump a {
+  font-family: var(--mono);
+  font-size: var(--step--1);
+  color: var(--text-soft);
+  border: 1px solid var(--border-lit);
+  background: var(--bg-elev);
+  border-radius: var(--radius-sm);
+  padding: 0.35rem 0.75rem;
+  min-height: 32px;
+  display: inline-flex;
+  align-items: center;
+}
+.jump a:hover { color: var(--accent); border-color: var(--accent); text-decoration: none; }
 
 /* ---------- Contact ---------- */
 .contact { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-3); }
@@ -1250,6 +1344,8 @@ a.card:hover {
   .hero__inner { grid-template-columns: 1fr; }
   .metrics { grid-template-columns: 1fr 1fr; gap: var(--space-3) var(--space-4); }
   .pub { grid-template-columns: 1fr; gap: 0.2rem; }
+  .pillars { grid-template-columns: 1fr; }
+  .edu__row, .talk { grid-template-columns: 1fr; gap: 0.2rem; }
   .cards--2, .cards--3 { grid-template-columns: 1fr; }
   .contact { grid-template-columns: 1fr; }
   .postnav { grid-template-columns: 1fr; }

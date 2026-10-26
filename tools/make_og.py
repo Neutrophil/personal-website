@@ -129,7 +129,7 @@ def main() -> None:
     # eyebrow: a drawn triangle, because the glyph is not in every font
     y = 150
     draw.polygon([(PAD, y + 2), (PAD, y + 16), (PAD + 12, y + 9)], fill=CYAN)
-    draw.text((PAD + 24, y), "RESEARCH SCIENTIST  ·  SINGAPORE",
+    draw.text((PAD + 24, y), "RESEARCH SCIENTIST II  ·  SINGAPORE",
               font=font(MONO, 22), fill=CYAN)
 
     draw.text((PAD, y + 46), "JUNJIE CHEN", font=font(MONO_BOLD, 92), fill=TEXT)
@@ -137,7 +137,7 @@ def main() -> None:
     # role line, with the plus picked out in the accent
     role_font = font(MONO, 38)
     ry = y + 172
-    parts = [("Genomics ", SOFT), ("+", CYAN), (" Machine Learning", SOFT)]
+    parts = [("AI for Life Science ", SOFT), ("·", CYAN), (" Clinical Genomics", SOFT)]
     x = PAD
     for text, colour in parts:
         draw.text((x, ry), text, font=role_font, fill=colour)

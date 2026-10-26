@@ -102,3 +102,6 @@ CV/
 # A live SQLite database keeps its recent pages in sidecar files, and '*.db'
 # does not match a name ending in .db-shm. That gap has surfaced twice.
 *.db-shm
+
+# CV generator: holds the phone number, job-application folders and JDs. Never publish.
+cv_system/

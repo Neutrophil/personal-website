@@ -65,6 +65,9 @@ disables `denylist-name` and `contact` here and exempts `assets/**` from scannin
 
 That exemption is the reason to be careful, not a reason to relax:
 
+- **The CV PDF is built, not copied.** `cv_system/` (gitignored — it holds the phone number and
+  job applications) renders `profiles/website.yaml`, the ACE content with the phone dropped from
+  the header; copy its PDF to `assets/cv/CHEN_Junjie_CV.pdf` and grep the text for `+65` first.
 - **Anything under `assets/` is world-readable and unscanned** — check every file added
   there, especially a new CV revision, for a phone number, home address or anything else
   that should not be public.

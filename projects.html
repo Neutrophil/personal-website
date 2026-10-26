@@ -6,19 +6,19 @@
   <meta name="color-scheme" content="dark light" />
   <meta name="theme-color" content="#0a0b0f" media="(prefers-color-scheme: dark)" />
   <meta name="theme-color" content="#fbfcfd" media="(prefers-color-scheme: light)" />
-  <title>Builds — Junjie Chen</title>
-  <meta name="description" content="What Junjie Chen has built: whole-genome sequencing pipelines and ML for cancer classification at Lucence, plus a shelf of personal systems — a quantum-inspired portfolio optimizer, a multi-market paper-trading research rig, a multi-currency dashboard, a statement parser, and the privacy scanner that guards them all." />
+  <title>Research & builds — Junjie Chen</title>
+  <meta name="description" content="Junjie Chen's work: population whole-genome sequencing, cfDNA MRD and multi-cancer early detection and ML at Lucence Diagnostics; mRNA–LNP, cancer vaccines and TCR-T at NUS; an AI-for-Life-Science atlas and curricula; and the engineering practice behind them." />
   <meta name="author" content="Junjie Chen" />
 
   <meta property="og:type" content="website" />
-  <meta property="og:title" content="Builds — Junjie Chen" />
-  <meta property="og:description" content="Clinical genomics and ML by day; optimization, data pipelines and developer tooling on evenings." />
+  <meta property="og:title" content="Research & builds — Junjie Chen" />
+  <meta property="og:description" content="Clinical genomics and AI for life science at Lucence, translational development at NUS, and the systems built on evenings." />
   <meta property="og:url" content="https://neutrophil.github.io/projects.html" />
   <meta property="og:site_name" content="Junjie Chen" />
   <meta property="og:image" content="https://neutrophil.github.io/assets/og.png" />
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="630" />
-  <meta property="og:image:alt" content="Junjie Chen — Genomics + Machine Learning" />
+  <meta property="og:image:alt" content="Junjie Chen — AI for Life Science · Clinical Genomics" />
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:image" content="https://neutrophil.github.io/assets/og.png" />
 
@@ -65,9 +65,10 @@
       </a>
 
       <nav class="nav__links" id="nav-links" aria-label="Primary">
-        <a href="projects.html" class="is-active" aria-current="page"><span class="nav__bracket" aria-hidden="true">[</span>builds<span class="nav__bracket" aria-hidden="true">]</span></a>
-        <a href="blog.html"><span class="nav__bracket" aria-hidden="true">[</span>writing<span class="nav__bracket" aria-hidden="true">]</span></a>
         <a href="index.html#about"><span class="nav__bracket" aria-hidden="true">[</span>about<span class="nav__bracket" aria-hidden="true">]</span></a>
+        <a href="projects.html" class="is-active" aria-current="page"><span class="nav__bracket" aria-hidden="true">[</span>research<span class="nav__bracket" aria-hidden="true">]</span></a>
+        <a href="index.html#publications"><span class="nav__bracket" aria-hidden="true">[</span>publications<span class="nav__bracket" aria-hidden="true">]</span></a>
+        <a href="blog.html"><span class="nav__bracket" aria-hidden="true">[</span>writing<span class="nav__bracket" aria-hidden="true">]</span></a>
         <a href="index.html#contact"><span class="nav__bracket" aria-hidden="true">[</span>contact<span class="nav__bracket" aria-hidden="true">]</span></a>
       </nav>
 
@@ -90,75 +91,135 @@
       <div class="grid-bg" aria-hidden="true"></div>
       <div class="aurora" aria-hidden="true"></div>
       <div class="shell">
-        <p class="eyebrow"><span aria-hidden="true">▸</span> Two shelves</p>
-        <h1 class="pagehead__title">Builds</h1>
+        <p class="eyebrow"><span aria-hidden="true">▸</span> Bench · pipeline · model · clinic</p>
+        <h1 class="pagehead__title">Research &amp; builds</h1>
         <p class="pagehead__lede">
-          Clinical genomics and machine learning by day. On evenings, systems that let me
-          practise the engineering the day job does not always have room for — optimization,
-          data pipelines, and the tooling that keeps them honest. Roughly 70,000 lines of
-          Python behind more than 1,400 tests, every one of which runs offline.
+          Clinical genomics and machine learning at Lucence Diagnostics; a decade of translational
+          development at NUS before that; and, on evenings, AI-for-Life-Science systems plus the
+          engineering practice that keeps them honest.
         </p>
+        <nav class="jump" aria-label="On this page">
+          <a href="#lucence">clinical genomics</a>
+          <a href="#translational">translational</a>
+          <a href="#ai4ls">AI for life science</a>
+          <a href="#engineering">engineering</a>
+        </nav>
       </div>
     </section>
 
-    <!-- ============ RESEARCH ============ -->
-    <section class="section" id="research">
+    <!-- ============ LUCENCE ============ -->
+    <section class="section" id="lucence">
       <div class="shell">
         <header class="section__head reveal">
-          <h2 class="section__title"><span class="section__num">// 01</span> Research &amp; clinical genomics</h2>
+          <h2 class="section__title"><span class="section__num">// 01</span> Clinical genomics &amp; AI at Lucence</h2>
           <p class="section__lede">
-            Work at Lucence Diagnostics and NUS. The specifics stay deliberately high-level —
-            the underlying assays and models are not mine to publish — so these describe the
-            problem shape rather than the implementation.
+            Since November 2025. The assays, data and models are not mine to publish, so these
+            describe the problem shape and the public tools — never samples, results or
+            performance figures.
           </p>
         </header>
         <div class="cards cards--2">
-
           <article class="card card--tick reveal">
-            <h3 class="card__title">WGS bioinformatics pipelines</h3>
+            <h3 class="card__title">Population whole-genome sequencing</h3>
             <p>
-              End-to-end whole-genome sequencing workflows spanning cfDNA, gDNA and FFPE-DNA —
-              from raw reads through QC, alignment and variant analysis. Each input type
-              misbehaves differently: FFPE deaminates, cfDNA is short and scarce, and every
-              library prep leaves its own fingerprint in the data.
+              End-to-end lead for the <strong>Singapore nationwide population (PRECISE) WGS</strong> workflow: wet-lab library preparation, bioinformatic analysis, reporting, clinical validation and deployment. At population scale a workflow is only as good as its worst week, so library QC — single- versus double-sided size selection at normalised depth — and depth-titration tooling are part of the design.
             </p>
             <ul class="tags tags--mini">
-              <li>WGS</li><li>Python</li><li>Pipelines</li><li>NGS</li><li>QC</li>
+              <li>Germline WGS</li><li>Library prep</li><li>QC</li><li>Clinical validation</li>
             </ul>
           </article>
-
           <article class="card card--tick reveal">
-            <h3 class="card__title">ML for cancer classification</h3>
+            <h3 class="card__title">cfDNA MRD and multi-cancer early detection</h3>
             <p>
-              Models that separate cancer signal from noise in sequencing-derived features, built
-              for a clinical-diagnostics setting rather than a leaderboard. Calibration,
-              batch robustness and interpretability matter more than the headline metric, because
-              the cost of being wrong is a patient rather than a rank.
+              Wet-lab and pipeline development for <strong>minimal residual disease</strong> and <strong>MCED</strong> from plasma. A low-pass cfDNA CNV consensus (ichorCNA, WisecondorX, BACDAC) estimates tumour fraction, ploidy and LOH at ≤5x coverage, validated with in-silico mixtures of a matched tumour/normal cell-line pair.
             </p>
             <ul class="tags tags--mini">
-              <li>Machine learning</li><li>Classification</li><li>Calibration</li><li>Genomic features</li>
+              <li>cfDNA</li><li>Low-pass WGS</li><li>Tumour fraction</li><li>Fragmentomics</li>
             </ul>
           </article>
-
           <article class="card card--tick reveal">
-            <h3 class="card__title">Multi-omics integration</h3>
+            <h3 class="card__title">Somatic FFPE-WGS and the CNV/SV stack</h3>
             <p>
-              Combining genomic and complementary omics layers to improve detection sensitivity
-              without losing biological interpretability. The interesting part is rarely the
-              model — it is deciding which layers genuinely carry independent signal and which
-              are re-describing the same thing.
+              A modular pipeline — fastp → BWA-MEM → GATK MarkDuplicates/BQSR → DeepVariant / Mutect2 / DeepSomatic → CNVkit / ichorCNA — that detects existing BAMs and makes BQSR configurable. Germline and somatic CNV/SV calling (GATK gCNV, CNVkit, Control-FREEC, Manta, DELLY, PureCN, ascatNGS; merged with SURVIVOR/Truvari) feeds germline calls as priors into the FFPE and cfDNA pipelines.
             </p>
             <ul class="tags tags--mini">
-              <li>Multi-omics</li><li>Feature integration</li><li>Statistics</li>
+              <li>FFPE</li><li>Somatic calling</li><li>CNV / SV</li><li>GATK</li>
             </ul>
           </article>
+          <article class="card card--tick reveal">
+            <h3 class="card__title">Benchmarking against truth</h3>
+            <p>
+              Every caller is measured, not trusted: GIAB HG002 (v4.2.1, CMRG) with hap.py, vcfeval and Truvari, plus a curated panel of about twenty cancer cell lines and reference samples with tiered somatic truth sets drawn from SEQC2/GIAB and DepMap/CCLE.
+            </p>
+            <ul class="tags tags--mini">
+              <li>GIAB</li><li>SEQC2</li><li>hap.py</li><li>Truvari</li>
+            </ul>
+          </article>
+          <article class="card card--tick reveal">
+            <h3 class="card__title">ML for tumour classification</h3>
+            <p>
+              Models that separate cancer signal from noise in sequencing-derived features, built for a diagnostics setting rather than a leaderboard. Calibration, batch robustness and interpretability matter more than the headline metric, because the cost of being wrong is a patient rather than a rank.
+            </p>
+            <ul class="tags tags--mini">
+              <li>Machine learning</li><li>Classification</li><li>Calibration</li><li>AI for LS</li>
+            </ul>
+          </article>
+          <article class="card card--tick reveal">
+            <h3 class="card__title">Nanobody–NGS multi-omics assay</h3>
+            <p>
+              Developed and clinically validated a nanobody–NGS-based multi-omics detection assay. In multi-omics the interesting part is rarely the model — it is deciding which layers carry independent signal and which re-describe the same thing.
+            </p>
+            <ul class="tags tags--mini">
+              <li>Multi-omics</li><li>Assay development</li><li>NGS</li>
+            </ul>
+          </article>
+        </div>
+      </div>
+    </section>
 
+    <!-- ============ TRANSLATIONAL ============ -->
+    <section class="section section--alt" id="translational">
+      <div class="shell">
+        <header class="section__head reveal">
+          <h2 class="section__title"><span class="section__num">// 02</span> Translational development at NUS</h2>
+          <p class="section__lede">
+            2014–2025, Immunology Translational Research Programme. Multidisciplinary programmes
+            taken from bench to preclinical development — the project-management half of the job
+            as much as the science.
+          </p>
+        </header>
+        <div class="cards cards--2">
+          <article class="card card--tick reveal">
+            <h3 class="card__title">mRNA–LNP and targeted delivery</h3>
+            <p>
+              Optimised mRNA and siRNA design, chemical modification, synthesis and purification, including mRNA–LNP formulation. Designed ligand-mediated oligonucleotide delivery and validated its biodistribution in murine tumour models; explored a cell-penetrating-peptide platform for delivery, vaccines and TCR-T.
+            </p>
+            <ul class="tags tags--mini">
+              <li>mRNA–LNP</li><li>siRNA</li><li>CPP</li><li>In vivo</li>
+            </ul>
+          </article>
+          <article class="card card--tick reveal">
+            <h3 class="card__title">Dendritic-cell cancer vaccines</h3>
+            <p>
+              Peptide-based antigen–adjuvant platforms for monocyte-derived dendritic-cell (Mo-DC) vaccines, informed by the PhD finding that a nucleolar GAR/RGG motif behaves as an alarmin — the subject of an oral talk at the International Symposium on Dendritic Cells.
+            </p>
+            <ul class="tags tags--mini">
+              <li>Mo-DC</li><li>Adjuvants</li><li>Antigen design</li><li>Flow cytometry</li>
+            </ul>
+          </article>
+          <article class="card card--tick reveal">
+            <h3 class="card__title">TCR-T cell therapy</h3>
+            <p>
+              Artificial APC-based, MHC-I-restricted CD8 TCR-T cell therapy for solid tumours, using human PBMCs; antigens designed, expressed and purified from mammalian, bacterial and yeast systems.
+            </p>
+            <ul class="tags tags--mini">
+              <li>TCR-T</li><li>Human PBMCs</li><li>Protein expression</li>
+            </ul>
+          </article>
           <article class="card card--tick reveal">
             <h3 class="card__title">Nucleolar proteomics (PhD)</h3>
             <p>
-              Mapping the protein networks around nucleolar autoantigens, including a published
-              protocol for extracting the nuclear scaffold from the chromatin network. This is
-              the work behind most of the papers below.
+              Mapping the protein networks around nucleolar autoantigens (UBF, NCL, NPM1), including the discovery of linker histone H1.2 at the nucleolar organiser regions and a published protocol for extracting the nuclear scaffold. The work behind most of the papers.
             </p>
             <ul class="tags tags--mini">
               <li>Proteomics</li><li>Mass spec</li><li>PPI</li><li>Immunology</li>
@@ -167,7 +228,90 @@
               <a class="arrowlink" href="index.html#publications">Publications <span aria-hidden="true">→</span></a>
             </p>
           </article>
+        </div>
+      </div>
+    </section>
 
+    <!-- ============ AI FOR LIFE SCIENCE ============ -->
+    <section class="section" id="ai4ls">
+      <div class="shell">
+        <header class="section__head reveal">
+          <h2 class="section__title"><span class="section__num">// 03</span> AI for Life Science builds</h2>
+          <p class="section__lede">
+            Built on evenings, to learn the field properly by making it runnable. Every lab is
+            real code in pure numpy, and every test suite runs with the network unplugged.
+          </p>
+          <p class="groupnote">
+            Private repositories. Educational and research use only — not medical advice and not
+            for clinical decisions.
+          </p>
+        </header>
+        <div class="cards">
+          <article class="card card--tick build reveal" id="ai4ls-atlas">
+            <div class="build__head">
+              <h3 class="build__title">AI-for-Life-Science atlas and curriculum</h3>
+              <span class="build__kind">AI for LS</span>
+            </div>
+            <div class="build__body">
+              <p>
+                A map of the AI reshaping biology and medicine — about a hundred tools and models, 33 landmark papers, 24 algorithm cards and 20 datasets and benchmarks — where every row carries an evidence grade: peer-reviewed, preprint, self-reported or unverified. The grade is the point: it separates what was shown from what was announced.
+              </p>
+              <p>
+                It teaches the field from zero across twelve levels: computing → biology → statistics → ML → deep learning → genomics → single-cell and spatial → proteins → proteomics → multi-omics → medicine → drug discovery. Twenty labs include sequence alignment, FDR, data leakage, a trained 1D-CNN, in-silico mutagenesis, a single-cell pipeline, co-evolution contacts and survival analysis.
+              </p>
+            </div>
+            <div class="spec">
+              <div class="spec__row"><span class="spec__k">stack</span><span class="spec__v">Python · numpy · Streamlit · SQLite</span></div>
+              <div class="spec__row"><span class="spec__k">content</span><span class="spec__v">12 levels · 53 lessons · 20 labs</span></div>
+              <div class="spec__row"><span class="spec__k">feed</span><span class="spec__v">Europe PMC · arXiv · bioRxiv, button-only, cached</span></div>
+              <div class="spec__row"><span class="spec__k">tests</span><span class="spec__v">462, offline</span></div>
+            </div>
+            <div class="build__foot">
+              <p class="build__note">private repo · educational use</p>
+            </div>
+          </article>
+          <article class="card card--tick build reveal" id="learn-ai">
+            <div class="build__head">
+              <h3 class="build__title">Learn AI, from the maths up</h3>
+              <span class="build__kind">curriculum</span>
+            </div>
+            <div class="build__body">
+              <p>
+                A runnable path from linear algebra and probability to transformers, agents, harnesses and AI for science, with no deep-learning framework: backpropagation, attention and optimisers are written out in numpy so nothing is a black box.
+              </p>
+              <p>
+                Five labs can call a live model, but only on a button press, only with a key present, and only after a privacy check on the payload; without one they fall back to offline.
+              </p>
+            </div>
+            <div class="spec">
+              <div class="spec__row"><span class="spec__k">stack</span><span class="spec__v">Python · numpy · Streamlit · SQLite</span></div>
+              <div class="spec__row"><span class="spec__k">content</span><span class="spec__v">10 levels · 57 lessons · 21 labs</span></div>
+              <div class="spec__row"><span class="spec__k">tests</span><span class="spec__v">345, offline</span></div>
+            </div>
+            <div class="build__foot">
+              <p class="build__note">private repo · educational use</p>
+            </div>
+          </article>
+          <article class="card card--tick build reveal" id="agents">
+            <div class="build__head">
+              <h3 class="build__title">Agent workflows course</h3>
+              <span class="build__kind">agents</span>
+            </div>
+            <div class="build__body">
+              <p>
+                A course for using Claude Code and Cowork as an AI-native collaborator: from a first session through configuration, hooks, skills, subagents, MCP and headless automation to running a project from zero to done. Each lesson pairs a short read with a mission run in a separate practice repository; the dashboard then checks what was built, offline, without ever calling a model.
+              </p>
+            </div>
+            <div class="spec">
+              <div class="spec__row"><span class="spec__k">stack</span><span class="spec__v">Python · Streamlit · SQLite</span></div>
+              <div class="spec__row"><span class="spec__k">content</span><span class="spec__v">12 modules · 55 lessons · 21 missions · 5 simulators</span></div>
+              <div class="spec__row"><span class="spec__k">checks</span><span class="spec__v">16 practice-repo checks with a passing reference</span></div>
+              <div class="spec__row"><span class="spec__k">tests</span><span class="spec__v">257, offline</span></div>
+            </div>
+            <div class="build__foot">
+              <p class="build__note">private repo · educational use</p>
+            </div>
+          </article>
         </div>
       </div>
     </section>
@@ -176,9 +320,10 @@
     <section class="section section--alt" id="engineering">
       <div class="shell">
         <header class="section__head reveal">
-          <h2 class="section__title"><span class="section__num">// 02</span> Engineering side projects</h2>
+          <h2 class="section__title"><span class="section__num">// 04</span> Engineering practice</h2>
           <p class="section__lede">
-            Five systems I built and still run. They share one architecture on purpose: pure,
+            Five more systems I built and still run, outside life science on purpose: they are
+            where I practise engineering without a deadline. They share one architecture: pure,
             injectable domain logic with no UI imports; a single layer allowed to touch the
             network; every network call cached and degrading to stale rather than crashing; and
             a test suite that runs with the network unplugged.
@@ -369,8 +514,7 @@
 
         <p class="section__foot reveal">
           <span class="groupnote groupnote--block">
-            Also built and running: a curriculum dashboard that turns a six-month
-            AI-for-Life-Science study plan into something trackable; a job-search assistant whose
+            Also built and running: a job-search assistant whose
             CV tailoring is checked against the source bullets so it cannot invent experience;
             and a social-posting manager where every write path sits behind a human approval
             queue and a rate cap. Around 11,000 more lines and 160 more tests between them.
@@ -383,9 +527,9 @@
     <section class="section" id="how">
       <div class="shell shell--narrow">
         <header class="section__head reveal">
-          <h2 class="section__title"><span class="section__num">// 03</span> The shape they share</h2>
+          <h2 class="section__title"><span class="section__num">// 05</span> The shape they share</h2>
           <p class="section__lede">
-            Eight repositories converged on one architecture, largely because each rule in it
+            Every repository on this page converged on one architecture, largely because each rule in it
             replaced a bug.
           </p>
         </header>
@@ -477,7 +621,7 @@
     <div class="shell footer__inner">
       <div class="footer__col">
         <p class="footer__sig">Junjie Chen</p>
-        <p class="footer__meta">Singapore · genomics, machine learning, and things built on evenings</p>
+        <p class="footer__meta">Singapore · AI for life science, clinical genomics, and things built on evenings</p>
       </div>
       <nav class="footer__col footer__links" aria-label="Elsewhere">
         <a href="mailto:chen_junjie@outlook.com">Email</a>

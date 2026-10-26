@@ -3,14 +3,14 @@
 # belong in it. See CLAUDE.md before adding anything.
 
 title    = "Junjie Chen"
-tagline  = "Genomics + Machine Learning"
+tagline  = "AI for Life Science · Clinical Genomics"
 url      = "https://neutrophil.github.io"
 author   = "Junjie Chen"
 email    = "chen_junjie@outlook.com"
 location = "Singapore"
 lang     = "en"
 
-description = "Junjie Chen — Research Scientist II at Lucence Diagnostics. PhD molecular biologist and immunologist bridging clinical genomics, bioinformatics and machine learning, building toward AI for Life Science."
+description = "Junjie Chen — Research Scientist II at Lucence Diagnostics. Engineer-scientist and translational researcher working across AI for life science, clinical genomics (population WGS, cfDNA MRD and MCED), bench-to-clinic project development, and wet-lab plus bioinformatics."
 
 [links]
 linkedin = "https://www.linkedin.com/in/junjie-chen-nus/"
@@ -18,18 +18,22 @@ github   = "https://github.com/Neutrophil"
 cv       = "assets/cv/CHEN_Junjie_CV.pdf"
 
 # Primary navigation. `href` is resolved against {{rel}} at build time unless
-# it starts with http. Keep this short — a nav with seven items reads as a menu.
+# it starts with http. Keep this short — five is the ceiling; seven reads as a menu.
 [[nav]]
-label = "builds"
+label = "about"
+href  = "index.html#about"
+
+[[nav]]
+label = "research"
 href  = "projects.html"
+
+[[nav]]
+label = "publications"
+href  = "index.html#publications"
 
 [[nav]]
 label = "writing"
 href  = "blog.html"
-
-[[nav]]
-label = "about"
-href  = "index.html#about"
 
 [[nav]]
 label = "contact"

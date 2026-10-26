@@ -154,12 +154,17 @@
     bar.appendChild(button);
   });
 
-  /* ---- Tag filtering on the writing index ---- */
-  var filter = document.getElementById('tag-filter');
-  var postlist = document.getElementById('postlist');
-  if (filter && postlist) {
-    var items = Array.prototype.slice.call(postlist.querySelectorAll('[data-tags]'));
-    var empty = document.getElementById('postlist-empty');
+  /* ---- Tag filtering: the writing index and the publications list.
+   * The publication chips ship `hidden`, so a reader without this script
+   * never sees a button that does nothing; the writing chips are generated
+   * visible by build.py and simply stay inert. */
+  function wireFilter(filterId, listId, emptyId) {
+    var filter = document.getElementById(filterId);
+    var list = document.getElementById(listId);
+    if (!filter || !list) return;
+    var items = Array.prototype.slice.call(list.querySelectorAll('[data-tags]'));
+    var empty = document.getElementById(emptyId);
+    filter.hidden = false;
 
     filter.addEventListener('click', function (e) {
       var chip = e.target.closest('.chip');
@@ -182,4 +187,6 @@
       if (empty) empty.hidden = shown !== 0;
     });
   }
+  wireFilter('tag-filter', 'postlist', 'postlist-empty');
+  wireFilter('pub-filter', 'pub-list', 'pub-empty');
 })();

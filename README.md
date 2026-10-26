@@ -34,7 +34,7 @@ tools/make_og.py             # regenerates assets/og.png (Pillow + fontTools; by
 tools/shots.py               # screenshot matrix for a visual diff (Playwright; by hand)
 tools/audit.py               # browser-side checks --check cannot do (Playwright; by hand)
 assets/fonts/                # JetBrains Mono, subset to this site (OFL, ~75 KB, 3 weights)
-assets/cv/                   # downloadable CV (PDF)
+assets/cv/                   # downloadable CV (PDF) — built by cv_system/profiles/website.yaml, no phone
 assets/favicon.svg
 assets/og.png                # 1200x630 social card, committed
 .nojekyll                    # serve files as-is on GitHub Pages
