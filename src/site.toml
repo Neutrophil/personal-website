@@ -31,6 +31,8 @@ lang_short = "EN"
 theme      = "Switch theme"
 menu       = "Open menu"
 place      = "Singapore"
+home       = "home"
+primary    = "Primary"
 
 [strings.zh]
 skip       = "跳到正文"
@@ -44,6 +46,8 @@ lang_short = "中"
 theme      = "切换主题"
 menu       = "打开菜单"
 place      = "新加坡"
+home       = "首页"
+primary    = "主导航"
 
 # The writing index offers a filter chip only for tags two or more posts share,
 # plus these: the site's own subject, worth a chip while it has a single post.

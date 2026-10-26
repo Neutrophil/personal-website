@@ -13,18 +13,19 @@ Sources live in `src/`. Generated HTML is written to the repo root **and committ
 GitHub Pages keeps serving plain files with no CI step.
 
 ```
-build.py                     # the generator — stdlib only, ~330 lines
+build.py                     # the generator — stdlib only
 src/
-  site.toml                  # site metadata + primary nav
+  site.toml                  # site metadata, nav per language, chrome strings, pinned tags
   templates/base.html        # the one page skeleton (head, theme script, chrome)
   templates/post.html        # article wrapper for a post body
   partials/nav.html          # header chrome
   partials/footer.html
   partials/signal.svg        # hero waveform
-  partials/diagrams/*.svg    # six theme-aware inline diagrams
+  partials/diagrams/*.svg    # theme-aware inline diagrams; *-tall.svg = phone variant
   pages/index.html           # body fragment + TOML frontmatter
+  pages/zh/index.html        # the 中文 home page (lang + translation frontmatter)
   pages/projects.html
-  pages/404.html
+  pages/404.html             # root-relative, so it works at any missed URL
   blog.html                  # the writing index (post list is generated into it)
   posts/*.html               # one fragment per post, + _TEMPLATE.html
 
@@ -39,7 +40,7 @@ assets/favicon.svg
 assets/og.png                # 1200x630 social card, committed
 .nojekyll                    # serve files as-is on GitHub Pages
 
-index.html projects.html blog.html 404.html feed.xml posts/*.html   # ← generated, committed
+index.html zh/index.html projects.html blog.html 404.html feed.xml posts/*.html   # ← generated, committed
 ```
 
 ## Build and preview
@@ -54,7 +55,9 @@ cd /home/junjie/claude/personal_website
 
 - an unresolved `{{ token }}` anywhere in the output;
 - a local `href`/`src` that does not resolve to a file on disk (this catches the broken
-  relative paths the two-directory layout invites);
+  relative paths the nested layout invites), or a `#fragment` with no matching `id` on the
+  page it points at — moving a section breaks inbound links that the file check alone misses;
+- a duplicate `id` on a page, or two sources writing the same output file;
 - a post missing `title`, `date`, `summary` or `tags`, or with a uselessly short summary;
 - `feed.xml` not parsing, or containing a relative link;
 - a missing `assets/og.png` — every page references it by absolute URL, which the link
@@ -67,7 +70,13 @@ cd /home/junjie/claude/personal_website
 - a control declared smaller than 24px, more than one current-page marker on a page, or a
   page with no `theme-color`.
 - an element shipped with `hidden` whose component rule sets `display` without a matching
-  `.class[hidden]` rule — the author rule would otherwise show a control meant to stay hidden.
+  `.class[hidden]` rule — the author rule would otherwise show a control meant to stay hidden;
+- a class selector in `css/styles.css` that nothing renders (classes added at runtime —
+  `is-*`, `reveal-on`, `js` — and those shown in `_TEMPLATE.html` count as used);
+- **anything shaped like a phone number, or an email address other than the site's own, in any
+  generated page.** The workspace privacy guard cannot catch these here: this repo turns its
+  contact rule off so the owner's address can be published, and the phone pattern lives inside
+  that rule.
 
 Run it before every commit.
 
@@ -79,11 +88,19 @@ does, and exits non-zero the same way:
 
 ```bash
 export LD_LIBRARY_PATH=$HOME/miniconda3/envs/investing/lib
-~/miniconda3/envs/investing/bin/python tools/audit.py     # contrast, targets, print, no-JS
+~/miniconda3/envs/investing/bin/python tools/audit.py     # contrast, targets, layout, print, no-JS
 ~/miniconda3/envs/investing/bin/python tools/shots.py --out /tmp/shots/after
 ```
 
-`shots.py` writes six pages x two themes x two widths, plus strips sliced to viewport height,
+Beyond rendered contrast and tap targets it checks, at 1440, 390 and 320px: diagram labels
+fit their boxes and stay ≥10px; a phone is shown the tall drawing, which does not scroll; the
+sticky nav stays on screen; a missed URL serves a styled 404 whose links work; the footer
+reaches the bottom of a short page; no line of prose runs past ~90 characters; a post's first
+paragraph is above the fold on a phone; and a jump link lands its heading below the sticky
+bars. All three local servers (`--serve`, audit, shots) answer a miss with `404.html`, as
+GitHub Pages does.
+
+`shots.py` writes every page x two themes x two widths, plus strips sliced to viewport height,
 which is what makes a before-and-after diff readable.
 
 ## The social card
@@ -110,11 +127,27 @@ Three steps, only one of which is writing:
 3. `python build.py --check`, then commit.
 
 The blog index, tag filter, RSS feed, prev/next links and reading time are all derived from
-the frontmatter. There is no list to maintain by hand.
+the frontmatter. There is no list to maintain by hand. Optional `featured = true` puts a post
+first in the home page's list (only there — the feed and prev/next stay in date order). The
+writing filter shows a chip only for a tag two posts share, plus `[blog] pinned_tags`.
 
 To add a diagram, drop an SVG into `src/partials/diagrams/` and include it with
 `{{ include:diagrams/name.svg }}`. Use the shared `d-*` classes (`d-label`, `d-accent`,
-`d-fill-elev`, …) so it follows the theme and matches the others.
+`d-label--violet`, `d-fill-elev`, …) so it follows the theme and matches the others. Never
+set font sizes inside a drawing.
+
+A **flow** diagram also gets a phone drawing, `name-tall.svg`: exactly 250 units wide (the box
+a 320px screen leaves, so it renders at 1:1), stages stacked top to bottom, and every `id`
+suffixed `t` (`d1t-arw`) so its markers cannot resolve into the hidden wide copy. The figure
+holds both and CSS shows one:
+
+```html
+<div class="diagram__scroll diagram__alt--wide">{{ include:diagrams/name.svg }}</div>
+<div class="diagram__alt--tall">{{ include:diagrams/name-tall.svg }}</div>
+```
+
+A **chart** stays wide and scrolls — narrowing an axis distorts it — and its caption starts
+with `<span class="diagram__swipe">…</span>`, which only phones show.
 
 ## Design system
 
@@ -131,9 +164,25 @@ content when scripting is unavailable.
 
 Everything in `js/main.js` is an enhancement. If it fails to load the site is still complete.
 
+Colour has one job each: **cyan** is the computational work (AI, bioinformatics), **violet**
+the bench and the clinic. Pillars, their tags and the bench-to-clinic diagram follow that key;
+nothing else is violet.
+
+## The 中文 page
+
+`src/pages/zh/index.html` is a summary of the English home, not a mirror: it is translated
+only from text already published there, citations and talk titles stay in English, and links
+to the research, writing and CV say they are English. Frontmatter `lang = "zh-Hans"` picks the
+`[strings.zh]` chrome and `[[nav_zh]]`; `translation = "index.html"` (and the reverse on the
+English home) adds the hreflang pair and the EN / 中 toggle. Under `:lang(zh)` the font
+stacks lead with a CJK face and labels drop their tracking and capitals. Break Chinese prose
+only between tags, never between two hanzi — a source line break renders as a space.
+
 ## Deploy to GitHub Pages
 
-This is a **user site**, so the repo must be named exactly `neutrophil.github.io`.
+This is a **user site**, so the repo must be named exactly `neutrophil.github.io`. The 404
+page is root-relative to the path of `url` in `site.toml` — it assumes that rename; as a
+project site (`/personal-website/`) its links would point at the account root.
 
 1. Rename the repo to `neutrophil.github.io` and make it public (a deliberate decision — see
    `CLAUDE.md`; every other repo in this workspace stays private).
@@ -143,7 +192,7 @@ This is a **user site**, so the repo must be named exactly `neutrophil.github.io
 ```bash
 ~/miniconda3/envs/investing/bin/python build.py --check
 /home/junjie/claude/tools/privacy-guard scan .
-git add index.html projects.html blog.html 404.html feed.xml posts/ src/ css/ js/ build.py
+git add index.html zh/ projects.html blog.html 404.html feed.xml posts/ src/ css/ js/ build.py tools/
 git commit -m "..."
 git push
 ```

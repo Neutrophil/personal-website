@@ -310,6 +310,7 @@ em { color: var(--text); }
   color: var(--text-soft);
   padding: 0.42rem 0.5rem;
   border-radius: var(--radius-sm);
+  white-space: nowrap;   /* hanzi break between any two characters without it */
   transition: color var(--dur-fast) var(--ease), background-color var(--dur-fast) var(--ease);
 }
 .nav__bracket { color: var(--text-faint); transition: color var(--dur-fast) var(--ease); }
@@ -546,6 +547,8 @@ em { color: var(--text); }
   text-transform: none;
 }
 :lang(zh) :is(h1, h2, h3, .pillar__claim) { font-weight: 600; }
+/* Break short labels only at their spaces and separators, never inside a word. */
+:lang(zh) :is(.eyebrow, .hero__role, .metrics__k, .pillar__kicker) { word-break: keep-all; }
 .nav__lang { font-family: var(--sans); font-size: var(--step--1); font-weight: 600; text-decoration: none; }
 .nav__lang:hover { color: var(--accent); border-color: var(--accent); text-decoration: none; }
 
@@ -842,6 +845,10 @@ a.card:hover {
   overflow-x: auto; white-space: nowrap; scrollbar-width: none;
 }
 .jump__inner::-webkit-scrollbar { display: none; }
+@media (max-width: 760px) {
+  /* The bar scrolls sideways on a phone; a fade at the edge says so. */
+  .jump__inner { mask-image: linear-gradient(to right, #000 calc(100% - 28px), transparent); }
+}
 .page-projects .section[id], .page-projects [id].build, .page-projects #how { scroll-margin-top: var(--jump-h); }
 .no-js .jump { position: static; }
 .jump a {
@@ -1380,6 +1387,10 @@ a.card:hover {
 
 /* ---------- Responsive ---------- */
 @media (max-width: 900px) {
+  /* Between the burger and a wide desktop the bar holds five links and three
+     buttons; the wordmark gives way first (the monogram stays), then padding. */
+  .nav__name { display: none; }
+  .nav__links a { padding-inline: 0.3rem; }
   .footer__inner { grid-template-columns: 1fr 1fr; }
   .footer__end { grid-column: 1 / -1; text-align: left; }
 }

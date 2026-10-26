@@ -26,7 +26,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
-from build import _not_found_handler  # noqa: E402 - serve misses the way Pages does
+from build import _not_found_handler, private_hits  # noqa: E402
 
 PORT = 8912
 
@@ -269,10 +269,40 @@ def main() -> int:
                     page.wait_for_timeout(150)
                     top = page.evaluate("() => [window.scrollY, document.querySelector('.nav').getBoundingClientRect().top]")
                     if click:
-                        continue  # the open menu holds the page still; scrollY stays 0
+                        # Open: the page is held still and the bar stays put. Every
+                        # way out — Escape, or the window growing past the burger —
+                        # must release the hold.
+                        lock = lambda: page.evaluate("() => document.documentElement.style.overflow")
+                        if lock() != "hidden" or abs(top[1]) > 1:
+                            problems.append(f"menu open/{width}: page not held (overflow {lock()!r}) or nav at {top[1]}px")
+                        page.keyboard.press("Escape")
+                        if lock() != "":
+                            problems.append("menu: Escape closed the menu but left the page locked")
+                        page.click(click)
+                        page.set_viewport_size({"width": 1200, "height": 844})
+                        page.wait_for_timeout(150)
+                        if lock() != "":
+                            problems.append("menu: widening past the burger left the page locked")
+                        continue
                     if top[0] < 2000 or abs(top[1]) > 1:
                         problems.append(f"sticky nav/{width}: after scrolling to {top[0]}px the nav sits at {top[1]}px")
                 ctx.close()
+
+            # Between the burger breakpoint and a wide desktop the nav bar is at
+            # its tightest; nothing may push the page sideways there.
+            ctx = browser.new_context(viewport={"width": 761, "height": 800})
+            page = ctx.new_page()
+            for width in (761, 800, 900, 1024):
+                page.set_viewport_size({"width": width, "height": 800})
+                for name in ("home", "home-zh", "builds"):
+                    page.goto(base + PAGES[name], wait_until="networkidle")
+                    over = page.evaluate("() => document.documentElement.scrollWidth - document.documentElement.clientWidth")
+                    tall = page.evaluate("() => Math.max(...[...document.querySelectorAll('.nav__links a')].map(a => a.getBoundingClientRect().height))")
+                    if over > 0:
+                        problems.append(f"{name}/{width}: page scrolls {over}px sideways")
+                    if tall > 44:
+                        problems.append(f"{name}/{width}: a nav link wraps onto two lines ({tall:.0f}px tall)")
+            ctx.close()
 
             # A phone reader must reach the first paragraph of a post without
             # scrolling past a screenful of header.
@@ -308,6 +338,10 @@ def main() -> int:
             # its links must still lead somewhere from a nested URL.
             ctx = browser.new_context(viewport={"width": 1440, "height": 900})
             page = ctx.new_page()
+            for miss in ("posts/", "src/"):
+                r = page.request.get(base + miss)
+                if r.status != 404:
+                    problems.append(f"404: GET /{miss} answered {r.status}; Pages lists no directories")
             resp = page.goto(base + "posts/no-such-post.html", wait_until="networkidle")
             if resp is None or resp.status != 404:
                 problems.append(f"404: a missing URL answered {resp and resp.status}, not 404")
@@ -387,6 +421,22 @@ def main() -> int:
             browser.close()
     finally:
         srv.shutdown()
+
+    # Anything under assets/ is published and exempt from the privacy guard; the
+    # CV PDF is where a phone number is most likely to arrive. Same gate as the
+    # pages, on the PDF's text layer.
+    import shutil
+    import subprocess
+    import tomllib
+
+    if shutil.which("pdftotext"):
+        for pdf in sorted((ROOT / "assets").rglob("*.pdf")):
+            text = subprocess.run(["pdftotext", "-q", str(pdf), "-"], capture_output=True, text=True).stdout
+            own = tomllib.loads((ROOT / "src" / "site.toml").read_text(encoding="utf-8"))["email"]
+            for hit in sorted(set(private_hits(text, own))):
+                problems.append(f"{pdf.relative_to(ROOT)}: {hit} — never publish one")
+    else:
+        problems.append("pdftotext not found: the published PDFs went unchecked for private data")
 
     for note in notes:
         print(f"  {note}")

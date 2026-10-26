@@ -22,6 +22,7 @@ import html
 import re
 import sys
 import tomllib
+import unicodedata
 from collections import Counter
 from dataclasses import dataclass, field
 from datetime import date, datetime, timezone
@@ -377,6 +378,7 @@ def base_context(site: dict, rel: str, lang: str | None = None) -> dict:
         "rel": rel,
         "lang": lang,
         "alternates": "",
+        "home": f"{rel}index.html",
         "lang_toggle": "",
         "site_title": site["title"],
         "tagline": site["tagline"],
@@ -430,7 +432,11 @@ def build(check: bool = False) -> list[Path]:
     sources = sorted(PAGES.rglob("*.html"))
     # Pages that exist in two languages name each other; both sides get the
     # hreflang pair and a toggle, so neither can drift out of the pairing.
-    page_lang = {p.relative_to(PAGES).as_posix(): parse_doc(p).meta.get("lang", site["lang"]) for p in sources}
+    metas = {p.relative_to(PAGES).as_posix(): parse_doc(p).meta for p in sources}
+    page_lang = {k: m.get("lang", site["lang"]) for k, m in metas.items()}
+    for here, meta in metas.items():
+        if (other := meta.get("translation")) and metas.get(other, {}).get("translation") != here:
+            raise BuildError(f"src/pages/{here} names {other} as its translation, but {other} does not name it back")
     for path in sources:
         doc = parse_doc(path)
         rel_out = path.relative_to(PAGES)
@@ -443,6 +449,9 @@ def build(check: bool = False) -> list[Path]:
             rel = urlparse(site["url"]).path.rstrip("/") + "/"
         url_path = rel_out.as_posix().removesuffix("index.html")
         ctx = base_context(site, rel=rel, lang=doc.meta.get("lang"))
+        # A translated page's logo leads home in its own language.
+        if rel_out.parent != Path("."):
+            ctx["home"] = "./"
         if other := doc.meta.get("translation"):
             if other not in page_lang:
                 raise BuildError(f"{_rel(path)}: translation {other!r} is not a page")
@@ -481,6 +490,8 @@ def build(check: bool = False) -> list[Path]:
         post_count=str(len(posts)),
     )
     blog_out = ROOT / "blog.html"
+    if blog_out in written:
+        raise BuildError(f"{_rel(blog_out)} is generated from src/blog.html; another source also wrote it")
     blog_out.write_text(render_page(site, template, ctx, blog_src.body), encoding="utf-8")
     written.append(blog_out)
 
@@ -509,6 +520,8 @@ def build(check: bool = False) -> list[Path]:
         ctx.update(post_summary=esc(post.summary), post_toc=toc_html(headings))
         body = resolve(wrapper, {**ctx, "post_body": numbered})
         out = POSTS_OUT / f"{post.doc.slug}.html"
+        if out in written:
+            raise BuildError(f"{_rel(out)} is generated from a post; another source also wrote it")
         out.write_text(render_page(site, template, ctx, body), encoding="utf-8")
         written.append(out)
 
@@ -638,14 +651,47 @@ MIN_CONTROL_PX = 24  # WCAG 2.2 pointer-target minimum
 # What must never be published, however it got into a page. The workspace guard
 # cannot see these here: `.privacy-guard-allow` turns its contact rule off so the
 # owner's address can appear, and the phone pattern lives inside that rule.
+_SEP = r"[\s.()-]{0,3}"  # what people put between digit groups, after _plain()
 PHONE_RES = (
-    re.compile(r"(?<![\w])\+(?:65[ -]?\d{4}[ -]?\d{4}|86[ -]?1\d{2}[ -]?\d{4}[ -]?\d{4}|\d{9,15})(?![\w])"),
-    re.compile(r"(?<![\w.+/-])[689]\d{3}[ -]?\d{4}(?![\w.-])"),     # bare Singapore number
-    re.compile(r"(?<![\w.+/-])1[3-9]\d[ -]?\d{4}[ -]?\d{4}(?![\w.-])"),  # bare mainland mobile
+    re.compile(rf"(?<![\w])\+\s?(?:65{_SEP}\d{{4}}{_SEP}\d{{4}}|86{_SEP}1\d{{2}}{_SEP}\d{{4}}{_SEP}\d{{4}}|\d{{9,15}})(?![\w])"),
+    re.compile(rf"(?<![\w.+/-])\(?[689]\d{{3}}{_SEP}\d{{4}}(?![\w.-])"),             # bare Singapore number
+    re.compile(rf"(?<![\w.+/-])1[3-9]\d{_SEP}\d{{4}}{_SEP}\d{{4}}(?![\w.-])"),       # bare mainland mobile
+    re.compile(r"""href=["']?(?:tel|sms):""", re.I),                              # a dialler link, whatever it holds
 )
 EMAIL_RE = re.compile(r"[\w.+-]+@[\w-]+(?:\.[\w-]+)+")
+# Shapes the private-data gate must catch, checked on every run so a regex edit
+# cannot quietly narrow it. Synthetic numbers; none belongs to anyone.
+PRIVATE_MUST_HIT = (
+    "+65 9123 4567", "+65&nbsp;9123&nbsp;4567", "+65\u00a09123\u00a04567", "&#57;123 4567",
+    "\uff0b\uff16\uff15 \uff19\uff11\uff12\uff13 \uff14\uff15\uff16\uff17", "9123.4567", "+65 (9123) 4567", "9123\u20134567",
+    "+65 9123 <b>4567</b>", '<a href="tel:+6591234567">call</a>', '<span data-p="9123 4567">x</span>',
+    "<!-- 9123 4567 -->", "138 0013 8000", "someone&#64;example-mail.net", "someone\uff20example-mail.net",
+    "<span>someone</span>@example-mail.net",
+)
+PRIVATE_MUST_PASS = ("J Biol Chem, 293(7), 2358–2369", "doi.org/10.3389/fimmu.2023.1196544", "2017 – 2022", "~21,000 lines")
+
+
+def _plain(text: str) -> str:
+    """Undo the encodings a number can hide behind: entities, full-width forms, odd spaces and dashes."""
+    text = unicodedata.normalize("NFKC", html.unescape(text))
+    text = re.sub(r"[\u2010-\u2015\u2212]", "-", text)
+    return re.sub(r"\s+", " ", text)
+
+
+def private_hits(markup: str, own_email: str) -> list[str]:
+    """Phone-shaped numbers and foreign emails, in the markup and in its text.
+
+    Both views matter: attributes, comments and dialler links exist only in
+    the markup, and a number split across tags joins up only in the text.
+    """
+    views = (_plain(markup), _plain(re.sub(r"<[^>]+>", "", markup)))
+    hits = [f"phone-shaped ({len(m.group())} chars)" for v in views for pat in PHONE_RES for m in pat.finditer(v)]
+    hits += ["foreign email" for v in views for m in EMAIL_RE.finditer(v) if m.group().lower() != own_email.lower()]
+    return hits
 # Classes that only exist at runtime, added by the inline head script or main.js.
-RUNTIME_CLASS_RE = re.compile(r"^(?:js|no-js|reveal-on|is-[a-z-]+|page-[a-z0-9-]+)$")
+# Everything else main.js adds is harvested from its classList calls, and body
+# classes are in the rendered pages.
+RUNTIME_CLASS_RE = re.compile(r"^(?:js|no-js|reveal-on)$")
 
 
 def unused_css_classes(css: str, used: set[str]) -> list[str]:
@@ -900,14 +946,15 @@ def run_checks(site: dict, written: list[Path], posts: list[Post]) -> None:
 
     # 13. nothing private reaches a page: no phone number in any shape, and no
     #     address but the owner's own
-    for path in pages:
-        text = re.sub(r"<[^>]+>", " ", path.read_text(encoding="utf-8"))
-        for pattern in PHONE_RES:
-            for m in pattern.finditer(text):
-                problems.append(f"{_rel(path)}: looks like a phone number ({len(m.group())} chars) — never publish one")
-        for m in EMAIL_RE.finditer(path.read_text(encoding="utf-8")):
-            if m.group().lower() != site["email"].lower():
-                problems.append(f"{_rel(path)}: email address other than the site's own")
+    for sample in PRIVATE_MUST_HIT:
+        if not private_hits(sample, site["email"]):
+            problems.append(f"build.py: the private-data gate no longer catches {sample!r}")
+    for sample in PRIVATE_MUST_PASS:
+        if private_hits(sample, site["email"]):
+            problems.append(f"build.py: the private-data gate flags harmless {sample!r}")
+    for path in [*pages, ROOT / "feed.xml"]:
+        for hit in sorted(set(private_hits(path.read_text(encoding="utf-8"), site["email"]))):
+            problems.append(f"{_rel(path)}: {hit} — never publish one")
 
     if problems:
         print(f"\n✗ {len(problems)} problem(s):", file=sys.stderr)
@@ -937,6 +984,11 @@ def _not_found_handler():
             self.end_headers()
             if self.command != "HEAD":
                 self.wfile.write(body)
+
+        def list_directory(self, path):
+            # Pages lists nothing: a directory without an index is a miss.
+            self.send_error(404)
+            return None
 
         def log_message(self, *args):  # noqa: D102 - keep the terminal quiet
             pass

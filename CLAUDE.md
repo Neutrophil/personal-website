@@ -29,19 +29,24 @@ $PY tools/shots.py --out /tmp/shots/after # screenshot matrix (--out is required
   prev/next, and the `--check` gates. Sources: `src/site.toml`, `src/templates/`,
   `src/partials/` (incl. `diagrams/*.svg`), `src/pages/`, `src/blog.html`, `src/posts/`
   (`_TEMPLATE.html` is skipped). Styles `css/styles.css`, behaviour `js/main.js`.
-- **Never hand-edit a generated file at the repo root** (`index.html`, `projects.html`,
-  `blog.html`, `404.html`, `feed.xml`, `posts/*.html`) — the next build overwrites it.
+- **Never hand-edit a generated file at the repo root** (`index.html`, `zh/index.html`,
+  `projects.html`, `blog.html`, `404.html`, `feed.xml`, `posts/*.html`) — the next build overwrites it.
 
 ## Conventions
 
 - **Templating is deliberately primitive** — `{{ key }}` and `{{ include:path }}`, no
   expressions or loops; anything list-shaped is assembled in `build.py`, so the generator
   stays one readable file.
-- **`--check` is the test suite** — tokens, links, frontmatter, feed, social card, WCAG AA
-  contrast in both themes, diagram label size, reveal gating, control size and more, all
-  arithmetic over the sources. Add a gate rather than relying on a manual look.
-- **`tools/audit.py` is the other half** — rendered contrast, label sizes, clipping, tap
-  targets, print colours, survival without `main.js`. Run it before a visual commit.
+- **`--check` is the test suite** — tokens, links and `#fragment` targets, duplicate ids,
+  frontmatter, feed, social card, WCAG AA contrast in both themes, diagram label size, reveal
+  gating, control size, unused CSS classes, and phone numbers / foreign emails in any page,
+  all arithmetic over the sources. Add a gate rather than relying on a manual look.
+- **The privacy guard is blind to phone numbers here** — `.privacy-guard-allow` disables its
+  `contact` rule (the owner's address is published), and that rule is where phones are
+  matched. `--check` gate 13 is the only net; never weaken it.
+- **`tools/audit.py` is the other half** — rendered contrast, label sizes and fit, clipping,
+  tap targets, sticky nav, nested 404, line length, post fold, jump-link landing, print
+  colours, survival without `main.js`, at 1440/390/320. Run it before a visual commit.
 - **`build.py` stays dependency-free** — anything needing a package (the social-card
   renderer `tools/make_og.py`) lives in `tools/`, is run by hand, and its output committed.
 - **JS is enhancement only, enforced** — `.reveal` is hidden under `.reveal-on`, which
@@ -52,6 +57,13 @@ $PY tools/shots.py --out /tmp/shots/after # screenshot matrix (--out is required
   wrapped in `.diagram > .diagram__scroll`; `.diagram svg` has a `min-width` so narrow
   screens scroll rather than shrink. Size type in the CSS `d-*` classes, not in the
   drawings — growing type in the fixed 900-unit space pushes labels through their boxes.
+  Flow diagrams also carry `name-tall.svg` (250 units wide, ids suffixed `t`) swapped in at
+  ≤760px; charts stay wide with a `.diagram__swipe` note. Syntax in README.
+- **Colour key** — cyan = computational (AI, bioinformatics), violet = bench and clinic.
+  Nothing else is violet.
+- **The 中文 home page** (`src/pages/zh/index.html`) translates only what the English home
+  already says; chrome strings come from `[strings.zh]`, nav from `[[nav_zh]]`. Never join
+  two hanzi across a source line break — it renders as a space.
 - **Playwright tools need** `channel="chromium"` (the default headless shell is a different
   binary) and `LD_LIBRARY_PATH=$HOME/miniconda3/envs/investing/lib` (`libnss3` lives in the
   conda env). Capture before and after a visual change; still check motion and focus order
@@ -83,6 +95,10 @@ That exemption is the reason to be careful, not a reason to relax:
 
 ## Known limitations
 
+- Only the home page exists in Chinese; research, writing and the CV link out to English and
+  say so.
+- The 404 page is root-relative to `site.toml`'s `url` path, so it is right only once the repo
+  is renamed to the user-site name.
 - Generated root files are committed, so diffs are larger than the edit — the price of no CI.
 - No syntax highlighting; code blocks are escaped by hand.
 - Posts are HTML fragments, not Markdown — diagrams and callouts are inline HTML anyway.

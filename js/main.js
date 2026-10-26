@@ -70,6 +70,12 @@
     document.addEventListener('keydown', function (e) {
       if (e.key === 'Escape') closeNav();
     });
+    /* Rotating a tablet or widening a window hides the burger; an open menu
+       would otherwise leave the page locked with no control to undo it. */
+    var phone = window.matchMedia('(max-width: 760px)');
+    var onWide = function (m) { if (!m.matches) closeNav(); };
+    if (phone.addEventListener) phone.addEventListener('change', onWide);
+    else if (phone.addListener) phone.addListener(onWide);
     /* Tapping the scrim — anything outside the panel — dismisses it. */
     document.addEventListener('click', function (e) {
       if (!links.classList.contains('is-open')) return;
@@ -144,7 +150,14 @@
       entries.forEach(function (entry) {
         if (!entry.isIntersecting) return;
         jumped.forEach(function (pair) {
-          pair.anchor.classList.toggle('is-active', pair.section === entry.target);
+          var on = pair.section === entry.target;
+          pair.anchor.classList.toggle('is-active', on);
+          /* Keep the marked chip in view on a bar that scrolls sideways —
+             by moving the bar, never the page. */
+          var bar = pair.anchor.parentNode;
+          if (on && bar.scrollWidth > bar.clientWidth) {
+            bar.scrollTo({ left: pair.anchor.offsetLeft - bar.offsetLeft - 16, behavior: reduceMotion ? 'auto' : 'smooth' });
+          }
         });
       });
     }, { rootMargin: '-40% 0px -55% 0px', threshold: 0 });
