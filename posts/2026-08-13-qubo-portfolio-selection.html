@@ -158,13 +158,13 @@
   <rect class="d-fill-elev d-stroke" x="180" y="30" width="150" height="60" rx="8" stroke-width="1" />
   <text class="d-label--accent" x="196" y="54">μ</text>
   <text class="d-label" x="214" y="54">expected return</text>
-  <text class="d-label--sm" x="196" y="72">8 clipped signals, blended</text>
+  <text class="d-label--sm" x="196" y="72">8 signals, blended</text>
 
   <!-- B2 · covariance -->
   <rect class="d-fill-elev d-stroke" x="180" y="140" width="150" height="60" rx="8" stroke-width="1" />
   <text class="d-label--accent" x="196" y="164">Σ</text>
   <text class="d-label" x="214" y="164">covariance</text>
-  <text class="d-label--sm" x="196" y="182">shrunk toward diagonal</text>
+  <text class="d-label--sm" x="196" y="182">shrunk to diagonal</text>
 
   <!-- C · Q matrix -->
   <rect class="d-fill-elev d-stroke" x="378" y="68" width="164" height="94" rx="8" stroke-width="1" />
@@ -243,9 +243,9 @@
 
           <div class="codeblock">
             <div class="codeblock__bar"><span class="codeblock__name">the objective</span></div>
-            <pre><code>f(x) = − Σᵢ μᵢ xᵢ          expected return, negated because we minimise
-       + γ Σᵢⱼ σᵢⱼ xᵢ xⱼ    risk: every selected pair's covariance
-       + P (Σᵢ xᵢ − K)²     penalty: zero when exactly K are chosen</code></pre>
+            <pre><code>f(x) = − Σ_i μ_i x_i            expected return, negated because we minimise
+       + γ Σ_ij σ_ij x_i x_j    risk: every selected pair's covariance
+       + P (Σ_i x_i − K)²       penalty: zero when exactly K are chosen</code></pre>
           </div>
 
           <p>
@@ -269,12 +269,12 @@
           </p>
 
           <div class="codeblock">
-            <div class="codeblock__bar"><span class="codeblock__name">expanding P(Σxᵢ − K)²</span></div>
-            <pre><code>(Σᵢ xᵢ)²  =  Σᵢ xᵢ²  +  2 Σᵢ&lt;ⱼ xᵢxⱼ
-          =  Σᵢ xᵢ   +  2 Σᵢ&lt;ⱼ xᵢxⱼ        ← because xᵢ² = xᵢ
+            <div class="codeblock__bar"><span class="codeblock__name">expanding P(Σx_i − K)²</span></div>
+            <pre><code>(Σ_i x_i)²  =  Σ_i x_i²  +  2 Σ_i&lt;j x_i x_j
+            =  Σ_i x_i   +  2 Σ_i&lt;j x_i x_j        ← because x_i² = x_i
 
-P(Σxᵢ − K)²  =  P Σᵢ xᵢ (1 − 2K)  +  2P Σᵢ&lt;ⱼ xᵢxⱼ  +  P K²
-                └── diagonal ──┘     └── off-diagonal ──┘   └ constant ┘</code></pre>
+P(Σ_i x_i − K)²  =  P Σ_i x_i (1 − 2K)  +  2P Σ_i&lt;j x_i x_j  +  P K²
+                    └─── diagonal ───┘     └ off-diagonal ┘     └ constant ┘</code></pre>
           </div>
 
           <p>

@@ -2,6 +2,7 @@
 title = "Not found"
 description = "That page does not exist."
 active = "none"
+root_relative = true
 +++
     <section class="pagehead pagehead--center">
       <div class="grid-bg" aria-hidden="true"></div>
@@ -13,9 +14,9 @@ active = "none"
           The link is wrong, or something moved. Neither is your fault.
         </p>
         <div class="btnrow">
-          <a class="btn btn--primary" href="index.html">Home</a>
-          <a class="btn btn--ghost" href="blog.html">Writing</a>
-          <a class="btn btn--ghost" href="projects.html">Research</a>
+          <a class="btn btn--primary" href="{{rel}}index.html">Home</a>
+          <a class="btn btn--ghost" href="{{rel}}blog.html">Writing</a>
+          <a class="btn btn--ghost" href="{{rel}}projects.html">Research</a>
         </div>
       </div>
     </section>

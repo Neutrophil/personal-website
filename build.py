@@ -22,10 +22,12 @@ import html
 import re
 import sys
 import tomllib
+from collections import Counter
 from dataclasses import dataclass, field
 from datetime import date, datetime, timezone
 from html.parser import HTMLParser
 from pathlib import Path
+from urllib.parse import urlparse
 
 ROOT = Path(__file__).resolve().parent
 SRC = ROOT / "src"
@@ -380,22 +382,32 @@ def build(check: bool = False) -> list[Path]:
     written: list[Path] = []
 
     # --- standalone pages ---------------------------------------------------
-    for path in sorted(PAGES.glob("*.html")):
+    for path in sorted(PAGES.rglob("*.html")):
         doc = parse_doc(path)
-        out = ROOT / f"{doc.slug}.html"
-        ctx = base_context(site, rel="")
+        rel_out = path.relative_to(PAGES)
+        out = ROOT / rel_out
+        out.parent.mkdir(parents=True, exist_ok=True)
+        rel = "../" * (len(rel_out.parts) - 1)
+        # The 404 page is served at whatever URL was missed, so a relative path
+        # would resolve against /posts/ or wherever the visitor was. Root it.
+        if doc.meta.get("root_relative"):
+            rel = urlparse(site["url"]).path.rstrip("/") + "/"
+        url_path = rel_out.as_posix().removesuffix("index.html")
+        ctx = base_context(site, rel=rel)
         ctx.update(
             title=doc.meta.get("page_title") or f"{doc.meta['title']} — {site['author']}",
             description=doc.meta.get("description", site["description"]),
             og_type=doc.meta.get("og_type", "website"),
             og_title=doc.meta.get("og_title", doc.meta["title"]),
             og_description=doc.meta.get("og_description", doc.meta.get("description", site["description"])),
-            og_url=f"{site['url']}/" if doc.slug == "index" else f"{site['url']}/{doc.slug}.html",
+            og_url=f"{site['url']}/{url_path}",
             body_class=doc.meta.get("body_class", f"page-{doc.slug}"),
             active=doc.meta.get("active", f"{doc.slug}.html"),
-            latest_posts=latest_posts_html(posts, rel=""),
+            latest_posts=latest_posts_html(posts, rel=rel),
             post_count=str(len(posts)),
         )
+        if out in written:
+            raise BuildError(f"{_rel(path)}: writes {_rel(out)}, which another source already wrote")
         out.write_text(render_page(site, template, ctx, doc.body), encoding="utf-8")
         written.append(out)
 
@@ -507,11 +519,17 @@ class LinkCollector(HTMLParser):
     def __init__(self) -> None:
         super().__init__()
         self.refs: list[str] = []
+        self.ids: list[str] = []
+        self.classes: set[str] = set()
 
     def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
         for name, value in attrs:
             if name in ("href", "src") and value:
                 self.refs.append(value)
+            elif name == "id" and value:
+                self.ids.append(value)
+            elif name == "class" and value:
+                self.classes.update(value.split())
 
 
 def _hex_to_rgb(value: str) -> tuple[float, float, float]:
@@ -560,6 +578,30 @@ CONTRAST_RULES = [
 # supported viewport. Below this the figure is decoration, not information.
 MIN_DIAGRAM_LABEL_PX = 10.0
 MIN_CONTROL_PX = 24  # WCAG 2.2 pointer-target minimum
+
+# What must never be published, however it got into a page. The workspace guard
+# cannot see these here: `.privacy-guard-allow` turns its contact rule off so the
+# owner's address can appear, and the phone pattern lives inside that rule.
+PHONE_RES = (
+    re.compile(r"(?<![\w])\+(?:65[ -]?\d{4}[ -]?\d{4}|86[ -]?1\d{2}[ -]?\d{4}[ -]?\d{4}|\d{9,15})(?![\w])"),
+    re.compile(r"(?<![\w.+/-])[689]\d{3}[ -]?\d{4}(?![\w.-])"),     # bare Singapore number
+    re.compile(r"(?<![\w.+/-])1[3-9]\d[ -]?\d{4}[ -]?\d{4}(?![\w.-])"),  # bare mainland mobile
+)
+EMAIL_RE = re.compile(r"[\w.+-]+@[\w-]+(?:\.[\w-]+)+")
+# Classes that only exist at runtime, added by the inline head script or main.js.
+RUNTIME_CLASS_RE = re.compile(r"^(?:js|no-js|reveal-on|is-[a-z-]+|page-[a-z0-9-]+)$")
+
+
+def unused_css_classes(css: str, used: set[str]) -> list[str]:
+    """Class selectors in the stylesheet that nothing renders.
+
+    Comments, url()s and strings go first: `jetbrains-mono-regular.woff2` is not
+    a class called `woff2`.
+    """
+    css = re.sub(r"/\*.*?\*/", "", css, flags=re.S)
+    css = re.sub(r"url\([^)]*\)|\"[^\"]*\"|'[^']*'", "", css)
+    declared = set(re.findall(r"\.([a-zA-Z_][\w-]*)", css))
+    return sorted(c for c in declared if c not in used and not RUNTIME_CLASS_RE.match(c))
 
 
 def diagram_label_sizes(css: str, svg_dir: Path) -> list[tuple[str, float]]:
@@ -650,18 +692,35 @@ def run_checks(site: dict, written: list[Path], posts: list[Post]) -> None:
         for match in TOKEN_RE.finditer(path.read_text(encoding="utf-8")):
             problems.append(f"{_rel(path)}: unresolved template token {match.group(0)}")
 
-    # 2. every local link resolves to a file that exists
+    # 2. every local link resolves to a file that exists, and every #fragment
+    #    to an id on its target page. Moving a section used to break inbound
+    #    links silently: the file was still there, so the old gate was happy.
+    pages: dict[Path, LinkCollector] = {}
     for path in written:
-        if path.suffix != ".html":
-            continue
-        collector = LinkCollector()
-        collector.feed(path.read_text(encoding="utf-8"))
+        if path.suffix == ".html":
+            pages[path.resolve()] = collector = LinkCollector()
+            collector.feed(path.read_text(encoding="utf-8"))
+            for dup, n in Counter(collector.ids).items():
+                if n > 1:
+                    problems.append(f"{_rel(path)}: id {dup!r} appears {n} times")
+    site_path = urlparse(site["url"]).path.rstrip("/")
+    for path, collector in pages.items():
         for ref in collector.refs:
-            if ref.startswith(("http://", "https://", "mailto:", "#", "data:", "//")):
+            if ref.startswith(("http://", "https://", "mailto:", "data:", "//")):
                 continue
-            target = (path.parent / ref.split("#", 1)[0].split("?", 1)[0]).resolve()
+            file_part, _, frag = ref.partition("#")
+            file_part = file_part.split("?", 1)[0]
+            if file_part.startswith("/"):
+                file_part = file_part.removeprefix(site_path).lstrip("/") or "index.html"
+                target = (ROOT / file_part).resolve()
+            else:
+                target = (path.parent / file_part).resolve() if file_part else path
+            if target.is_dir():
+                target = target / "index.html"
             if not target.exists():
                 problems.append(f"{_rel(path)}: dead link → {ref}")
+            elif frag and target in pages and frag not in pages[target].ids:
+                problems.append(f"{_rel(path)}: link {ref} has no id {frag!r} to land on")
 
     # 3. the feed is well-formed and every link is absolute
     import xml.etree.ElementTree as ET
@@ -769,15 +828,63 @@ def run_checks(site: dict, written: list[Path], posts: list[Post]) -> None:
             if sets_display and f".{cls}[hidden]" not in css_text:
                 problems.append(f"{_rel(path)}: .{cls} ships hidden but its display rule overrides [hidden]")
 
+    # 12. no class selector outlives the markup it styled
+    used = set().union(*(c.classes for c in pages.values()))
+    used |= set(re.findall(r"classList\.(?:add|remove|toggle|contains)\('([\w-]+)'", js_text))
+    used |= {c for v in re.findall(r"className\s*=\s*'([^']+)'", js_text) for c in v.split()}
+    # The post template is the catalogue of components a post may use, so what it
+    # shows is in use even before a published post needs it.
+    template = LinkCollector()
+    template.feed((POSTS_SRC / "_TEMPLATE.html").read_text(encoding="utf-8"))
+    used |= template.classes
+    for cls in unused_css_classes(css_text, used):
+        problems.append(f"css: .{cls} matches nothing on any page — delete it or use it")
+
+    # 13. nothing private reaches a page: no phone number in any shape, and no
+    #     address but the owner's own
+    for path in pages:
+        text = re.sub(r"<[^>]+>", " ", path.read_text(encoding="utf-8"))
+        for pattern in PHONE_RES:
+            for m in pattern.finditer(text):
+                problems.append(f"{_rel(path)}: looks like a phone number ({len(m.group())} chars) — never publish one")
+        for m in EMAIL_RE.finditer(path.read_text(encoding="utf-8")):
+            if m.group().lower() != site["email"].lower():
+                problems.append(f"{_rel(path)}: email address other than the site's own")
+
     if problems:
         print(f"\n✗ {len(problems)} problem(s):", file=sys.stderr)
         for problem in problems:
             print(f"  {problem}", file=sys.stderr)
         raise SystemExit(1)
-    print("✓ checks passed — tokens, links, feed, contrast, diagrams, no-JS, controls, frontmatter")
+    print("✓ checks passed — tokens, links, fragments, feed, contrast, diagrams, no-JS, controls, "
+          "frontmatter, unused CSS, private data")
 
 
 # --------------------------------------------------------------------------
+
+def _not_found_handler():
+    import http.server
+
+    class Handler(http.server.SimpleHTTPRequestHandler):
+        """Answer a miss with 404.html, the way GitHub Pages does."""
+
+        def send_error(self, code, message=None, explain=None):
+            page = ROOT / "404.html"
+            if code != 404 or not page.is_file():
+                return super().send_error(code, message, explain)
+            body = page.read_bytes()
+            self.send_response(404)
+            self.send_header("Content-Type", "text/html; charset=utf-8")
+            self.send_header("Content-Length", str(len(body)))
+            self.end_headers()
+            if self.command != "HEAD":
+                self.wfile.write(body)
+
+        def log_message(self, *args):  # noqa: D102 - keep the terminal quiet
+            pass
+
+    return Handler
+
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
@@ -795,7 +902,7 @@ def main() -> None:
         import functools
         import http.server
 
-        handler = functools.partial(http.server.SimpleHTTPRequestHandler, directory=str(ROOT))
+        handler = functools.partial(_not_found_handler(), directory=str(ROOT))
         # Loopback only. This serves the repo root, which also holds .git, the
         # raw CV sources and the gitignored working notes — none of which should
         # be reachable from the LAN just to preview a page.

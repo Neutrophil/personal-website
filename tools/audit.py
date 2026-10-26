@@ -15,6 +15,7 @@ Exits non-zero on any failure, so it can gate a commit the same way --check does
 
 from __future__ import annotations
 
+import functools
 import http.server
 import json
 import re
@@ -24,6 +25,9 @@ import threading
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(ROOT))
+from build import _not_found_handler  # noqa: E402 - serve misses the way Pages does
+
 PORT = 8912
 
 PAGES = {
@@ -32,6 +36,9 @@ PAGES = {
     "writing": "blog.html",
     "404": "404.html",
     "post": "posts/2026-08-13-qubo-portfolio-selection.html",
+    "post-guard": "posts/2026-08-13-a-scanner-for-my-own-repos.html",
+    "post-currency": "posts/2026-08-13-currency-is-a-data-model.html",
+    "post-backtest": "posts/2026-08-13-every-backtest-number-was-wrong.html",
 }
 
 # Text that carries meaning and must survive compositing, opacity and small size.
@@ -98,11 +105,29 @@ JS_CONTRAST = r"""(sels) => {
 
 JS_PAGE = r"""() => {
   const vw = document.documentElement.clientWidth;
-  const diagrams = [...document.querySelectorAll('.diagram svg')].map(svg => {
+  /* Only the variant on screen: a figure may carry a wide and a tall drawing,
+     and the hidden one measures 0px wide. */
+  const shown = [...document.querySelectorAll('.diagram svg')].filter(svg => svg.getClientRects().length > 0);
+  const diagrams = shown.map(svg => {
     const vb = svg.viewBox.baseVal;
     const scale = svg.getBoundingClientRect().width / (vb.width || 1);
     const sizes = [...svg.querySelectorAll('text')].map(t => parseFloat(getComputedStyle(t).fontSize) * scale);
-    return {viewBox: vb.width, scale: +scale.toFixed(2), smallest: sizes.length ? +Math.min(...sizes).toFixed(1) : null};
+    /* A label belongs to the smallest box drawn around its anchor point, and must
+       fit inside it. Labels standing in open space are annotations: exempt. */
+    const rects = [...svg.querySelectorAll('rect')].map(r => r.getBBox()).filter(b => b.width > 30 && b.height > 18);
+    const overflow = [];
+    svg.querySelectorAll('text').forEach(t => {
+      const b = t.getBBox();
+      const ax = t.x.baseVal.length ? t.x.baseVal[0].value : b.x;
+      const ay = t.y.baseVal.length ? t.y.baseVal[0].value : b.y + b.height;
+      const box = rects.filter(r => ax >= r.x && ax <= r.x + r.width && ay >= r.y && ay <= r.y + r.height)
+                       .sort((a, c) => a.width * a.height - c.width * c.height)[0];
+      if (!box) return;
+      const over = Math.max(box.x + 3 - b.x, b.x + b.width - (box.x + box.width - 3));
+      if (over > 0.5) overflow.push(`"${t.textContent.trim().slice(0, 40)}" by ${over.toFixed(1)} units`);
+    });
+    return {viewBox: vb.width, scale: +scale.toFixed(2), smallest: sizes.length ? +Math.min(...sizes).toFixed(1) : null,
+            overflow, clipped: Math.max(0, Math.round(svg.parentElement.scrollWidth - svg.parentElement.clientWidth))};
   });
   /* WCAG 2.2 exempts a target that sits inside a sentence, which is most of the
      links in prose and in the footer row. Those are reported as advice, not as
@@ -129,12 +154,7 @@ JS_PAGE = r"""() => {
 }"""
 
 
-class _Quiet(http.server.SimpleHTTPRequestHandler):
-    def __init__(self, *a, **kw):
-        super().__init__(*a, directory=str(ROOT), **kw)
-
-    def log_message(self, *a):
-        pass
+_Quiet = functools.partial(_not_found_handler(), directory=str(ROOT))
 
 
 def main() -> int:
@@ -164,6 +184,7 @@ def main() -> int:
                     page = ctx.new_page()
                     for name, path in PAGES.items():
                         page.goto(base + path, wait_until="networkidle")
+                        page.evaluate("() => document.fonts.ready")
                         where = f"{name}/{theme}/{width}"
 
                         for row in page.evaluate(JS_CONTRAST, TEXT_SELECTORS):
@@ -189,6 +210,8 @@ def main() -> int:
                                     f"{where}: diagram label renders at {d['smallest']}px "
                                     f"(viewBox {d['viewBox']:.0f} at {d['scale']} scale)"
                                 )
+                            for o in d["overflow"]:
+                                problems.append(f"{where}: diagram label overflows its box — {o}")
                         for t in facts["targets"]:
                             if t["h"] >= MIN_TARGET_PX and t["w"] >= MIN_TARGET_PX:
                                 continue
@@ -203,6 +226,52 @@ def main() -> int:
                                 )
                         notes.append(f"{where}: {facts['docHeight']}px tall")
                     ctx.close()
+
+            # The nav stays on screen however far down the page is, menu open or not.
+            # A body overflow once made the body its own scroller, and the sticky
+            # nav rode off the top of every page while every other gate passed.
+            for width in (1440, 390):
+                ctx = browser.new_context(viewport={"width": width, "height": 844})
+                page = ctx.new_page()
+                page.goto(base + "projects.html", wait_until="networkidle")
+                states = [("closed", None)]
+                if width < 760:
+                    states.append(("open", "#nav-burger"))
+                for state, click in states:
+                    if click:
+                        page.evaluate("() => window.scrollTo({top: 0, behavior: 'instant'})")
+                        page.click(click)
+                    page.evaluate("() => window.scrollTo({top: 3000, behavior: 'instant'})")
+                    page.wait_for_timeout(150)
+                    top = page.evaluate("() => [window.scrollY, document.querySelector('.nav').getBoundingClientRect().top]")
+                    if click:
+                        continue  # the open menu holds the page still; scrollY stays 0
+                    if top[0] < 2000 or abs(top[1]) > 1:
+                        problems.append(f"sticky nav/{width}: after scrolling to {top[0]}px the nav sits at {top[1]}px")
+                ctx.close()
+
+            # A miss anywhere serves the 404 page, and it must still be styled and
+            # its links must still lead somewhere from a nested URL.
+            ctx = browser.new_context(viewport={"width": 1440, "height": 900})
+            page = ctx.new_page()
+            resp = page.goto(base + "posts/no-such-post.html", wait_until="networkidle")
+            if resp is None or resp.status != 404:
+                problems.append(f"404: a missing URL answered {resp and resp.status}, not 404")
+            styled = page.evaluate(
+                "()=>({font: document.fonts.check('16px \"JetBrains Mono\"'),"
+                " bg: getComputedStyle(document.body).backgroundColor,"
+                " links: [...document.querySelectorAll('main a, .nav a')].map(a => a.href),"
+                " foot: document.querySelector('.footer').getBoundingClientRect().bottom,"
+                " vh: window.innerHeight})"
+            )
+            if styled["bg"] in ("rgba(0, 0, 0, 0)", "rgb(255, 255, 255)"):
+                problems.append("404 at a nested URL: the stylesheet did not load")
+            for href in styled["links"]:
+                if href.startswith(base) and page.request.get(href).status != 200:
+                    problems.append(f"404 at a nested URL: link {href} is dead")
+            if styled["foot"] < styled["vh"] - 1:
+                problems.append(f"404: the footer stops {styled['vh'] - styled['foot']:.0f}px above the bottom of the window")
+            ctx.close()
 
             # The page must survive its own JavaScript going missing.
             ctx = browser.new_context(viewport={"width": 1440, "height": 900})
@@ -276,7 +345,8 @@ def main() -> int:
         for problem in problems:
             print(f"  {problem}", file=sys.stderr)
         return 1
-    print("\n✓ audit passed — contrast, targets, diagrams, scroll cues, print, no-JS")
+    print("\n✓ audit passed — contrast, targets, diagrams, label fit, scroll cues, sticky nav, "
+          "404, print, no-JS")
     return 0
 
 

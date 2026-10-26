@@ -56,6 +56,7 @@
   --glow-soft: 0 0 22px rgb(34 211 238 / 0.10);
   --shadow: 0 1px 2px rgb(0 0 0 / 0.4), 0 12px 34px rgb(0 0 0 / 0.34);
   --aurora-strength: 0.55;
+  --scrim: rgb(0 0 0 / 0.55);
   --code-bg: #07080c;
 
   color-scheme: dark;
@@ -82,6 +83,7 @@
   --glow-soft: 0 0 18px rgb(14 116 144 / 0.07);
   --shadow: 0 1px 2px rgb(16 36 62 / 0.05), 0 10px 30px rgb(16 36 62 / 0.08);
   --aurora-strength: 0.34;
+  --scrim: rgb(13 17 23 / 0.35);
   --code-bg: #f6f8fb;
 
   color-scheme: light;
@@ -122,6 +124,8 @@
   --z-overlay: 90;
 
   --nav-h: 66px;
+  /* The date/kind column every dated list shares, so their text starts on one edge. */
+  --meta-col: 7.5rem;
   --control: 38px;
 
   --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial,
@@ -149,8 +153,16 @@ body {
   background: var(--bg);
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
-  overflow-x: hidden;
+  /* No overflow-x here. With html already clipping, a body overflow turns the
+     body into its own scroll box, and the sticky nav then sticks to a box that
+     never scrolls — it rode off the top of every page. html clips instead.
+     The flex column keeps the footer at the bottom of a short page. */
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
 }
+#main { flex: 1 0 auto; }
 
 h1, h2, h3, h4 {
   color: var(--text);
@@ -504,7 +516,6 @@ em { color: var(--text); }
   letter-spacing: 0.02em;
 }
 .section__lede { max-width: 64ch; margin: var(--space-3) 0 0; }
-.section__hint { color: var(--text-faint); }
 .section__foot { margin: var(--space-4) 0 0; }
 
 /* ---------- Page headers (blog, builds, 404) ---------- */
@@ -521,12 +532,7 @@ em { color: var(--text); }
 .pagehead__lede { max-width: 62ch; font-size: var(--step-1); margin: 0; }
 .pagehead--center .pagehead__lede { margin: 0 auto; }
 
-/* ---------- About ---------- */
-.about { display: block; }
-.about__body { max-width: 68ch; }
-
-/* Scoped to .about so it outranks .card / .card--tick, which also set position. */
-.about .facts { position: sticky; top: calc(var(--nav-h) + 26px); padding: var(--space-4); }
+/* ---------- At a glance ---------- */
 .facts__title {
   font-size: var(--step--1);
   color: var(--text-faint);
@@ -540,7 +546,6 @@ em { color: var(--text); }
 /* ---------- Cards ---------- */
 .cards { display: grid; gap: var(--space-3); }
 .cards--2 { grid-template-columns: repeat(2, 1fr); }
-.cards--3 { grid-template-columns: repeat(3, 1fr); }
 
 .card {
   position: relative;
@@ -604,7 +609,7 @@ a.card:hover {
 .timeline { list-style: none; margin: 0; padding: 0; }
 .timeline__item {
   display: grid;
-  grid-template-columns: 118px 1fr;
+  grid-template-columns: var(--meta-col) 1fr;
   gap: var(--space-4);
   padding-bottom: var(--space-5);
   position: relative;
@@ -612,7 +617,8 @@ a.card:hover {
 .timeline__item::before {
   content: "";
   position: absolute;
-  left: 125px; top: 0.6rem; bottom: -0.3rem;
+  /* on the dot's centre: the dot is 9px wide and starts 6px left of the body */
+  left: calc(var(--meta-col) + var(--space-4) - 2px); top: 0.6rem; bottom: -0.3rem;
   width: 1px;
   background: linear-gradient(180deg, var(--border-lit), var(--border));
 }
@@ -645,7 +651,7 @@ a.card:hover {
 .pindex { border-top: 1px solid var(--border); }
 .pindex__row {
   display: grid;
-  grid-template-columns: 7.5rem 1fr auto 1.1rem;
+  grid-template-columns: calc(var(--meta-col) + 2 * var(--space-4) - var(--space-3)) 1fr auto 1.1rem;
   gap: var(--space-3);
   align-items: baseline;
   padding: 0.95rem 0.5rem 0.95rem 0;
@@ -683,8 +689,8 @@ a.card:hover {
 .pubs { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--border); }
 .pub {
   display: grid;
-  grid-template-columns: 4.5rem 1fr;
-  gap: var(--space-3);
+  grid-template-columns: var(--meta-col) 1fr;
+  gap: calc(2 * var(--space-4));
   padding: 0.85rem 0;
   border-bottom: 1px solid var(--border);
 }
@@ -744,10 +750,11 @@ a.card:hover {
 .timeline__tags { margin-top: 0.75rem; }
 
 .edu { display: grid; gap: var(--space-3); }
-.edu__row { display: grid; grid-template-columns: 118px 1fr; gap: var(--space-4); }
+.edu__row { display: grid; grid-template-columns: var(--meta-col) 1fr; gap: var(--space-4); }
+.edu__row > :last-child { padding-left: var(--space-4); }
 .edu__date { font-family: var(--mono); font-size: var(--step--1); color: var(--text-faint); padding-top: 0.15rem; }
 .edu__title { font-weight: 600; color: var(--text); margin: 0; }
-.edu__org { font-family: var(--mono); font-size: var(--step--1); color: var(--text-soft); margin: 0.1rem 0 0.3rem; }
+.edu__org { font-family: var(--mono); font-size: var(--step--1); color: var(--text); margin: 0.1rem 0 0.3rem; }
 .edu__note { margin: 0; color: var(--text-soft); font-size: 0.95rem; }
 
 .checklist { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.6rem; }
@@ -762,10 +769,11 @@ a.card:hover {
 .checklist strong { color: var(--text); }
 
 .talks { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--border); }
+.subhead + .talks { border-top: 0; }
 .talk {
   display: grid;
-  grid-template-columns: 7.5rem 1fr;
-  gap: var(--space-3);
+  grid-template-columns: var(--meta-col) 1fr;
+  gap: calc(2 * var(--space-4));
   padding: 0.75rem 0;
   border-bottom: 1px solid var(--border);
 }
@@ -850,7 +858,7 @@ a.card:hover {
   transition: color var(--dur-fast) var(--ease), border-color var(--dur-fast) var(--ease),
               background-color var(--dur-fast) var(--ease);
 }
-.chip:hover { color: var(--text); border-color: var(--border-lit); }
+.chip:hover { color: var(--text); border-color: var(--accent); }
 .chip.is-on {
   color: var(--on-accent);
   background: var(--accent);
@@ -1083,11 +1091,16 @@ a.card:hover {
   transition: color var(--dur-fast) var(--ease), border-color var(--dur-fast) var(--ease);
 }
 .codeblock__copy:hover { color: var(--accent); border-color: var(--accent); }
-.codeblock pre { margin: 0; padding: var(--space-3); overflow-x: auto; }
+/* Size the pre, not just the code: an inline <code> at 0.83rem inside a block
+   with the body's 17px/1.65 strut put every line on a 28px pitch. */
+.codeblock pre {
+  margin: 0; padding: var(--space-3); overflow-x: auto;
+  font-family: var(--mono); font-size: 0.83rem; line-height: 1.6;
+}
 .codeblock code {
   font-family: var(--mono);
-  font-size: 0.83rem;
-  line-height: 1.7;
+  font-size: inherit;
+  line-height: inherit;
   color: var(--text-soft);
   background: none;
   border: 0;
@@ -1256,6 +1269,7 @@ a.card:hover {
   margin: 0 0 var(--space-4);
   max-width: 78ch;
 }
+.section__head .groupnote { margin: var(--space-4) 0 0; }
 
 /* ---------- Motion ----------
    `.reveal-on` is added by js/main.js as its very first action — NOT by the
@@ -1284,7 +1298,6 @@ a.card:hover {
 
 /* ---------- Responsive ---------- */
 @media (max-width: 900px) {
-  .cards--3 { grid-template-columns: repeat(2, 1fr); }
   .footer__inner { grid-template-columns: 1fr 1fr; }
   .footer__end { grid-column: 1 / -1; text-align: left; }
 }
@@ -1318,7 +1331,10 @@ a.card:hover {
     pointer-events: auto;
     transition-delay: 0s;
     /* a scrim, drawn as a spread shadow so it needs no extra element */
-    box-shadow: var(--shadow), 0 0 0 100vh color-mix(in srgb, #000 55%, transparent);
+    box-shadow: var(--shadow), 0 0 0 100vh var(--scrim);
+    /* ...cut off at the panel's top edge, so it dims the page, not the bar
+       holding the close button */
+    clip-path: inset(0 -100vw -100vh -100vw);
   }
 
   /* Without scripting the burger cannot open anything, so show the nav inline. */
@@ -1342,13 +1358,12 @@ a.card:hover {
   .nav__name { display: none; }
   .nav__burger { display: flex; }
 
-  .about .facts { position: static; }
   .hero__inner { grid-template-columns: 1fr; }
   .metrics { grid-template-columns: 1fr 1fr; gap: var(--space-3) var(--space-4); }
   .pub { grid-template-columns: 1fr; gap: 0.2rem; }
   .pillars { grid-template-columns: 1fr; }
   .edu__row, .talk { grid-template-columns: 1fr; gap: 0.2rem; }
-  .cards--2, .cards--3 { grid-template-columns: 1fr; }
+  .cards--2 { grid-template-columns: 1fr; }
   .contact { grid-template-columns: 1fr; }
   .postnav { grid-template-columns: 1fr; }
   .postnav__link--next { text-align: left; }
@@ -1408,7 +1423,7 @@ a.card:hover {
   /* A topic filter on screen must not silently drop papers from the printout. */
   .pub[hidden] { display: grid !important; }
   #pub-empty { display: none !important; }
-  body { background: #fff; color: #000; font-size: 11pt; }
+  body { background: #fff; color: #000; font-size: 11pt; display: block; min-height: 0; }
   .section--alt { background: none; }
   a { color: #000; text-decoration: underline; }
   .card, .postcard, .contact__link { border: 1px solid #ccc; box-shadow: none; }

@@ -16,12 +16,16 @@ and friends. They ship inside the conda env, which is what the env var points at
 from __future__ import annotations
 
 import argparse
+import functools
 import http.server
+import sys
 import os
 import threading
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(ROOT))
+from build import _not_found_handler  # noqa: E402 - serve misses the way Pages does
 PORT = 8911
 
 PAGES = {
@@ -31,17 +35,15 @@ PAGES = {
     "404": "404.html",
     "post-qubo": "posts/2026-08-13-qubo-portfolio-selection.html",
     "post-streamlit": "posts/2026-08-13-sixty-streamlit-pages.html",
+    "post-guard": "posts/2026-08-13-a-scanner-for-my-own-repos.html",
+    "post-currency": "posts/2026-08-13-currency-is-a-data-model.html",
+    "post-backtest": "posts/2026-08-13-every-backtest-number-was-wrong.html",
 }
 VIEWPORTS = {"desktop": (1440, 900), "mobile": (390, 844)}
 STRIP = {"desktop": 900, "mobile": 1000}
 
 
-class _Quiet(http.server.SimpleHTTPRequestHandler):
-    def __init__(self, *a, **kw):
-        super().__init__(*a, directory=str(ROOT), **kw)
-
-    def log_message(self, *a):  # noqa: D102 - silence the request log
-        pass
+_Quiet = functools.partial(_not_found_handler(), directory=str(ROOT))
 
 
 def serve(port: int = PORT) -> http.server.ThreadingHTTPServer:

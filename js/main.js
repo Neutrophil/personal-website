@@ -43,7 +43,7 @@
     if (!links) return;
     links.classList.toggle('is-open', open);
     /* Hold the page still while the overlay is up. */
-    document.body.style.overflow = open ? 'hidden' : '';
+    root.style.overflow = open ? 'hidden' : '';
     if (burger) {
       burger.setAttribute('aria-expanded', open ? 'true' : 'false');
       burger.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
