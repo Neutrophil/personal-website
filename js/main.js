@@ -129,15 +129,20 @@
     spied.forEach(function (pair) { spy.observe(pair.section); });
   }
 
-  /* ---- Contents list: folded on a phone, so the first paragraph is on the
-   * first screen. It ships open; a reader without this script keeps it so. */
-  if (window.matchMedia('(max-width: 760px)').matches) {
-    Array.prototype.forEach.call(document.querySelectorAll('.toc__fold'), function (d) { d.open = false; });
+  /* ---- Folds: a post's contents list and the build cards' spec tables are
+   * shut on a phone, so the prose leads. They ship open; a reader without this
+   * script keeps them so. Widening reopens them: the spec has no toggle there. */
+  var folds = document.querySelectorAll('.toc__fold, .spec__fold');
+  var foldMq = window.matchMedia('(max-width: 760px)');
+  function setFolds(open) {
+    Array.prototype.forEach.call(folds, function (d) { d.open = open; });
   }
+  var onFoldWide = function (m) { if (!m.matches) setFolds(true); };
+  if (foldMq.matches) setFolds(false);
+  if (foldMq.addEventListener) foldMq.addEventListener('change', onFoldWide);
+  else if (foldMq.addListener) foldMq.addListener(onFoldWide);
   /* A closed <details> prints closed, and CSS cannot open it. */
-  window.addEventListener('beforeprint', function () {
-    Array.prototype.forEach.call(document.querySelectorAll('.toc__fold'), function (d) { d.open = true; });
-  });
+  window.addEventListener('beforeprint', function () { setFolds(true); });
 
   /* ---- Jump bar: mark the section in view. Visual only — the nav's own
    * aria-current already names the page, and a page has one of those. */

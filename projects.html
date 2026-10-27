@@ -264,12 +264,13 @@
                 It teaches the field from zero across twelve levels: computing → biology → statistics → ML → deep learning → genomics → single-cell and spatial → proteins → proteomics → multi-omics → medicine → drug discovery. Twenty labs include sequence alignment, FDR, data leakage, a trained 1D-CNN, in-silico mutagenesis, a single-cell pipeline, co-evolution contacts and survival analysis.
               </p>
             </div>
-            <div class="spec">
+            <details class="spec spec__fold" open>
+              <summary class="spec__sum">Spec</summary>
               <div class="spec__row"><span class="spec__k">stack</span><span class="spec__v">Python · numpy · Streamlit · SQLite</span></div>
               <div class="spec__row"><span class="spec__k">content</span><span class="spec__v">12 levels · 53 lessons · 20 labs</span></div>
               <div class="spec__row"><span class="spec__k">feed</span><span class="spec__v">Europe PMC · arXiv · bioRxiv, button-only, cached</span></div>
               <div class="spec__row"><span class="spec__k">tests</span><span class="spec__v">462, offline</span></div>
-            </div>
+            </details>
           </article>
           <article class="card card--tick build reveal" id="learn-ai">
             <div class="build__head">
@@ -284,11 +285,12 @@
                 Four labs and the lessons’ try-it blocks can call a live model, but only on a button press, only with a key present, and only after a privacy check on the payload; without one they fall back to offline.
               </p>
             </div>
-            <div class="spec">
+            <details class="spec spec__fold" open>
+              <summary class="spec__sum">Spec</summary>
               <div class="spec__row"><span class="spec__k">stack</span><span class="spec__v">Python · numpy · Streamlit · SQLite</span></div>
               <div class="spec__row"><span class="spec__k">content</span><span class="spec__v">10 levels · 57 lessons · 21 labs</span></div>
               <div class="spec__row"><span class="spec__k">tests</span><span class="spec__v">345, offline</span></div>
-            </div>
+            </details>
           </article>
           <article class="card card--tick build reveal" id="agents">
             <div class="build__head">
@@ -300,12 +302,13 @@
                 A course for using Claude Code and Cowork as an AI-native collaborator: from a first session through configuration, hooks, skills, subagents, MCP and headless automation to running a project from zero to done. Each lesson pairs a short read with a mission run in a separate practice repository; the dashboard then checks what was built, offline, without ever calling a model.
               </p>
             </div>
-            <div class="spec">
+            <details class="spec spec__fold" open>
+              <summary class="spec__sum">Spec</summary>
               <div class="spec__row"><span class="spec__k">stack</span><span class="spec__v">Python · Streamlit · SQLite</span></div>
               <div class="spec__row"><span class="spec__k">content</span><span class="spec__v">12 modules · 55 lessons · 28 missions · 5 simulators</span></div>
               <div class="spec__row"><span class="spec__k">checks</span><span class="spec__v">19 practice-repo checks with a passing reference</span></div>
               <div class="spec__row"><span class="spec__k">tests</span><span class="spec__v">257, offline</span></div>
-            </div>
+            </details>
           </article>
         </div>
       </div>
@@ -318,10 +321,8 @@
           <h2 class="section__title"><span class="section__num">// 04</span> Engineering practice</h2>
           <p class="section__lede">
             Five more systems I built and still run, outside life science on purpose: they are
-            where I practise engineering without a deadline. They share one architecture: pure,
-            injectable domain logic with no UI imports; a single layer allowed to touch the
-            network; every network call cached and degrading to stale rather than crashing; and
-            a test suite that runs with the network unplugged.
+            where I practise engineering without a deadline. All five share one architecture,
+            drawn at the <a href="#how">end of this section</a>.
           </p>
           <p class="groupnote">
             These repositories are private and stay private — they hold a real household's
@@ -348,13 +349,14 @@
                 master/sub RNG so two runs are bit-identical.
               </p>
             </div>
-            <div class="spec">
+            <details class="spec spec__fold" open>
+              <summary class="spec__sum">Spec</summary>
               <div class="spec__row"><span class="spec__k">stack</span><span class="spec__v">Python · numpy · Streamlit · SQLite</span></div>
               <div class="spec__row"><span class="spec__k">scale</span><span class="spec__v">~21,000 lines · 41 pages</span></div>
               <div class="spec__row"><span class="spec__k">content</span><span class="spec__v">9 levels · 54 lessons · 16 labs · 87 exercises</span></div>
               <div class="spec__row"><span class="spec__k">tests</span><span class="spec__v">1,366, offline and seeded</span></div>
               <div class="spec__row"><span class="spec__k">status</span><span class="spec__v">complete</span></div>
-            </div>
+            </details>
             <div class="build__foot">
               <a class="arrowlink" href="posts/2026-08-13-qubo-portfolio-selection.html">How the QUBO is built <span aria-hidden="true">→</span></a>
               <p class="build__note">private repo · research only</p>
@@ -375,13 +377,14 @@
                 A/B runs them all forward in parallel; exactly one champion is promoted by hand.
               </p>
             </div>
-            <div class="spec">
+            <details class="spec spec__fold" open>
+              <summary class="spec__sum">Spec</summary>
               <div class="spec__row"><span class="spec__k">stack</span><span class="spec__v">Python · scikit-learn · pandas · Streamlit</span></div>
               <div class="spec__row"><span class="spec__k">scale</span><span class="spec__v">~17,000 lines · 41 strategies · 4 markets</span></div>
               <div class="spec__row"><span class="spec__k">safety</span><span class="spec__v">paper endpoint enforced · kill switch fails closed</span></div>
               <div class="spec__row"><span class="spec__k">tests</span><span class="spec__v">958, network calls raise by default</span></div>
               <div class="spec__row"><span class="spec__k">status</span><span class="spec__v">running · no champion promoted yet</span></div>
-            </div>
+            </details>
             <div class="build__foot">
               <a class="arrowlink" href="posts/2026-08-13-every-backtest-number-was-wrong.html">The correctness postmortem <span aria-hidden="true">→</span></a>
               <p class="build__note">private repo · paper trading only</p>
@@ -403,13 +406,14 @@
                 change through its middle.
               </p>
             </div>
-            <div class="spec">
+            <details class="spec spec__fold" open>
+              <summary class="spec__sum">Spec</summary>
               <div class="spec__row"><span class="spec__k">stack</span><span class="spec__v">Python · pandas · Streamlit · SQLite</span></div>
               <div class="spec__row"><span class="spec__k">scale</span><span class="spec__v">~22,000 lines</span></div>
               <div class="spec__row"><span class="spec__k">notable</span><span class="spec__v">per-date FX restatement · evidence-ranked classification</span></div>
               <div class="spec__row"><span class="spec__k">tests</span><span class="spec__v">711, fully offline</span></div>
               <div class="spec__row"><span class="spec__k">status</span><span class="spec__v">in daily use, runs as a service</span></div>
-            </div>
+            </details>
             <div class="build__foot">
               <a class="arrowlink" href="posts/2026-08-13-currency-is-a-data-model.html">Why currency is a data model <span aria-hidden="true">→</span></a>
               <p class="build__note">private repo · personal use</p>
@@ -430,13 +434,14 @@
                 because the parser identifies an issuer from the text of the first page.
               </p>
             </div>
-            <div class="spec">
+            <details class="spec spec__fold" open>
+              <summary class="spec__sum">Spec</summary>
               <div class="spec__row"><span class="spec__k">stack</span><span class="spec__v">Python · pdfplumber · pandas · Streamlit</span></div>
               <div class="spec__row"><span class="spec__k">scale</span><span class="spec__v">~10,000 lines</span></div>
               <div class="spec__row"><span class="spec__k">notable</span><span class="spec__v">content-sniffing issuer detection · EN/中文 UI</span></div>
               <div class="spec__row"><span class="spec__k">tests</span><span class="spec__v">~290; the ones needing real data skip without it</span></div>
               <div class="spec__row"><span class="spec__k">status</span><span class="spec__v">in production, runs as a service</span></div>
-            </div>
+            </details>
             <div class="build__foot">
               <a class="arrowlink" href="posts/2026-08-13-sixty-streamlit-pages.html">Streamlit lessons from this and four siblings <span aria-hidden="true">→</span></a>
               <p class="build__note">private repo · personal use</p>
@@ -457,13 +462,14 @@
                 Python is on the box with no environment to set up.
               </p>
             </div>
-            <div class="spec">
+            <details class="spec spec__fold" open>
+              <summary class="spec__sum">Spec</summary>
               <div class="spec__row"><span class="spec__k">stack</span><span class="spec__v">Python stdlib only · git hooks · systemd timer</span></div>
               <div class="spec__row"><span class="spec__k">scale</span><span class="spec__v">~1,400 lines · 6 content rules · 4 enforcement layers</span></div>
               <div class="spec__row"><span class="spec__k">notable</span><span class="spec__v">Luhn + issuer prefix · checksum validation · redacting output</span></div>
               <div class="spec__row"><span class="spec__k">tests</span><span class="spec__v">71, on a fully synthetic corpus</span></div>
               <div class="spec__row"><span class="spec__k">status</span><span class="spec__v">live across every repository on this machine</span></div>
-            </div>
+            </details>
             <div class="build__foot">
               <a class="arrowlink" href="posts/2026-08-13-a-scanner-for-my-own-repos.html">How the scanner is designed <span aria-hidden="true">→</span></a>
               <p class="build__note">local-only tool</p>
